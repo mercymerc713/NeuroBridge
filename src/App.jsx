@@ -89,6 +89,14 @@ const aacCategories = [
       { label: "Loved", emoji: "🥰", speech: "I feel loved" },
       { label: "Frustrated", emoji: "😤", speech: "I feel frustrated" },
       { label: "Proud", emoji: "😊", speech: "I feel proud of myself" },
+      { label: "Nervous", emoji: "😬", speech: "I feel nervous" },
+      { label: "Lonely", emoji: "😞", speech: "I feel lonely" },
+      { label: "Bored", emoji: "😐", speech: "I feel bored" },
+      { label: "Worried", emoji: "😟", speech: "I feel worried" },
+      { label: "Silly", emoji: "🤪", speech: "I feel silly" },
+      { label: "Brave", emoji: "💪", speech: "I feel brave" },
+      { label: "Grateful", emoji: "🙏", speech: "I feel grateful" },
+      { label: "Overwhelmed", emoji: "😩", speech: "I feel overwhelmed" },
     ],
   },
   {
@@ -106,6 +114,12 @@ const aacCategories = [
       { label: "Sleep", emoji: "😴", speech: "I want to sleep" },
       { label: "Outside", emoji: "🌳", speech: "I want to go outside" },
       { label: "Home", emoji: "🏠", speech: "I want to go home" },
+      { label: "Phone", emoji: "📱", speech: "I need my phone" },
+      { label: "Jacket", emoji: "🧥", speech: "I need my jacket" },
+      { label: "Shoes", emoji: "👟", speech: "I need my shoes" },
+      { label: "Charger", emoji: "🔌", speech: "I need a charger" },
+      { label: "Tissue", emoji: "🤧", speech: "I need a tissue" },
+      { label: "Snack", emoji: "🍪", speech: "I want a snack please" },
     ],
   },
   {
@@ -123,6 +137,12 @@ const aacCategories = [
       { label: "More", emoji: "➕", speech: "I want more please" },
       { label: "All Done", emoji: "✨", speech: "I'm all done" },
       { label: "I Don't Know", emoji: "🤷", speech: "I don't know" },
+      { label: "OK", emoji: "👌", speech: "Okay" },
+      { label: "Not Yet", emoji: "⏳", speech: "Not yet" },
+      { label: "Of Course", emoji: "💯", speech: "Of course" },
+      { label: "No Thanks", emoji: "🙅", speech: "No thank you" },
+      { label: "Excuse Me", emoji: "🙇", speech: "Excuse me" },
+      { label: "I Agree", emoji: "🤝", speech: "I agree" },
     ],
   },
   {
@@ -140,6 +160,58 @@ const aacCategories = [
       { label: "Funny", emoji: "😂", speech: "That's funny!" },
       { label: "Come Here", emoji: "🫶", speech: "Come here please" },
       { label: "My Turn", emoji: "☝️", speech: "It's my turn" },
+      { label: "Your Turn", emoji: "👉", speech: "It's your turn" },
+      { label: "Nice To Meet", emoji: "😄", speech: "Nice to meet you" },
+      { label: "How Are You", emoji: "💬", speech: "How are you doing?" },
+      { label: "Miss You", emoji: "💕", speech: "I miss you" },
+      { label: "High Five", emoji: "🖐️", speech: "High five!" },
+      { label: "Great Work", emoji: "🏆", speech: "Great work!" },
+    ],
+  },
+  {
+    id: "questions", label: "Questions", emoji: "❓", color: T.pink, glow: T.pinkGlow,
+    items: [
+      { label: "What", emoji: "❓", speech: "What is that?" },
+      { label: "Where", emoji: "📍", speech: "Where is it?" },
+      { label: "When", emoji: "🕐", speech: "When?" },
+      { label: "Who", emoji: "🧑", speech: "Who is that?" },
+      { label: "Why", emoji: "🤔", speech: "Why?" },
+      { label: "How", emoji: "💭", speech: "How do I do this?" },
+      { label: "How Much", emoji: "💰", speech: "How much does it cost?" },
+      { label: "Can I", emoji: "🙋", speech: "Can I do that?" },
+      { label: "What Time", emoji: "⏰", speech: "What time is it?" },
+      { label: "Where Going", emoji: "🚗", speech: "Where are we going?" },
+      { label: "What's Next", emoji: "➡️", speech: "What are we doing next?" },
+      { label: "Can You Help", emoji: "🤝", speech: "Can you help me?" },
+      { label: "What's Wrong", emoji: "😟", speech: "What's wrong?" },
+      { label: "Are You OK", emoji: "💛", speech: "Are you okay?" },
+      { label: "How Long", emoji: "⏳", speech: "How much longer?" },
+      { label: "Why Not", emoji: "🤷", speech: "Why not?" },
+    ],
+  },
+  {
+    id: "food", label: "Food & Drink", emoji: "🍕", color: T.primary, glow: T.primaryGlow,
+    items: [
+      { label: "Water", emoji: "💧", speech: "water" },
+      { label: "Juice", emoji: "🧃", speech: "juice" },
+      { label: "Milk", emoji: "🥛", speech: "milk" },
+      { label: "Apple", emoji: "🍎", speech: "apple" },
+      { label: "Banana", emoji: "🍌", speech: "banana" },
+      { label: "Pizza", emoji: "🍕", speech: "pizza" },
+      { label: "Chicken", emoji: "🍗", speech: "chicken" },
+      { label: "Rice", emoji: "🍚", speech: "rice" },
+      { label: "Bread", emoji: "🍞", speech: "bread" },
+      { label: "Cheese", emoji: "🧀", speech: "cheese" },
+      { label: "Pasta", emoji: "🍝", speech: "pasta" },
+      { label: "Soup", emoji: "🍲", speech: "soup" },
+      { label: "Cookie", emoji: "🍪", speech: "cookie" },
+      { label: "Ice Cream", emoji: "🍦", speech: "ice cream" },
+      { label: "Cereal", emoji: "🥣", speech: "cereal" },
+      { label: "Sandwich", emoji: "🥪", speech: "sandwich" },
+      { label: "Fries", emoji: "🍟", speech: "french fries" },
+      { label: "Egg", emoji: "🥚", speech: "egg" },
+      { label: "Yogurt", emoji: "🥄", speech: "yogurt" },
+      { label: "Grapes", emoji: "🍇", speech: "grapes" },
     ],
   },
   {
@@ -153,10 +225,18 @@ const aacCategories = [
       { label: "Bedroom", emoji: "🛏️", speech: "I want to go to my room" },
       { label: "Kitchen", emoji: "🍳", speech: "I want to go to the kitchen" },
       { label: "Library", emoji: "📚", speech: "I want to go to the library" },
+      { label: "Bathroom", emoji: "🚿", speech: "I need the bathroom" },
+      { label: "Playground", emoji: "🎡", speech: "I want to go to the playground" },
+      { label: "Restaurant", emoji: "🍽️", speech: "I want to go to a restaurant" },
+      { label: "Beach", emoji: "🏖️", speech: "I want to go to the beach" },
+      { label: "Pool", emoji: "🏊", speech: "I want to go to the pool" },
+      { label: "Church", emoji: "⛪", speech: "I want to go to church" },
+      { label: "Grandma's", emoji: "👵", speech: "I want to go to grandma's house" },
+      { label: "Work", emoji: "🏢", speech: "I need to go to work" },
     ],
   },
   {
-    id: "actions", label: "Actions", emoji: "🏃", color: T.pink, glow: T.pinkGlow,
+    id: "actions", label: "Actions", emoji: "🏃", color: T.blue, glow: T.blueGlow,
     items: [
       { label: "Eat", emoji: "🍽️", speech: "eat" },
       { label: "Drink", emoji: "🥤", speech: "drink" },
@@ -170,10 +250,26 @@ const aacCategories = [
       { label: "Watch", emoji: "👁️", speech: "watch" },
       { label: "Open", emoji: "📂", speech: "open" },
       { label: "Close", emoji: "📁", speech: "close" },
+      { label: "Play", emoji: "🎮", speech: "play" },
+      { label: "Stop", emoji: "✋", speech: "stop" },
+      { label: "Walk", emoji: "🚶", speech: "walk" },
+      { label: "Run", emoji: "🏃", speech: "run" },
+      { label: "Jump", emoji: "🤸", speech: "jump" },
+      { label: "Sleep", emoji: "😴", speech: "sleep" },
+      { label: "Clean", emoji: "🧹", speech: "clean up" },
+      { label: "Give", emoji: "🤲", speech: "give" },
+      { label: "Take", emoji: "🫴", speech: "take" },
+      { label: "Push", emoji: "👐", speech: "push" },
+      { label: "Pull", emoji: "🤏", speech: "pull" },
+      { label: "Turn On", emoji: "💡", speech: "turn on" },
+      { label: "Turn Off", emoji: "🔌", speech: "turn off" },
+      { label: "Put On", emoji: "👕", speech: "put on" },
+      { label: "Take Off", emoji: "🧤", speech: "take off" },
+      { label: "Draw", emoji: "🎨", speech: "draw" },
     ],
   },
   {
-    id: "people", label: "People", emoji: "👥", color: T.blue, glow: T.blueGlow,
+    id: "people", label: "People", emoji: "👥", color: T.green, glow: T.greenGlow,
     items: [
       { label: "I", emoji: "🙋", speech: "I" },
       { label: "You", emoji: "👉", speech: "you" },
@@ -187,6 +283,31 @@ const aacCategories = [
       { label: "We", emoji: "👫", speech: "we" },
       { label: "They", emoji: "👥", speech: "they" },
       { label: "Everyone", emoji: "🌍", speech: "everyone" },
+      { label: "Baby", emoji: "👶", speech: "baby" },
+      { label: "Grandma", emoji: "👵", speech: "grandma" },
+      { label: "Grandpa", emoji: "👴", speech: "grandpa" },
+      { label: "Pet", emoji: "🐾", speech: "my pet" },
+      { label: "Neighbor", emoji: "🏘️", speech: "neighbor" },
+      { label: "He", emoji: "👦", speech: "he" },
+      { label: "She", emoji: "👧", speech: "she" },
+      { label: "Helper", emoji: "🦸", speech: "my helper" },
+    ],
+  },
+  {
+    id: "body", label: "My Body", emoji: "🫀", color: T.pink, glow: T.pinkGlow,
+    items: [
+      { label: "Head", emoji: "😶", speech: "my head" },
+      { label: "Tummy", emoji: "🫃", speech: "my tummy" },
+      { label: "Hand", emoji: "✋", speech: "my hand" },
+      { label: "Foot", emoji: "🦶", speech: "my foot" },
+      { label: "Eye", emoji: "👁️", speech: "my eye" },
+      { label: "Ear", emoji: "👂", speech: "my ear" },
+      { label: "Mouth", emoji: "👄", speech: "my mouth" },
+      { label: "Nose", emoji: "👃", speech: "my nose" },
+      { label: "Back", emoji: "🔙", speech: "my back" },
+      { label: "Teeth", emoji: "🦷", speech: "my teeth" },
+      { label: "Hurts", emoji: "🩹", speech: "it hurts here" },
+      { label: "Itchy", emoji: "😣", speech: "it's itchy" },
     ],
   },
   {
@@ -204,10 +325,26 @@ const aacCategories = [
       { label: "Old", emoji: "📜", speech: "old" },
       { label: "Same", emoji: "🟰", speech: "same" },
       { label: "Different", emoji: "🔀", speech: "different" },
+      { label: "Pretty", emoji: "🌸", speech: "pretty" },
+      { label: "Loud", emoji: "🔊", speech: "loud" },
+      { label: "Quiet", emoji: "🔇", speech: "quiet" },
+      { label: "Heavy", emoji: "🏋️", speech: "heavy" },
+      { label: "Light", emoji: "🪶", speech: "light" },
+      { label: "Soft", emoji: "🧸", speech: "soft" },
+      { label: "Hard", emoji: "🪨", speech: "hard" },
+      { label: "Yummy", emoji: "😋", speech: "yummy" },
+      { label: "Yucky", emoji: "🤢", speech: "yucky" },
+      { label: "Wet", emoji: "💦", speech: "wet" },
+      { label: "Dry", emoji: "☀️", speech: "dry" },
+      { label: "Full", emoji: "😊", speech: "full" },
+      { label: "Empty", emoji: "📭", speech: "empty" },
+      { label: "Scary", emoji: "👻", speech: "scary" },
+      { label: "Fun", emoji: "🎉", speech: "fun" },
+      { label: "Easy", emoji: "✅", speech: "easy" },
     ],
   },
   {
-    id: "time", label: "Time", emoji: "🕐", color: T.green, glow: T.greenGlow,
+    id: "time", label: "Time", emoji: "🕐", color: T.purple, glow: T.purpleGlow,
     items: [
       { label: "Now", emoji: "⏰", speech: "now" },
       { label: "Later", emoji: "🔜", speech: "later" },
@@ -221,6 +358,44 @@ const aacCategories = [
       { label: "Never", emoji: "🚫", speech: "never" },
       { label: "Before", emoji: "⬅️", speech: "before" },
       { label: "After", emoji: "➡️", speech: "after" },
+      { label: "Lunch Time", emoji: "🍽️", speech: "lunch time" },
+      { label: "Bed Time", emoji: "🛌", speech: "bed time" },
+      { label: "Weekend", emoji: "🎉", speech: "on the weekend" },
+      { label: "First", emoji: "1️⃣", speech: "first" },
+      { label: "Then", emoji: "2️⃣", speech: "then" },
+      { label: "Last", emoji: "🏁", speech: "last" },
+    ],
+  },
+  {
+    id: "weather", label: "Weather", emoji: "🌤️", color: T.blue, glow: T.blueGlow,
+    items: [
+      { label: "Sunny", emoji: "☀️", speech: "It is sunny" },
+      { label: "Rainy", emoji: "🌧️", speech: "It is raining" },
+      { label: "Snowy", emoji: "❄️", speech: "It is snowing" },
+      { label: "Windy", emoji: "💨", speech: "It is windy" },
+      { label: "Cloudy", emoji: "☁️", speech: "It is cloudy" },
+      { label: "Hot Out", emoji: "🥵", speech: "It is hot outside" },
+      { label: "Cold Out", emoji: "🥶", speech: "It is cold outside" },
+      { label: "Storm", emoji: "⛈️", speech: "There is a storm" },
+      { label: "Rainbow", emoji: "🌈", speech: "I see a rainbow" },
+      { label: "Night Sky", emoji: "🌙", speech: "The stars are out" },
+    ],
+  },
+  {
+    id: "manners", label: "Manners", emoji: "🌟", color: T.green, glow: T.greenGlow,
+    items: [
+      { label: "Please", emoji: "🙏", speech: "please" },
+      { label: "Thank You", emoji: "💖", speech: "thank you" },
+      { label: "You're Welcome", emoji: "😊", speech: "you're welcome" },
+      { label: "Excuse Me", emoji: "🙇", speech: "excuse me" },
+      { label: "I'm Sorry", emoji: "😔", speech: "I'm sorry" },
+      { label: "Bless You", emoji: "🤧", speech: "bless you" },
+      { label: "Good Morning", emoji: "🌅", speech: "good morning" },
+      { label: "Good Night", emoji: "🌙", speech: "good night" },
+      { label: "May I", emoji: "🙋", speech: "may I please" },
+      { label: "After You", emoji: "🚪", speech: "after you" },
+      { label: "Pardon Me", emoji: "🫡", speech: "pardon me" },
+      { label: "Nice Job", emoji: "⭐", speech: "nice job" },
     ],
   },
 ];
@@ -232,13 +407,23 @@ const wordGames = [
   { image: "🐕", word: "DOG", choices: ["LOG", "FOG", "DOG", "HOG"], hint: "A pet that barks", level: 1 },
   { image: "🐟", word: "FISH", choices: ["DISH", "FISH", "WISH", "SWISH"], hint: "Swims in water", level: 1 },
   { image: "🌳", word: "TREE", choices: ["FREE", "THREE", "TREE", "SEE"], hint: "Tall with leaves", level: 1 },
+  { image: "🐸", word: "FROG", choices: ["FROG", "BLOG", "CLOG", "JROG"], hint: "Green and hops", level: 1 },
+  { image: "🌹", word: "ROSE", choices: ["NOSE", "ROSE", "HOSE", "POSE"], hint: "A pretty flower", level: 1 },
+  { image: "🐝", word: "BEE", choices: ["BEE", "SEE", "TEE", "FEE"], hint: "Makes honey and buzzes", level: 1 },
   { image: "🌙", word: "MOON", choices: ["MOON", "NOON", "SOON", "SPOON"], hint: "In the night sky", level: 2 },
   { image: "⭐", word: "STAR", choices: ["CAR", "STAR", "FAR", "BAR"], hint: "Twinkles at night", level: 2 },
   { image: "🏠", word: "HOME", choices: ["DOME", "HOME", "SOME", "COME"], hint: "Where you live", level: 2 },
   { image: "🎵", word: "SONG", choices: ["LONG", "SONG", "GONG", "BONG"], hint: "Music you sing", level: 2 },
   { image: "🦋", word: "FLY", choices: ["FLY", "TRY", "CRY", "SKY"], hint: "Wings help you do this", level: 2 },
+  { image: "🐢", word: "TURTLE", choices: ["TURTLE", "PURPLE", "HURTLE", "MYRTLE"], hint: "Slow with a shell", level: 2 },
+  { image: "🦁", word: "LION", choices: ["LION", "IRON", "NION", "BION"], hint: "King of the jungle", level: 2 },
+  { image: "🍕", word: "PIZZA", choices: ["PIZZA", "PLAZA", "PIAZZA", "PINTA"], hint: "Cheesy round food", level: 2 },
   { image: "🌊", word: "OCEAN", choices: ["OCEAN", "MOTION", "POTION", "LOTION"], hint: "Big body of salt water", level: 3 },
   { image: "🏔️", word: "MOUNTAIN", choices: ["FOUNTAIN", "MOUNTAIN", "CAPTAIN", "CURTAIN"], hint: "Very tall land formation", level: 3 },
+  { image: "🦅", word: "EAGLE", choices: ["EAGLE", "BEAGLE", "LEGAL", "REGAL"], hint: "A big bird of prey", level: 3 },
+  { image: "🌋", word: "VOLCANO", choices: ["VOLCANO", "TORNADO", "AVOCADO", "BUFFALO"], hint: "Erupts with lava", level: 3 },
+  { image: "🦕", word: "DINOSAUR", choices: ["DINOSAUR", "DISCOVER", "DISORDER", "DINGASOR"], hint: "Extinct giant reptile", level: 3 },
+  { image: "🏰", word: "CASTLE", choices: ["CASTLE", "HASSLE", "TASSEL", "VASSAL"], hint: "Where kings and queens live", level: 3 },
 ];
 
 const colorMatchGame = [
@@ -248,32 +433,92 @@ const colorMatchGame = [
   { color: "#FFBB33", name: "YELLOW", emoji: "🟡" },
   { color: "#BB44FF", name: "PURPLE", emoji: "🟣" },
   { color: "#FF8844", name: "ORANGE", emoji: "🟠" },
+  { color: "#FF69B4", name: "PINK", emoji: "💗" },
+  { color: "#8B4513", name: "BROWN", emoji: "🤎" },
+  { color: "#000000", name: "BLACK", emoji: "⚫" },
+  { color: "#BBBBBB", name: "GRAY", emoji: "🩶" },
 ];
 
 const patternData = [
   { pattern: ["🔴", "🔵", "🔴", "🔵", "?"], answer: "🔴", choices: ["🔴", "🟢", "🔵"], level: 1 },
   { pattern: ["⭐", "⭐", "🌙", "⭐", "⭐", "?"], answer: "🌙", choices: ["⭐", "🌙", "☀️"], level: 1 },
   { pattern: ["🐱", "🐕", "🐱", "🐕", "?"], answer: "🐱", choices: ["🐟", "🐱", "🐕"], level: 1 },
+  { pattern: ["🍎", "🍎", "🍌", "🍎", "🍎", "?"], answer: "🍌", choices: ["🍎", "🍌", "🍇"], level: 1 },
+  { pattern: ["😊", "😢", "😊", "😢", "?"], answer: "😊", choices: ["😊", "😢", "😠"], level: 1 },
   { pattern: ["1", "2", "3", "4", "?"], answer: "5", choices: ["5", "6", "3"], level: 2 },
   { pattern: ["🍎", "🍌", "🍎", "🍌", "🍎", "?"], answer: "🍌", choices: ["🍎", "🍌", "🍇"], level: 2 },
   { pattern: ["△", "○", "□", "△", "○", "?"], answer: "□", choices: ["△", "○", "□"], level: 2 },
+  { pattern: ["A", "B", "C", "D", "?"], answer: "E", choices: ["E", "F", "B"], level: 2 },
+  { pattern: ["🔵", "🔵", "🔴", "🔵", "🔵", "?"], answer: "🔴", choices: ["🔵", "🔴", "🟢"], level: 2 },
   { pattern: ["2", "4", "6", "8", "?"], answer: "10", choices: ["9", "10", "12"], level: 3 },
   { pattern: ["🔴", "🔵", "🟢", "🔴", "🔵", "?"], answer: "🟢", choices: ["🔴", "🔵", "🟢"], level: 3 },
+  { pattern: ["1", "1", "2", "3", "5", "?"], answer: "8", choices: ["7", "8", "6"], level: 3 },
+  { pattern: ["△", "□", "⬠", "△", "□", "?"], answer: "⬠", choices: ["△", "□", "⬠"], level: 3 },
 ];
 
 const mathProblems = [
   { q: "1 + 1", a: 2, choices: [1, 2, 3], level: 1 },
   { q: "2 + 3", a: 5, choices: [4, 5, 6], level: 1 },
   { q: "5 - 2", a: 3, choices: [2, 3, 4], level: 1 },
+  { q: "1 + 3", a: 4, choices: [3, 4, 5], level: 1 },
+  { q: "4 - 1", a: 3, choices: [2, 3, 4], level: 1 },
+  { q: "2 + 2", a: 4, choices: [3, 4, 5], level: 1 },
   { q: "3 + 4", a: 7, choices: [6, 7, 8], level: 2 },
   { q: "6 - 1", a: 5, choices: [4, 5, 6], level: 2 },
   { q: "4 + 4", a: 8, choices: [7, 8, 9], level: 2 },
   { q: "10 - 3", a: 7, choices: [6, 7, 8], level: 2 },
   { q: "2 + 6", a: 8, choices: [7, 8, 9], level: 2 },
+  { q: "9 - 4", a: 5, choices: [4, 5, 6], level: 2 },
+  { q: "5 + 7", a: 12, choices: [11, 12, 13], level: 2 },
   { q: "7 × 3", a: 21, choices: [18, 21, 24], level: 3 },
   { q: "15 - 8", a: 7, choices: [6, 7, 8], level: 3 },
   { q: "12 ÷ 4", a: 3, choices: [2, 3, 4], level: 3 },
   { q: "9 × 6", a: 54, choices: [48, 54, 56], level: 3 },
+  { q: "8 × 7", a: 56, choices: [54, 56, 58], level: 3 },
+  { q: "100 ÷ 5", a: 20, choices: [15, 20, 25], level: 3 },
+  { q: "13 + 19", a: 32, choices: [31, 32, 33], level: 3 },
+];
+
+// Memory game pairs
+const memoryCards = [
+  { id: "cat", emoji: "🐱", label: "Cat" }, { id: "dog", emoji: "🐕", label: "Dog" },
+  { id: "fish", emoji: "🐟", label: "Fish" }, { id: "bird", emoji: "🐦", label: "Bird" },
+  { id: "star", emoji: "⭐", label: "Star" }, { id: "heart", emoji: "❤️", label: "Heart" },
+  { id: "sun", emoji: "☀️", label: "Sun" }, { id: "moon", emoji: "🌙", label: "Moon" },
+  { id: "flower", emoji: "🌸", label: "Flower" }, { id: "tree", emoji: "🌳", label: "Tree" },
+  { id: "apple", emoji: "🍎", label: "Apple" }, { id: "car", emoji: "🚗", label: "Car" },
+];
+
+// Rhyming game data
+const rhymingData = [
+  { word: "CAT", emoji: "🐱", answer: "HAT", choices: ["HAT", "DOG", "SUN", "CUP"], level: 1 },
+  { word: "DOG", emoji: "🐕", answer: "LOG", choices: ["LOG", "CAT", "BIG", "RUN"], level: 1 },
+  { word: "SUN", emoji: "☀️", answer: "FUN", choices: ["FUN", "SAD", "HOT", "BIG"], level: 1 },
+  { word: "BALL", emoji: "⚽", answer: "TALL", choices: ["TALL", "SMALL", "BIG", "RUN"], level: 1 },
+  { word: "BEE", emoji: "🐝", answer: "TREE", choices: ["TREE", "BIRD", "BUZZ", "FLY"], level: 1 },
+  { word: "CAKE", emoji: "🎂", answer: "LAKE", choices: ["LAKE", "MOON", "FISH", "PIE"], level: 2 },
+  { word: "LIGHT", emoji: "💡", answer: "NIGHT", choices: ["NIGHT", "DARK", "LAMP", "SUN"], level: 2 },
+  { word: "BEAR", emoji: "🐻", answer: "CHAIR", choices: ["CHAIR", "LION", "CAVE", "FUR"], level: 2 },
+  { word: "TRAIN", emoji: "🚂", answer: "RAIN", choices: ["RAIN", "TRACK", "FAST", "BUS"], level: 2 },
+  { word: "HOUSE", emoji: "🏠", answer: "MOUSE", choices: ["MOUSE", "HOME", "DOOR", "ROOF"], level: 2 },
+  { word: "DREAM", emoji: "💭", answer: "STREAM", choices: ["STREAM", "SLEEP", "CLOUD", "WISH"], level: 3 },
+  { word: "PHONE", emoji: "📱", answer: "BONE", choices: ["BONE", "CALL", "RING", "TEXT"], level: 3 },
+  { word: "FLOWER", emoji: "🌸", answer: "TOWER", choices: ["TOWER", "GARDEN", "PETAL", "SEED"], level: 3 },
+  { word: "BRIGHT", emoji: "✨", answer: "FLIGHT", choices: ["FLIGHT", "DARK", "SHINE", "GLOW"], level: 3 },
+];
+
+// Shape sorting data
+const shapeSortData = [
+  { shape: "Circle", emoji: "🔵", items: ["⚽", "🍊", "🌙", "🪙"], answer: "🌙", wrongLabel: "Not round", level: 1 },
+  { shape: "Square", emoji: "🟧", items: ["📦", "📺", "🔵", "🖼️"], answer: "🔵", wrongLabel: "Not square", level: 1 },
+  { shape: "Triangle", emoji: "🔺", items: ["📐", "⚠️", "🍕", "⬜"], answer: "⬜", wrongLabel: "Not triangle", level: 1 },
+  { shape: "Red Things", emoji: "🔴", items: ["🍎", "🚗", "🌿", "❤️"], answer: "🌿", wrongLabel: "Not red", level: 2 },
+  { shape: "Animals", emoji: "🐾", items: ["🐱", "🌳", "🐕", "🐟"], answer: "🌳", wrongLabel: "Not an animal", level: 2 },
+  { shape: "Fruits", emoji: "🍎", items: ["🍌", "🍇", "🥕", "🍊"], answer: "🥕", wrongLabel: "Not a fruit", level: 2 },
+  { shape: "Things That Fly", emoji: "🦅", items: ["🐦", "✈️", "🚗", "🦋"], answer: "🚗", wrongLabel: "Doesn't fly", level: 3 },
+  { shape: "Cold Things", emoji: "❄️", items: ["🍦", "🧊", "🔥", "⛄"], answer: "🔥", wrongLabel: "Not cold", level: 3 },
+  { shape: "Musical", emoji: "🎵", items: ["🎸", "🥁", "📚", "🎹"], answer: "📚", wrongLabel: "Not musical", level: 3 },
+  { shape: "School Items", emoji: "🏫", items: ["📚", "✏️", "🍕", "📐"], answer: "🍕", wrongLabel: "Not for school", level: 3 },
 ];
 
 // ─── Speech ──────────────────────────────────────────────────────────────────
@@ -516,7 +761,7 @@ function OnboardingScreen() {
 
 // ─── HOME ────────────────────────────────────────────────────────────────────
 function HomeScreen({ setScreen }) {
-  const { settings } = useApp();
+  const { settings, updateSettings } = useApp();
   const ageInfo = ageRanges.find(a => a.id === settings.ageRange);
   const tips = [
     "Every step forward counts! 🌟", "Your brain is amazing! 🧠",
@@ -524,59 +769,123 @@ function HomeScreen({ setScreen }) {
     "Progress, not perfection! 🌈", "Be kind to yourself today! 💜",
   ];
   const [tip] = useState(tips[Math.floor(Math.random() * tips.length)]);
+  const [showAgePicker, setShowAgePicker] = useState(false);
+
+  const menuItems = [
+    { emoji: "💬", title: "Soundboard", desc: "Build sentences & communicate", color: T.blue, glow: T.blueGlow, screen: "soundboard", gradient: "linear-gradient(135deg, #4E8AE6 0%, #7BA8F0 100%)" },
+    { emoji: "🎮", title: "Learning Games", desc: "Words, colors, patterns & math", color: T.purple, glow: T.purpleGlow, screen: "games", gradient: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 100%)" },
+    { emoji: "🎯", title: "Focus Timer", desc: "Stay on track with reminders", color: T.green, glow: T.greenGlow, screen: "focus", gradient: "linear-gradient(135deg, #3EBB6E 0%, #6DD598 100%)" },
+    { emoji: "🫧", title: "Calm Corner", desc: "Breathing & sensory tools", color: T.pink, glow: T.pinkGlow, screen: "calm", gradient: "linear-gradient(135deg, #E84E8A 0%, #F08CB4 100%)" },
+    { emoji: "✅", title: "My Routines", desc: "Daily schedules & checklists", color: T.yellow, glow: T.yellowGlow, screen: "habits", gradient: "linear-gradient(135deg, #F7B731 0%, #FFCF5C 100%)" },
+  ];
 
   return (
-    <div style={{ padding: "24px 20px 120px" }}>
+    <div style={{ padding: "20px 16px 120px" }}>
+      {/* Hero Banner */}
       <div style={{
-        background: "linear-gradient(135deg, #FF6B3D 0%, #FF8F6B 50%, #FFB088 100%)",
-        borderRadius: 28, padding: "28px 24px", marginBottom: 24, color: "#fff", position: "relative", overflow: "hidden",
+        background: "linear-gradient(135deg, #FF6B3D 0%, #FF8F6B 40%, #FFB088 100%)",
+        borderRadius: 28, padding: "26px 22px 22px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden",
+        boxShadow: "0 8px 32px rgba(255,107,61,0.3)",
       }}>
-        <div style={{ position: "absolute", top: -20, right: -20, fontSize: 100, opacity: 0.15 }}>🧠</div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+        <div style={{ position: "absolute", top: -30, right: -10, fontSize: 120, opacity: 0.12, transform: "rotate(15deg)" }}>🧠</div>
+        <div style={{ position: "absolute", bottom: -20, left: -10, fontSize: 80, opacity: 0.08 }}>✨</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", position: "relative", zIndex: 1 }}>
           <div>
-            <h1 style={{ fontFamily: T.font, fontSize: 30, fontWeight: 800, margin: 0, lineHeight: 1.2 }}>NeuroBridge</h1>
-            <p style={{ fontFamily: T.fontAlt, fontSize: 15, margin: "8px 0 0", opacity: 0.9, lineHeight: 1.5 }}>
-              Learning tools built for the way <em>your</em> brain works.
+            <h1 style={{ fontFamily: T.font, fontSize: 32, fontWeight: 800, margin: 0, lineHeight: 1.1, textShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>NeuroBridge</h1>
+            <p style={{ fontFamily: T.fontAlt, fontSize: 14, margin: "6px 0 0", opacity: 0.9, lineHeight: 1.4 }}>
+              Tools built for the way <em>your</em> brain works
             </p>
           </div>
           <button onClick={() => setScreen("settings")} style={{
-            width: 40, height: 40, borderRadius: 14, background: "rgba(255,255,255,0.2)",
-            border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+            width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.25)",
+            border: "1px solid rgba(255,255,255,0.3)", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+            backdropFilter: "blur(10px)",
           }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
               <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
           </button>
         </div>
-        {ageInfo && (
-          <div style={{ marginTop: 12, background: "rgba(255,255,255,0.2)", display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 50, fontSize: 13, fontFamily: T.font }}>
-            {ageInfo.emoji} {ageInfo.label} Mode
+        <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap", position: "relative", zIndex: 1 }}>
+          {ageInfo && (
+            <button onClick={() => setShowAgePicker(!showAgePicker)} style={{
+              background: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.3)",
+              display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 50,
+              fontSize: 13, fontFamily: T.font, fontWeight: 600, color: "#fff", cursor: "pointer",
+              backdropFilter: "blur(10px)",
+            }}>
+              {ageInfo.emoji} {ageInfo.label} Mode <span style={{ fontSize: 10, opacity: 0.8 }}>▼</span>
+            </button>
+          )}
+          <div style={{
+            background: "rgba(255,255,255,0.2)", display: "inline-flex", padding: "6px 14px",
+            borderRadius: 50, fontSize: 13, fontFamily: T.font, fontWeight: 600, color: "#fff",
+          }}>
+            {tip}
           </div>
-        )}
-        <p style={{ fontFamily: T.font, fontSize: 14, margin: "10px 0 0", background: "rgba(255,255,255,0.2)", display: "inline-block", padding: "6px 14px", borderRadius: 50 }}>
-          {tip}
-        </p>
+        </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {[
-          { emoji: "💬", title: "Soundboard", desc: "Build sentences & communicate with voice", color: T.blue, glow: T.blueGlow, screen: "soundboard" },
-          { emoji: "🎮", title: "Learning Games", desc: "Words, colors, patterns, & math", color: T.purple, glow: T.purpleGlow, screen: "games" },
-          { emoji: "🎯", title: "Focus Timer", desc: "Stay on track with gentle reminders", color: T.green, glow: T.greenGlow, screen: "focus" },
-          { emoji: "🫧", title: "Calm Corner", desc: "Breathing, sounds, & sensory tools", color: T.pink, glow: T.pinkGlow, screen: "calm" },
-          { emoji: "✅", title: "My Routines", desc: "Visual daily schedules & checklists", color: T.yellow, glow: T.yellowGlow, screen: "habits" },
-        ].map(item => (
+      {/* Age Picker Dropdown */}
+      {showAgePicker && (
+        <Card style={{ marginBottom: 16, padding: 14, animation: "scaleIn 0.2s ease-out" }}>
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.soft, marginBottom: 10 }}>Switch Mode:</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {ageRanges.map(ar => (
+              <button key={ar.id} onClick={() => { updateSettings({ ageRange: ar.id }); setShowAgePicker(false); }} style={{
+                padding: "12px 10px", borderRadius: 14,
+                border: `2.5px solid ${settings.ageRange === ar.id ? ar.color : T.border}`,
+                background: settings.ageRange === ar.id ? `${ar.color}15` : T.surface,
+                cursor: "pointer", textAlign: "center", transition: "all 0.15s ease",
+              }}>
+                <div style={{ fontSize: 24 }}>{ar.emoji}</div>
+                <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: settings.ageRange === ar.id ? ar.color : T.text }}>{ar.label}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft }}>{ar.ages}</div>
+              </button>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Feature Cards - Grid layout for top 2, then stack */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+        {menuItems.slice(0, 2).map(item => (
           <Card key={item.screen} onClick={() => setScreen(item.screen)}
-            style={{ display: "flex", alignItems: "center", gap: 16, padding: 18, background: item.glow, border: `1.5px solid ${item.color}20` }}>
+            style={{
+              padding: 0, overflow: "hidden", border: "none",
+              boxShadow: `0 6px 24px ${item.color}25`,
+            }}>
             <div style={{
-              width: 56, height: 56, borderRadius: 18, background: `${item.color}18`,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, flexShrink: 0,
+              background: item.gradient, padding: "22px 16px 18px", color: "#fff",
+              position: "relative", overflow: "hidden",
+            }}>
+              <div style={{ position: "absolute", top: -8, right: -8, fontSize: 50, opacity: 0.2 }}>{item.emoji}</div>
+              <div style={{ fontSize: 36, marginBottom: 8, position: "relative", zIndex: 1 }}>{item.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, position: "relative", zIndex: 1 }}>{item.title}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 11, opacity: 0.85, marginTop: 4, lineHeight: 1.3, position: "relative", zIndex: 1 }}>{item.desc}</div>
+            </div>
+          </Card>
+        ))}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {menuItems.slice(2).map(item => (
+          <Card key={item.screen} onClick={() => setScreen(item.screen)}
+            style={{
+              display: "flex", alignItems: "center", gap: 14, padding: 16,
+              background: T.surface, border: `1.5px solid ${item.color}20`,
+              boxShadow: `0 4px 16px ${item.color}12`,
+            }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 16, background: item.gradient,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0,
+              boxShadow: `0 4px 12px ${item.color}30`,
             }}>{item.emoji}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text }}>{item.title}</div>
-              <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, marginTop: 2, lineHeight: 1.4 }}>{item.desc}</div>
+              <div style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text }}>{item.title}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, marginTop: 2 }}>{item.desc}</div>
             </div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.soft} strokeWidth="2" strokeLinecap="round"><path d="M9 5l7 7-7 7"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><path d="M9 5l7 7-7 7"/></svg>
           </Card>
         ))}
       </div>
@@ -769,7 +1078,12 @@ function SoundboardScreen({ setScreen }) {
   const [cat, setCat] = useState(null);
   const [sentence, setSentence] = useState([]);
   const [lastSpoken, setLastSpoken] = useState(null);
-  const [mode, setMode] = useState("categories"); // "categories" | "sentence"
+  const [customWords, setCustomWords] = useState(() => loadState("customWords", []));
+  const [showAddWord, setShowAddWord] = useState(false);
+  const [newWordLabel, setNewWordLabel] = useState("");
+  const [newWordEmoji, setNewWordEmoji] = useState("🗣️");
+  const [newWordSpeech, setNewWordSpeech] = useState("");
+  const [newWordCat, setNewWordCat] = useState("custom");
 
   function tapItem(item) {
     speak(item.speech, settings);
@@ -789,18 +1103,106 @@ function SoundboardScreen({ setScreen }) {
     setSentence(prev => prev.filter((_, i) => i !== index));
   }
 
+  function addCustomWord() {
+    if (!newWordLabel.trim() || !newWordSpeech.trim()) return;
+    const word = { label: newWordLabel.trim(), emoji: newWordEmoji, speech: newWordSpeech.trim(), custom: true, catId: newWordCat };
+    const updated = [...customWords, word];
+    setCustomWords(updated);
+    saveState("customWords", updated);
+    setNewWordLabel(""); setNewWordSpeech(""); setNewWordEmoji("🗣️"); setShowAddWord(false);
+  }
+
+  function removeCustomWord(index) {
+    const updated = customWords.filter((_, i) => i !== index);
+    setCustomWords(updated);
+    saveState("customWords", updated);
+  }
+
+  // Build full categories list including custom words
+  const customCategory = customWords.length > 0 ? {
+    id: "custom", label: "My Words", emoji: "⭐", color: T.primary, glow: T.primaryGlow,
+    items: customWords.filter(w => w.catId === "custom"),
+  } : null;
+
+  const allCategories = customCategory ? [customCategory, ...aacCategories] : aacCategories;
+
+  // Get items for current category, including custom words added to built-in categories
+  function getCatItems(catId) {
+    const builtIn = aacCategories.find(c => c.id === catId);
+    const builtInItems = builtIn ? builtIn.items : [];
+    const customInCat = customWords.filter(w => w.catId === catId);
+    return [...builtInItems, ...customInCat];
+  }
+
+  const quickPhrases = [
+    { label: "I want", emoji: "👉", speech: "I want" },
+    { label: "I need", emoji: "🙋", speech: "I need" },
+    { label: "I like", emoji: "💛", speech: "I like" },
+    { label: "I don't like", emoji: "👎", speech: "I don't like" },
+    { label: "Can I have", emoji: "🤲", speech: "Can I have" },
+    { label: "Let's go", emoji: "🚶", speech: "Let's go" },
+    { label: "to the", emoji: "➡️", speech: "to the" },
+    { label: "with", emoji: "🤝", speech: "with" },
+    { label: "and", emoji: "➕", speech: "and" },
+    { label: "the", emoji: "📎", speech: "the" },
+    { label: "is", emoji: "🟰", speech: "is" },
+    { label: "my", emoji: "🙋", speech: "my" },
+  ];
+
   return (
     <div style={{ padding: "24px 20px 120px" }}>
-      <Header title="💬 Soundboard" onBack={() => setScreen("home")} />
+      <Header title="💬 Soundboard" onBack={() => setScreen("home")}
+        right={
+          <button onClick={() => setShowAddWord(!showAddWord)} style={{
+            padding: "6px 12px", borderRadius: 12, border: `1.5px solid ${T.primary}40`,
+            background: T.primaryGlow, fontFamily: T.font, fontSize: 12, fontWeight: 700,
+            color: T.primary, cursor: "pointer",
+          }}>+ Add Word</button>
+        }
+      />
+
+      {/* Add Word Panel (for parents) */}
+      {showAddWord && (
+        <Card style={{ marginBottom: 16, padding: 18, border: `2px solid ${T.primary}30`, animation: "scaleIn 0.2s ease-out" }}>
+          <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 12 }}>
+            ⭐ Add Custom Word
+          </div>
+          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+            <input value={newWordEmoji} onChange={e => setNewWordEmoji(e.target.value)}
+              style={{ width: 50, padding: 10, borderRadius: 12, border: `1.5px solid ${T.border}`, fontSize: 24, textAlign: "center" }}
+              placeholder="😊" />
+            <input value={newWordLabel} onChange={e => setNewWordLabel(e.target.value)}
+              style={{ flex: 1, padding: 10, borderRadius: 12, border: `1.5px solid ${T.border}`, fontFamily: T.fontAlt, fontSize: 14 }}
+              placeholder="Button label (e.g. Juice)" />
+          </div>
+          <input value={newWordSpeech} onChange={e => setNewWordSpeech(e.target.value)}
+            style={{ width: "100%", padding: 10, borderRadius: 12, border: `1.5px solid ${T.border}`, fontFamily: T.fontAlt, fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
+            placeholder="What to say (e.g. I want juice please)" />
+          <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+            {[{ id: "custom", label: "My Words" }, ...aacCategories.slice(0, 6)].map(c => (
+              <button key={c.id} onClick={() => setNewWordCat(c.id)} style={{
+                padding: "4px 10px", borderRadius: 10, fontSize: 11, fontFamily: T.font, fontWeight: 600,
+                border: `1.5px solid ${newWordCat === c.id ? T.primary : T.border}`,
+                background: newWordCat === c.id ? T.primaryGlow : T.surface,
+                color: newWordCat === c.id ? T.primary : T.soft, cursor: "pointer",
+              }}>{c.label}</button>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Btn color={T.soft} size="sm" onClick={() => setShowAddWord(false)}>Cancel</Btn>
+            <Btn color={T.primary} size="sm" onClick={addCustomWord} disabled={!newWordLabel.trim() || !newWordSpeech.trim()}>Add Word</Btn>
+          </div>
+        </Card>
+      )}
 
       {/* Sentence Builder Bar */}
       <div style={{
-        background: T.surface, borderRadius: 18, padding: 14, marginBottom: 12,
-        border: `2px solid ${T.blue}30`, minHeight: 64,
+        background: T.surface, borderRadius: 18, padding: 14, marginBottom: 10,
+        border: `2px solid ${T.blue}30`, minHeight: 56,
         display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", boxShadow: T.shadow,
       }}>
         {sentence.length === 0 ? (
-          <span style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft }}>Tap cards to build a sentence...</span>
+          <span style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Tap cards to build a sentence...</span>
         ) : sentence.map((s, i) => (
           <button key={i} onClick={() => removeWord(i)} style={{
             background: T.blueGlow, padding: "5px 10px", borderRadius: 10, border: `1px solid ${T.blue}30`,
@@ -816,35 +1218,48 @@ function SoundboardScreen({ setScreen }) {
       {/* Sentence preview */}
       {sentence.length > 0 && (
         <div style={{
-          fontFamily: T.fontAlt, fontSize: 15, color: T.text, padding: "8px 14px",
-          background: T.yellowGlow, borderRadius: 12, marginBottom: 12, fontStyle: "italic",
+          fontFamily: T.fontAlt, fontSize: 14, color: T.text, padding: "8px 14px",
+          background: T.yellowGlow, borderRadius: 12, marginBottom: 10, fontStyle: "italic",
           border: `1px solid ${T.yellow}30`,
         }}>
           "{sentence.map(s => s.speech).join(" ")}"
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <Btn color={T.blue} onClick={speakSentence} style={{ flex: 1 }} disabled={sentence.length === 0} size="sm">🔊 Speak</Btn>
         <Btn color={T.soft} onClick={() => setSentence([])} disabled={sentence.length === 0} size="sm">Clear</Btn>
-        <Btn color={T.green} onClick={() => {
-          if (sentence.length > 0) {
-            const last = sentence[sentence.length - 1];
-            setSentence(prev => [...prev, { label: ".", emoji: "", speech: "." }]);
-          }
-        }} disabled={sentence.length === 0} size="sm">+ Period</Btn>
       </div>
+
+      {/* Quick Phrase Starters */}
+      {cat === null && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.soft, marginBottom: 8 }}>Quick phrases:</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {quickPhrases.map((p, i) => (
+              <button key={i} onClick={() => tapItem(p)} style={{
+                padding: "5px 10px", borderRadius: 10, border: `1.5px solid ${T.purple}25`,
+                background: T.purpleGlow, fontFamily: T.font, fontSize: 12, fontWeight: 600,
+                color: T.purple, cursor: "pointer",
+              }}>{p.emoji} {p.label}</button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {cat === null ? (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-          {aacCategories.map(c => (
-            <Card key={c.id} onClick={() => setCat(c.id)}
-              style={{ textAlign: "center", padding: 14, background: c.glow, border: `1.5px solid ${c.color}25` }}>
-              <div style={{ fontSize: 28, marginBottom: 4 }}>{c.emoji}</div>
-              <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: c.color }}>{c.label}</div>
-              <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{c.items.length}</div>
-            </Card>
-          ))}
+          {allCategories.map(c => {
+            const itemCount = c.id === "custom" ? c.items.length : getCatItems(c.id).length;
+            return (
+              <Card key={c.id} onClick={() => setCat(c.id)}
+                style={{ textAlign: "center", padding: 14, background: c.glow, border: `1.5px solid ${c.color}25` }}>
+                <div style={{ fontSize: 28, marginBottom: 4 }}>{c.emoji}</div>
+                <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: c.color }}>{c.label}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{itemCount}</div>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <>
@@ -857,8 +1272,8 @@ function SoundboardScreen({ setScreen }) {
             All Categories
           </button>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {aacCategories.find(c => c.id === cat).items.map((item, i) => {
-              const catData = aacCategories.find(c => c.id === cat);
+            {getCatItems(cat).map((item, i) => {
+              const catData = allCategories.find(c => c.id === cat) || { color: T.primary };
               const isActive = lastSpoken === item.label;
               return (
                 <button key={i} onClick={() => tapItem(item)}
@@ -867,10 +1282,17 @@ function SoundboardScreen({ setScreen }) {
                     border: `2px solid ${isActive ? catData.color : catData.color + "30"}`,
                     borderRadius: 16, padding: "12px 6px", cursor: "pointer",
                     display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-                    transition: "all 0.15s ease",
+                    transition: "all 0.15s ease", position: "relative",
                     transform: isActive ? "scale(1.05)" : "scale(1)",
                     boxShadow: isActive ? `0 4px 20px ${catData.color}40` : "none",
                   }}>
+                  {item.custom && (
+                    <button onClick={e => { e.stopPropagation(); removeCustomWord(customWords.indexOf(item)); }} style={{
+                      position: "absolute", top: 2, right: 2, width: 18, height: 18, borderRadius: 9,
+                      background: T.primary, border: "none", color: "#fff", fontSize: 10, cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
+                    }}>✕</button>
+                  )}
                   <span style={{ fontSize: 28 }}>{item.emoji}</span>
                   <span style={{
                     fontFamily: T.font, fontSize: 11, fontWeight: 700,
@@ -937,7 +1359,10 @@ function GamesScreen({ setScreen }) {
     { id: "words", emoji: "🔤", title: "Word Match", desc: "Match pictures to words", color: T.primary, glow: T.primaryGlow },
     { id: "colors", emoji: "🎨", title: "Color Match", desc: "Learn your colors", color: T.blue, glow: T.blueGlow },
     { id: "patterns", emoji: "🔷", title: "Pattern Finder", desc: "What comes next?", color: T.purple, glow: T.purpleGlow },
-    { id: "math", emoji: "🔢", title: "Number Fun", desc: "Simple adding & subtracting", color: T.green, glow: T.greenGlow },
+    { id: "math", emoji: "🔢", title: "Number Fun", desc: "Adding, subtracting & more", color: T.green, glow: T.greenGlow },
+    { id: "memory", emoji: "🧠", title: "Memory Match", desc: "Find the matching pairs", color: T.pink, glow: T.pinkGlow },
+    { id: "rhyming", emoji: "🎤", title: "Rhyme Time", desc: "Which word rhymes?", color: T.yellow, glow: T.yellowGlow },
+    { id: "shapes", emoji: "🧩", title: "Odd One Out", desc: "Which doesn't belong?", color: T.primary, glow: T.primaryGlow },
   ];
 
   return (
@@ -1181,6 +1606,194 @@ function MathGameScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Correct!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Try again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── MEMORY GAME ────────────────────────────────────────────────────────────
+function MemoryGameScreen({ setScreen }) {
+  const { settings } = useApp();
+  const [cards, setCards] = useState([]);
+  const [flipped, setFlipped] = useState([]);
+  const [matched, setMatched] = useState([]);
+  const [moves, setMoves] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const lockRef = useRef(false);
+
+  const pairCount = settings.ageRange === "child" ? 4 : settings.ageRange === "teen" ? 6 : 8;
+
+  useEffect(() => {
+    const picked = [...memoryCards].sort(() => Math.random() - 0.5).slice(0, pairCount);
+    const deck = [...picked, ...picked].map((c, i) => ({ ...c, uid: i })).sort(() => Math.random() - 0.5);
+    setCards(deck); setFlipped([]); setMatched([]); setMoves(0);
+  }, []);
+
+  function flipCard(uid) {
+    if (lockRef.current || flipped.includes(uid) || matched.includes(uid)) return;
+    const next = [...flipped, uid];
+    setFlipped(next);
+    if (next.length === 2) {
+      lockRef.current = true;
+      setMoves(m => m + 1);
+      const [a, b] = next.map(u => cards.find(c => c.uid === u));
+      if (a.id === b.id) {
+        const newMatched = [...matched, next[0], next[1]];
+        setMatched(newMatched);
+        setFlipped([]);
+        lockRef.current = false;
+        speak("Match!", settings);
+        if (newMatched.length === cards.length) {
+          setShowConfetti(true);
+          speak("Amazing! You found them all!", settings);
+          setTimeout(() => setShowConfetti(false), 3000);
+        }
+      } else {
+        setTimeout(() => { setFlipped([]); lockRef.current = false; }, 900);
+      }
+    }
+  }
+
+  const cols = pairCount <= 4 ? 4 : 4;
+  const won = matched.length === cards.length && cards.length > 0;
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🧠 Memory Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 14, color: T.soft, fontWeight: 700 }}>Moves: {moves}</span>} />
+      <ProgressBar value={matched.length} max={cards.length} color={T.pink} h={6} />
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 10, marginTop: 16 }}>
+        {cards.map(c => {
+          const isFlipped = flipped.includes(c.uid) || matched.includes(c.uid);
+          return (
+            <button key={c.uid} onClick={() => flipCard(c.uid)} style={{
+              aspectRatio: "1", borderRadius: 16, border: `2.5px solid ${matched.includes(c.uid) ? T.green : T.border}`,
+              background: isFlipped ? (matched.includes(c.uid) ? T.greenGlow : T.blueGlow) : `linear-gradient(135deg, ${T.purple} 0%, #A78BFA 100%)`,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: isFlipped ? 32 : 24, transition: "all 0.25s ease",
+              transform: isFlipped ? "rotateY(0deg)" : "rotateY(0deg)",
+              boxShadow: matched.includes(c.uid) ? `0 4px 12px ${T.green}30` : "none",
+            }}>
+              {isFlipped ? c.emoji : "❓"}
+            </button>
+          );
+        })}
+      </div>
+      {won && (
+        <div style={{ textAlign: "center", padding: 20, marginTop: 16 }}>
+          <div style={{ fontFamily: T.font, fontSize: 24, fontWeight: 800, color: T.green }}>🎉 You Won!</div>
+          <div style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, marginTop: 8 }}>Completed in {moves} moves</div>
+          <Btn color={T.purple} onClick={() => { const picked = [...memoryCards].sort(() => Math.random() - 0.5).slice(0, pairCount); const deck = [...picked, ...picked].map((c, i) => ({ ...c, uid: i })).sort(() => Math.random() - 0.5); setCards(deck); setFlipped([]); setMatched([]); setMoves(0); }} style={{ marginTop: 16 }}>Play Again</Btn>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── RHYMING GAME ───────────────────────────────────────────────────────────
+function RhymingGameScreen({ setScreen }) {
+  const { settings } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = rhymingData.filter(r => r.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const item = filtered[idx % filtered.length];
+
+  function pick(choice) {
+    if (feedback) return;
+    if (choice === item.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${item.word} rhymes with ${item.answer}!`, settings);
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+    } else {
+      setFeedback("wrong"); speak("Try another one!", settings);
+      setTimeout(() => setFeedback(""), 800);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🎤 Rhyme Time" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.pink} h={6} />
+      <Card style={{ textAlign: "center", padding: 32, marginBottom: 20, marginTop: 16 }}>
+        <div style={{ fontSize: 64, marginBottom: 8 }}>{item.emoji}</div>
+        <div style={{ fontFamily: T.font, fontSize: 36, fontWeight: 800, color: T.text, letterSpacing: 4 }}>{item.word}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, margin: "12px 0 0" }}>What rhymes with this?</p>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        {item.choices.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === item.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: 18, borderRadius: 18, border: `2.5px solid ${border}`, background: bg,
+              cursor: "pointer", fontFamily: T.font, fontSize: 20, fontWeight: 800,
+              color: col, letterSpacing: 2, transition: "all 0.15s ease",
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 They rhyme!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Not quite! Try again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── SHAPE SORTING GAME ─────────────────────────────────────────────────────
+function ShapeSortScreen({ setScreen }) {
+  const { settings } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = shapeSortData.filter(s => s.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const item = filtered[idx % filtered.length];
+
+  function pick(emoji) {
+    if (feedback) return;
+    if (emoji === item.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Right! That one doesn't belong!`, settings);
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+    } else {
+      setFeedback("wrong"); speak("That one fits! Look again.", settings);
+      setTimeout(() => setFeedback(""), 800);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🧩 Odd One Out" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.yellow} h={6} />
+      <Card style={{ textAlign: "center", padding: 28, marginBottom: 20, marginTop: 16 }}>
+        <div style={{ fontSize: 48, marginBottom: 8 }}>{item.emoji}</div>
+        <div style={{ fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.text }}>{item.shape}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "10px 0 0" }}>Which one does NOT belong?</p>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, maxWidth: 300, margin: "0 auto" }}>
+        {item.items.map((emoji, i) => {
+          let bg = T.surface, border = T.border;
+          if (feedback === "correct" && emoji === item.answer) { bg = T.greenGlow; border = T.green; }
+          return (
+            <button key={i} onClick={() => pick(emoji)} style={{
+              aspectRatio: "1", borderRadius: 22, border: `3px solid ${border}`, background: bg,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 44, transition: "all 0.15s ease", boxShadow: T.shadow,
+            }}>{emoji}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 20, fontWeight: 800, color: T.green }}>🎉 {item.wrongLabel}!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>That one fits! Try again! 👀</div>}
     </div>
   );
 }
@@ -1480,6 +2093,9 @@ export default function App() {
     game_colors: <ColorGameScreen setScreen={setScreen} />,
     game_patterns: <PatternGameScreen setScreen={setScreen} />,
     game_math: <MathGameScreen setScreen={setScreen} />,
+    game_memory: <MemoryGameScreen setScreen={setScreen} />,
+    game_rhyming: <RhymingGameScreen setScreen={setScreen} />,
+    game_shapes: <ShapeSortScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
