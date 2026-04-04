@@ -50,6 +50,20 @@ const defaultSettings = {
 const AppContext = createContext();
 function useApp() { return useContext(AppContext); }
 
+// ─── Age-Adaptive Helpers ────────────────────────────────────────────────────
+function getMaxLevel(ageRange) {
+  if (ageRange === "child") return 1;
+  if (ageRange === "teen") return 2;
+  return 3; // young_adult, adult
+}
+function getFontScale(settings) {
+  const base = settings.fontSize === "small" ? 0.85 : settings.fontSize === "large" ? 1.18 : 1;
+  return base;
+}
+function getButtonScale(ageRange) {
+  return ageRange === "child" ? 1.15 : 1;
+}
+
 // ─── Age Range Config ────────────────────────────────────────────────────────
 const ageRanges = [
   { id: "child", label: "Child", ages: "4-10", emoji: "🧒", color: T.primary, desc: "Simple words, big buttons, fun sounds" },
@@ -914,12 +928,14 @@ function GamesScreen({ setScreen }) {
 // ─── WORD GAME ───────────────────────────────────────────────────────────────
 function WordGameScreen({ setScreen }) {
   const { settings } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = wordGames.filter(g => g.level <= maxLevel);
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const game = wordGames[idx];
+  const game = filtered[idx % filtered.length];
 
   function pick(choice) {
     if (feedback) return;
@@ -927,7 +943,7 @@ function WordGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak("Great job!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setShowHint(false); setIdx(i => (i + 1) % wordGames.length); }, 1800);
+      setTimeout(() => { setFeedback(""); setShowHint(false); setIdx(i => (i + 1) % filtered.length); }, 1800);
     } else {
       setFeedback("wrong"); speak("Try again!", settings);
       setTimeout(() => setFeedback(""), 1000);
@@ -939,7 +955,7 @@ function WordGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔤 Word Match" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <ProgressBar value={idx + 1} max={wordGames.length} color={T.primary} h={6} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.primary} h={6} />
       <Card style={{ textAlign: "center", padding: 32, marginBottom: 20, marginTop: 16 }}>
         <div style={{ fontSize: 80, marginBottom: 12 }}>{game.image}</div>
         <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, margin: 0 }}>What word matches this picture?</p>
@@ -1025,11 +1041,13 @@ function ColorGameScreen({ setScreen }) {
 // ─── PATTERN GAME ────────────────────────────────────────────────────────────
 function PatternGameScreen({ setScreen }) {
   const { settings } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = patternData.filter(p => p.level <= maxLevel);
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const p = patternData[idx];
+  const p = filtered[idx % filtered.length];
 
   function pick(val) {
     if (feedback) return;
@@ -1037,7 +1055,7 @@ function PatternGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak("You found the pattern!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % patternData.length); }, 1500);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
     } else { setFeedback("wrong"); speak("Look again", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
@@ -1046,7 +1064,7 @@ function PatternGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔷 Pattern Finder" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <ProgressBar value={idx + 1} max={patternData.length} color={T.purple} h={6} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.purple} h={6} />
       <Card style={{ textAlign: "center", padding: 28, marginBottom: 24, marginTop: 16 }}>
         <p style={{ fontFamily: T.font, fontSize: 16, color: T.soft, margin: "0 0 16px" }}>What comes next?</p>
         <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
@@ -1079,11 +1097,13 @@ function PatternGameScreen({ setScreen }) {
 // ─── MATH GAME ───────────────────────────────────────────────────────────────
 function MathGameScreen({ setScreen }) {
   const { settings } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = mathProblems.filter(p => p.level <= maxLevel);
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const prob = mathProblems[idx];
+  const prob = filtered[idx % filtered.length];
 
   function pick(val) {
     if (feedback) return;
@@ -1091,7 +1111,7 @@ function MathGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak(`Yes! ${prob.q} equals ${prob.a}`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % mathProblems.length); }, 1500);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
     } else { setFeedback("wrong"); speak("Not quite", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
@@ -1100,7 +1120,7 @@ function MathGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔢 Number Fun" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <ProgressBar value={idx + 1} max={mathProblems.length} color={T.green} h={6} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.green} h={6} />
       <Card style={{ textAlign: "center", padding: 36, marginBottom: 24, marginTop: 16 }}>
         <div style={{ fontFamily: T.font, fontSize: 56, fontWeight: 800, color: T.text, letterSpacing: 4 }}>{prob.q}</div>
         <div style={{ fontFamily: T.font, fontSize: 20, color: T.soft, marginTop: 8 }}>= ?</div>
@@ -1401,8 +1421,8 @@ export default function App() {
           background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
           fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
         }}>
-          <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; }`}</style>
-          <OnboardingScreen />
+          <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+          <div style={{ animation: "fadeIn 0.4s ease-out" }}><OnboardingScreen /></div>
         </div>
       </AppContext.Provider>
     );
@@ -1422,14 +1442,28 @@ export default function App() {
     settings: <SettingsScreen setScreen={setScreen} />,
   };
 
+  const globalCSS = `
+    * { box-sizing: border-box; }
+    button { -webkit-tap-highlight-color: transparent; }
+    ::-webkit-scrollbar { display: none; }
+    input { outline: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .page-enter { animation: fadeIn 0.25s ease-out; }
+  `;
+
   return (
     <AppContext.Provider value={{ settings, updateSettings }}>
       <div style={{
         background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
         fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
       }}>
-        <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; }`}</style>
-        {screens[screen] || <HomeScreen setScreen={setScreen} />}
+        <style>{globalCSS}</style>
+        <div key={screen} className="page-enter">
+          {screens[screen] || <HomeScreen setScreen={setScreen} />}
+        </div>
         <BottomNav screen={screen} setScreen={setScreen} />
       </div>
     </AppContext.Provider>
