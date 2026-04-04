@@ -1,29 +1,29 @@
 import { useState, useEffect, useRef, useCallback, createContext, useContext } from "react";
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
-const T = {
-  bg: "#FFF8F0",
-  surface: "#FFFFFF",
-  text: "#2B2520",
-  soft: "#9E9589",
-  primary: "#FF6B3D",
-  primaryGlow: "#FFF0EB",
-  blue: "#4E8AE6",
-  blueGlow: "#EBF2FF",
-  purple: "#8B6CF6",
-  purpleGlow: "#F3EFFF",
-  green: "#3EBB6E",
-  greenGlow: "#E6F9ED",
-  yellow: "#F7B731",
-  yellowGlow: "#FFF7E0",
-  pink: "#E84E8A",
-  pinkGlow: "#FFEBF3",
-  border: "#F0EBE3",
-  shadow: "0 4px 20px rgba(43,37,32,0.06)",
-  radius: 22,
-  font: "'Baloo 2', cursive",
-  fontAlt: "'Atkinson Hyperlegible', sans-serif",
+const lightTheme = {
+  bg: "#FFF8F0", surface: "#FFFFFF", text: "#2B2520", soft: "#9E9589",
+  primary: "#FF6B3D", primaryGlow: "#FFF0EB",
+  blue: "#4E8AE6", blueGlow: "#EBF2FF",
+  purple: "#8B6CF6", purpleGlow: "#F3EFFF",
+  green: "#3EBB6E", greenGlow: "#E6F9ED",
+  yellow: "#F7B731", yellowGlow: "#FFF7E0",
+  pink: "#E84E8A", pinkGlow: "#FFEBF3",
+  border: "#F0EBE3", shadow: "0 4px 20px rgba(43,37,32,0.06)",
+  radius: 22, font: "'Baloo 2', cursive", fontAlt: "'Atkinson Hyperlegible', sans-serif",
 };
+const darkTheme = {
+  bg: "#1A1A2E", surface: "#16213E", text: "#E8E8E8", soft: "#8888AA",
+  primary: "#FF6B3D", primaryGlow: "#2A1A15",
+  blue: "#5B9BF0", blueGlow: "#1A2540",
+  purple: "#9B7FF0", purpleGlow: "#1E1A35",
+  green: "#4ECC7E", greenGlow: "#152520",
+  yellow: "#FFD044", yellowGlow: "#2A2515",
+  pink: "#F06B9E", pinkGlow: "#2A1520",
+  border: "#2A2A4A", shadow: "0 4px 20px rgba(0,0,0,0.3)",
+  radius: 22, font: "'Baloo 2', cursive", fontAlt: "'Atkinson Hyperlegible', sans-serif",
+};
+let T = lightTheme;
 
 // ─── Persistent Storage ──────────────────────────────────────────────────────
 function loadState(key, fallback) {
@@ -35,17 +35,46 @@ function saveState(key, value) {
 
 // ─── App Context ─────────────────────────────────────────────────────────────
 const defaultSettings = {
-  ageRange: null, // "child" | "teen" | "young_adult" | "adult"
+  ageRange: null,
   kidsMode: false,
-  gameTimerMinutes: 0, // 0 = no limit
+  gameTimerMinutes: 0,
   parentPin: "",
   voiceId: "default",
   voiceRate: 0.85,
   voicePitch: 1.0,
-  fontSize: "medium", // "small" | "medium" | "large"
+  fontSize: "medium",
   highContrast: false,
   hapticFeedback: true,
+  darkMode: false,
 };
+
+const defaultProgress = {
+  totalStars: 0,
+  gamesPlayed: 0,
+  wordsSpoken: 0,
+  routinesCompleted: 0,
+  breathingMinutes: 0,
+  focusMinutes: 0,
+  streak: 0,
+  lastActiveDate: null,
+  badges: [],
+  dailyLog: {},
+};
+
+const badgeDefs = [
+  { id: "first_game", emoji: "🎮", label: "First Game", desc: "Play your first game", check: p => p.gamesPlayed >= 1 },
+  { id: "five_games", emoji: "🏆", label: "Game Pro", desc: "Play 5 games", check: p => p.gamesPlayed >= 5 },
+  { id: "twenty_games", emoji: "👑", label: "Game Master", desc: "Play 20 games", check: p => p.gamesPlayed >= 20 },
+  { id: "first_word", emoji: "💬", label: "First Words", desc: "Use the soundboard", check: p => p.wordsSpoken >= 1 },
+  { id: "chatty", emoji: "🗣️", label: "Chatty", desc: "Speak 50 words", check: p => p.wordsSpoken >= 50 },
+  { id: "ten_stars", emoji: "⭐", label: "Star Collector", desc: "Earn 10 stars", check: p => p.totalStars >= 10 },
+  { id: "fifty_stars", emoji: "🌟", label: "Superstar", desc: "Earn 50 stars", check: p => p.totalStars >= 50 },
+  { id: "routine_done", emoji: "✅", label: "Routine Hero", desc: "Complete a full routine", check: p => p.routinesCompleted >= 1 },
+  { id: "calm_breath", emoji: "🫁", label: "Calm Breather", desc: "Use breathing exercises", check: p => p.breathingMinutes >= 1 },
+  { id: "focus_champ", emoji: "🎯", label: "Focus Champ", desc: "Focus for 10+ minutes", check: p => p.focusMinutes >= 10 },
+  { id: "streak_3", emoji: "🔥", label: "On Fire", desc: "3 day streak", check: p => p.streak >= 3 },
+  { id: "streak_7", emoji: "💎", label: "Diamond Streak", desc: "7 day streak", check: p => p.streak >= 7 },
+];
 
 const AppContext = createContext();
 function useApp() { return useContext(AppContext); }
@@ -521,6 +550,149 @@ const shapeSortData = [
   { shape: "School Items", emoji: "🏫", items: ["📚", "✏️", "🍕", "📐"], answer: "🍕", wrongLabel: "Not for school", level: 3 },
 ];
 
+// ─── Social Stories ─────────────────────────────────────────────────────────
+const socialStories = [
+  {
+    id: "doctor", title: "Going to the Doctor", emoji: "🏥", color: "#4E8AE6",
+    pages: [
+      { text: "Today I am going to the doctor.", emoji: "🏥" },
+      { text: "The waiting room might have other people. That's okay.", emoji: "🪑" },
+      { text: "A nurse might check my temperature or weigh me.", emoji: "🌡️" },
+      { text: "The doctor will ask me questions about how I feel.", emoji: "👨‍⚕️" },
+      { text: "The doctor might look in my ears, eyes, and mouth. It doesn't hurt.", emoji: "👁️" },
+      { text: "When it's done, I can feel proud that I was brave!", emoji: "⭐" },
+    ],
+  },
+  {
+    id: "school", title: "First Day of School", emoji: "🏫", color: "#8B6CF6",
+    pages: [
+      { text: "Today is a new day at school. It's okay to feel nervous.", emoji: "🏫" },
+      { text: "I will meet my teacher. They are there to help me.", emoji: "🧑‍🏫" },
+      { text: "There will be other kids. Some might become my friends.", emoji: "👦" },
+      { text: "I will learn new things. Learning can be fun!", emoji: "📚" },
+      { text: "If I need help, I can raise my hand or ask the teacher.", emoji: "🙋" },
+      { text: "At the end of the day, someone will pick me up. I did it!", emoji: "🎉" },
+    ],
+  },
+  {
+    id: "grocery", title: "Going to the Store", emoji: "🛒", color: "#3EBB6E",
+    pages: [
+      { text: "Today we are going to the store to get things we need.", emoji: "🛒" },
+      { text: "The store might be bright and noisy. I can take deep breaths.", emoji: "💨" },
+      { text: "We will walk through the aisles and pick out food.", emoji: "🍎" },
+      { text: "I can help by putting things in the cart.", emoji: "🤲" },
+      { text: "At the checkout, we wait in line. Waiting is hard but I can do it.", emoji: "⏳" },
+      { text: "Then we go home! I was a great helper.", emoji: "🏠" },
+    ],
+  },
+  {
+    id: "haircut", title: "Getting a Haircut", emoji: "💇", color: "#E84E8A",
+    pages: [
+      { text: "Today I am getting a haircut. My hair is getting long!", emoji: "💇" },
+      { text: "I will sit in a special chair. It might go up and down.", emoji: "💺" },
+      { text: "The hairdresser will put a cape on me to keep me clean.", emoji: "🧥" },
+      { text: "I might hear buzzing or snipping. These are normal sounds.", emoji: "✂️" },
+      { text: "I can sit very still. If I need a break, I can ask.", emoji: "✋" },
+      { text: "When it's done, I will look great! I was so brave.", emoji: "🌟" },
+    ],
+  },
+  {
+    id: "restaurant", title: "Eating at a Restaurant", emoji: "🍽️", color: "#F7B731",
+    pages: [
+      { text: "Today we are eating at a restaurant. How exciting!", emoji: "🍽️" },
+      { text: "We will sit at a table and look at the menu.", emoji: "📋" },
+      { text: "I can choose what I want to eat. It's okay to take my time.", emoji: "🤔" },
+      { text: "A waiter will bring our food. I can say please and thank you.", emoji: "🙏" },
+      { text: "I will use my inside voice because other people are eating too.", emoji: "🤫" },
+      { text: "When we're done, we go home with full tummies!", emoji: "😊" },
+    ],
+  },
+  {
+    id: "feelings", title: "When I Feel Angry", emoji: "😠", color: "#FF6B3D",
+    pages: [
+      { text: "Sometimes I feel angry. Everybody feels angry sometimes.", emoji: "😠" },
+      { text: "My body might feel hot. My hands might squeeze tight.", emoji: "✊" },
+      { text: "When I feel angry, I can stop and take a deep breath.", emoji: "🫁" },
+      { text: "I can count to ten slowly. 1... 2... 3... 4... 5...", emoji: "🔢" },
+      { text: "I can tell someone how I feel. 'I feel angry because...'", emoji: "💬" },
+      { text: "The angry feeling will pass. I can handle big feelings!", emoji: "💪" },
+    ],
+  },
+  {
+    id: "sleepover", title: "Sleeping at Someone's House", emoji: "🏠", color: "#8B6CF6",
+    pages: [
+      { text: "Tonight I am sleeping at someone else's house.", emoji: "🏠" },
+      { text: "I packed my bag with my pajamas and toothbrush.", emoji: "🎒" },
+      { text: "Their house might look different from mine. That's okay.", emoji: "👀" },
+      { text: "We might play games, watch a movie, or have snacks.", emoji: "🎮" },
+      { text: "When it's bedtime, I can use my own pillow or stuffed animal.", emoji: "🧸" },
+      { text: "In the morning, someone will come get me. I had fun!", emoji: "🌅" },
+    ],
+  },
+  {
+    id: "new_friend", title: "Making a New Friend", emoji: "🤝", color: "#3EBB6E",
+    pages: [
+      { text: "I see someone I want to be friends with.", emoji: "👋" },
+      { text: "I can walk up to them and say 'Hi, my name is...'", emoji: "🗣️" },
+      { text: "I can ask them what they like to do.", emoji: "❓" },
+      { text: "If they want to play, great! If not, that's okay too.", emoji: "🎮" },
+      { text: "Friends share, take turns, and are kind to each other.", emoji: "🤲" },
+      { text: "Making friends takes time. I'm doing a great job!", emoji: "⭐" },
+    ],
+  },
+];
+
+// ─── Reading Practice Data ──────────────────────────────────────────────────
+const sightWords = {
+  level1: ["the", "and", "is", "it", "to", "in", "I", "a", "my", "we", "go", "no", "so", "he", "me", "be", "do", "up", "at", "on"],
+  level2: ["said", "have", "with", "they", "this", "from", "that", "what", "were", "when", "your", "each", "make", "like", "just", "over", "such", "take", "than", "them"],
+  level3: ["about", "could", "would", "there", "their", "which", "other", "because", "through", "before", "should", "between", "people", "different", "important", "another", "together", "something", "sometimes", "everything"],
+};
+
+const readingStories = [
+  {
+    id: "cat_story", title: "The Cat", emoji: "🐱", level: 1,
+    text: "I see a cat. The cat is big. The cat is on my bed. I like the cat. The cat is my friend.",
+    questions: [{ q: "Where is the cat?", choices: ["On the bed", "In the car", "At school"], a: "On the bed" }],
+  },
+  {
+    id: "park_story", title: "At the Park", emoji: "🌲", level: 1,
+    text: "We go to the park. I see a dog. The dog can run fast. I like to play at the park. It is fun.",
+    questions: [{ q: "What did you see?", choices: ["A cat", "A dog", "A bird"], a: "A dog" }],
+  },
+  {
+    id: "rain_story", title: "Rainy Day", emoji: "🌧️", level: 2,
+    text: "Today it is raining outside. I put on my rain boots and my jacket. I like to jump in puddles. The rain makes everything smell fresh. When I go inside, I have hot chocolate.",
+    questions: [{ q: "What does the rain make?", choices: ["Everything wet", "Everything smell fresh", "Everything cold"], a: "Everything smell fresh" }],
+  },
+  {
+    id: "space_story", title: "Space Adventure", emoji: "🚀", level: 2,
+    text: "I dream about going to space. There are many stars and planets. The moon is very far away. Astronauts are very brave. Maybe one day I can visit the stars.",
+    questions: [{ q: "Who is brave?", choices: ["Teachers", "Astronauts", "Doctors"], a: "Astronauts" }],
+  },
+  {
+    id: "ocean_story", title: "Under the Sea", emoji: "🌊", level: 3,
+    text: "The ocean is full of amazing creatures. Dolphins swim together in groups called pods. Octopuses have eight arms and are very smart. The coral reef is like an underwater city where thousands of fish live. Scientists are working to protect these beautiful places for the future.",
+    questions: [{ q: "What are groups of dolphins called?", choices: ["Herds", "Pods", "Schools"], a: "Pods" }],
+  },
+];
+
+// ─── Coping Strategy Cards ──────────────────────────────────────────────────
+const copingCards = [
+  { emoji: "🫁", label: "Deep Breaths", desc: "Breathe in for 4, hold for 4, out for 4", color: "#4E8AE6" },
+  { emoji: "🧊", label: "Hold Ice", desc: "Hold something cold to ground yourself", color: "#5B9BF0" },
+  { emoji: "🎵", label: "Listen to Music", desc: "Put on your favorite song", color: "#8B6CF6" },
+  { emoji: "🏃", label: "Move Your Body", desc: "Jump, stretch, or go for a walk", color: "#3EBB6E" },
+  { emoji: "🧸", label: "Hug Something Soft", desc: "Squeeze a stuffed animal or pillow", color: "#E84E8A" },
+  { emoji: "🔢", label: "Count to 10", desc: "Slowly count numbers to calm down", color: "#F7B731" },
+  { emoji: "🎨", label: "Draw It Out", desc: "Draw how you're feeling", color: "#FF6B3D" },
+  { emoji: "💬", label: "Talk to Someone", desc: "Tell a trusted person how you feel", color: "#4E8AE6" },
+  { emoji: "🌿", label: "Go Outside", desc: "Fresh air can help you feel better", color: "#3EBB6E" },
+  { emoji: "📖", label: "Read a Story", desc: "Lose yourself in a good book", color: "#8B6CF6" },
+  { emoji: "✍️", label: "Write It Down", desc: "Journal your thoughts and feelings", color: "#E84E8A" },
+  { emoji: "🫧", label: "Blow Bubbles", desc: "Pretend to blow bubbles slowly", color: "#5B9BF0" },
+];
+
 // ─── Speech ──────────────────────────────────────────────────────────────────
 function getVoices() {
   return window.speechSynthesis?.getVoices() || [];
@@ -771,12 +943,18 @@ function HomeScreen({ setScreen }) {
   const [tip] = useState(tips[Math.floor(Math.random() * tips.length)]);
   const [showAgePicker, setShowAgePicker] = useState(false);
 
+  const { progress } = useApp();
   const menuItems = [
     { emoji: "💬", title: "Soundboard", desc: "Build sentences & communicate", color: T.blue, glow: T.blueGlow, screen: "soundboard", gradient: "linear-gradient(135deg, #4E8AE6 0%, #7BA8F0 100%)" },
-    { emoji: "🎮", title: "Learning Games", desc: "Words, colors, patterns & math", color: T.purple, glow: T.purpleGlow, screen: "games", gradient: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 100%)" },
+    { emoji: "🎮", title: "Learning Games", desc: "7 games: words, memory & more", color: T.purple, glow: T.purpleGlow, screen: "games", gradient: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 100%)" },
+    { emoji: "📖", title: "Social Stories", desc: "Prepare for new experiences", color: T.primary, glow: T.primaryGlow, screen: "stories", gradient: "linear-gradient(135deg, #FF6B3D 0%, #FF8F6B 100%)" },
+    { emoji: "📚", title: "Reading Practice", desc: "Sight words & read-along stories", color: T.blue, glow: T.blueGlow, screen: "reading", gradient: "linear-gradient(135deg, #4E8AE6 0%, #7BA8F0 100%)" },
+    { emoji: "🌡️", title: "How I Feel", desc: "Emotion check-in & coping tools", color: T.pink, glow: T.pinkGlow, screen: "emotions", gradient: "linear-gradient(135deg, #E84E8A 0%, #F08CB4 100%)" },
     { emoji: "🎯", title: "Focus Timer", desc: "Stay on track with reminders", color: T.green, glow: T.greenGlow, screen: "focus", gradient: "linear-gradient(135deg, #3EBB6E 0%, #6DD598 100%)" },
-    { emoji: "🫧", title: "Calm Corner", desc: "Breathing & sensory tools", color: T.pink, glow: T.pinkGlow, screen: "calm", gradient: "linear-gradient(135deg, #E84E8A 0%, #F08CB4 100%)" },
+    { emoji: "🫧", title: "Calm Corner", desc: "Breathing & grounding exercises", color: T.purple, glow: T.purpleGlow, screen: "calm", gradient: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 100%)" },
+    { emoji: "🧸", title: "Sensory Tools", desc: "Pop-it, spinner, color mixer", color: T.pink, glow: T.pinkGlow, screen: "fidget", gradient: "linear-gradient(135deg, #E84E8A 0%, #F08CB4 100%)" },
     { emoji: "✅", title: "My Routines", desc: "Daily schedules & checklists", color: T.yellow, glow: T.yellowGlow, screen: "habits", gradient: "linear-gradient(135deg, #F7B731 0%, #FFCF5C 100%)" },
+    { emoji: "🏆", title: "My Rewards", desc: `${progress.totalStars} stars · ${badgeDefs.filter(b => b.check(progress)).length} badges`, color: T.yellow, glow: T.yellowGlow, screen: "rewards", gradient: "linear-gradient(135deg, #F7B731 0%, #FFCF5C 100%)" },
   ];
 
   return (
@@ -848,9 +1026,9 @@ function HomeScreen({ setScreen }) {
         </Card>
       )}
 
-      {/* Feature Cards - Grid layout for top 2, then stack */}
+      {/* Feature Cards - Grid layout for top 4, then stack */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-        {menuItems.slice(0, 2).map(item => (
+        {menuItems.slice(0, 4).map(item => (
           <Card key={item.screen} onClick={() => setScreen(item.screen)}
             style={{
               padding: 0, overflow: "hidden", border: "none",
@@ -869,7 +1047,7 @@ function HomeScreen({ setScreen }) {
         ))}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {menuItems.slice(2).map(item => (
+        {menuItems.slice(4).map(item => (
           <Card key={item.screen} onClick={() => setScreen(item.screen)}
             style={{
               display: "flex", alignItems: "center", gap: 14, padding: 16,
@@ -1052,7 +1230,7 @@ function SettingsScreen({ setScreen }) {
           ))}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <div>
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>High Contrast</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Bolder colors & borders</div>
@@ -1067,6 +1245,32 @@ function SettingsScreen({ setScreen }) {
             }} />
           </button>
         </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🌙 Dark Mode</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Easier on sensitive eyes</div>
+          </div>
+          <button onClick={() => updateSettings({ darkMode: !settings.darkMode })} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.darkMode ? T.purple : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.darkMode ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+      </Card>
+
+      {/* Parent Dashboard Link */}
+      <Card onClick={() => setScreen("parent_dash")} style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 14, cursor: "pointer", padding: 18 }}>
+        <div style={{ width: 48, height: 48, borderRadius: 16, background: T.blueGlow, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>👨‍👩‍👧</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text }}>Parent Dashboard</div>
+          <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>View progress, stats & badges</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.soft} strokeWidth="2.5" strokeLinecap="round"><path d="M9 5l7 7-7 7"/></svg>
       </Card>
     </div>
   );
@@ -2016,16 +2220,551 @@ function HabitsScreen({ setScreen }) {
   );
 }
 
+// ─── REWARDS / BADGES ───────────────────────────────────────────────────────
+function RewardsScreen({ setScreen }) {
+  const { progress } = useApp();
+  const earned = badgeDefs.filter(b => b.check(progress));
+  const locked = badgeDefs.filter(b => !b.check(progress));
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="🏆 My Rewards" onBack={() => setScreen("home")} />
+
+      {/* Stats Banner */}
+      <div style={{
+        background: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 50%, #C4B5FD 100%)",
+        borderRadius: 24, padding: 22, marginBottom: 20, color: "#fff",
+        boxShadow: "0 8px 32px rgba(139,108,246,0.3)",
+      }}>
+        <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 800, marginBottom: 16 }}>My Progress</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          {[
+            { label: "Stars", value: progress.totalStars, emoji: "⭐" },
+            { label: "Games", value: progress.gamesPlayed, emoji: "🎮" },
+            { label: "Streak", value: `${progress.streak}d`, emoji: "🔥" },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign: "center", background: "rgba(255,255,255,0.15)", borderRadius: 16, padding: "12px 8px" }}>
+              <div style={{ fontSize: 24 }}>{s.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 22, fontWeight: 800 }}>{s.value}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 11, opacity: 0.8 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+          {[
+            { label: "Words Spoken", value: progress.wordsSpoken },
+            { label: "Focus Min", value: progress.focusMinutes },
+            { label: "Routines", value: progress.routinesCompleted },
+          ].map(s => (
+            <div key={s.label} style={{ flex: 1, textAlign: "center", background: "rgba(255,255,255,0.1)", borderRadius: 12, padding: "8px 4px" }}>
+              <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700 }}>{s.value}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 10, opacity: 0.7 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Earned Badges */}
+      <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 12 }}>
+        Earned Badges ({earned.length}/{badgeDefs.length})
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 24 }}>
+        {earned.map(b => (
+          <Card key={b.id} style={{ textAlign: "center", padding: 14, background: T.yellowGlow, border: `1.5px solid ${T.yellow}30` }}>
+            <div style={{ fontSize: 36 }}>{b.emoji}</div>
+            <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: T.text, marginTop: 4 }}>{b.label}</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{b.desc}</div>
+          </Card>
+        ))}
+      </div>
+
+      {locked.length > 0 && (
+        <>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.soft, marginBottom: 12 }}>
+            Keep Going! ({locked.length} left)
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+            {locked.map(b => (
+              <Card key={b.id} style={{ textAlign: "center", padding: 14, opacity: 0.5 }}>
+                <div style={{ fontSize: 36 }}>🔒</div>
+                <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: T.soft, marginTop: 4 }}>{b.label}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{b.desc}</div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── SOCIAL STORIES ─────────────────────────────────────────────────────────
+function SocialStoriesScreen({ setScreen }) {
+  const { settings } = useApp();
+  const [storyId, setStoryId] = useState(null);
+  const [page, setPage] = useState(0);
+
+  const story = socialStories.find(s => s.id === storyId);
+
+  if (!story) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="📖 Social Stories" onBack={() => setScreen("home")} />
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 20px", lineHeight: 1.6 }}>
+          Visual stories to help prepare for everyday situations.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {socialStories.map(s => (
+            <Card key={s.id} onClick={() => { setStoryId(s.id); setPage(0); }}
+              style={{ display: "flex", alignItems: "center", gap: 16, padding: 18, border: `1.5px solid ${s.color}20` }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: 18, background: `${s.color}15`,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, flexShrink: 0,
+              }}>{s.emoji}</div>
+              <div>
+                <div style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text }}>{s.title}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, marginTop: 2 }}>{s.pages.length} pages</div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const pg = story.pages[page];
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title={`📖 ${story.title}`} onBack={() => setStoryId(null)} />
+      <ProgressBar value={page + 1} max={story.pages.length} color={story.color} h={6} />
+
+      <Card style={{ textAlign: "center", padding: 40, marginTop: 20, marginBottom: 20, minHeight: 280, display: "flex", flexDirection: "column", justifyContent: "center", background: `${story.color}08` }}>
+        <div style={{ fontSize: 80, marginBottom: 20 }}>{pg.emoji}</div>
+        <p style={{ fontFamily: T.font, fontSize: 22, fontWeight: 600, color: T.text, lineHeight: 1.5, margin: 0 }}>{pg.text}</p>
+      </Card>
+
+      <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+        <Btn color={T.soft} onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}>← Back</Btn>
+        <Btn color={story.color} onClick={() => speak(pg.text, settings)}>🔊 Read</Btn>
+        {page < story.pages.length - 1 ? (
+          <Btn color={T.primary} onClick={() => setPage(p => p + 1)}>Next →</Btn>
+        ) : (
+          <Btn color={T.green} onClick={() => setStoryId(null)}>Done ✓</Btn>
+        )}
+      </div>
+      <div style={{ textAlign: "center", marginTop: 14, fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>
+        Page {page + 1} of {story.pages.length}
+      </div>
+    </div>
+  );
+}
+
+// ─── READING PRACTICE ───────────────────────────────────────────────────────
+function ReadingScreen({ setScreen }) {
+  const { settings } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const [mode, setMode] = useState(null); // "sight" | "stories"
+  const [wordIdx, setWordIdx] = useState(0);
+  const [storyId, setStoryId] = useState(null);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [score, setScore] = useState(0);
+
+  const levelKey = maxLevel === 1 ? "level1" : maxLevel === 2 ? "level2" : "level3";
+  const words = sightWords[levelKey];
+
+  if (!mode) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="📚 Reading Practice" onBack={() => setScreen("home")} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <Card onClick={() => setMode("sight")} style={{ display: "flex", alignItems: "center", gap: 16, padding: 22, background: T.blueGlow, border: `1.5px solid ${T.blue}20` }}>
+            <div style={{ width: 60, height: 60, borderRadius: 20, background: `${T.blue}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>🔤</div>
+            <div>
+              <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>Sight Words</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Practice reading common words</div>
+            </div>
+          </Card>
+          <Card onClick={() => setMode("stories")} style={{ display: "flex", alignItems: "center", gap: 16, padding: 22, background: T.purpleGlow, border: `1.5px solid ${T.purple}20` }}>
+            <div style={{ width: 60, height: 60, borderRadius: 20, background: `${T.purple}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>📖</div>
+            <div>
+              <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>Read Along Stories</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Short stories with audio</div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "sight") {
+    const word = words[wordIdx % words.length];
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="🔤 Sight Words" onBack={() => setMode(null)}
+          right={<span style={{ fontFamily: T.font, fontSize: 14, color: T.soft }}>{wordIdx + 1}/{words.length}</span>} />
+        <ProgressBar value={wordIdx + 1} max={words.length} color={T.blue} h={6} />
+        <Card style={{ textAlign: "center", padding: 48, marginTop: 20, marginBottom: 20 }}>
+          <div style={{ fontFamily: T.font, fontSize: 64, fontWeight: 800, color: T.text, letterSpacing: 4 }}>{word}</div>
+        </Card>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 16 }}>
+          <Btn color={T.blue} size="lg" onClick={() => speak(word, settings)}>🔊 Hear It</Btn>
+        </div>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          <Btn color={T.soft} onClick={() => setWordIdx(i => Math.max(0, i - 1))} disabled={wordIdx === 0}>← Back</Btn>
+          <Btn color={T.primary} onClick={() => setWordIdx(i => i + 1)}>Next →</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  // Stories mode
+  const filteredStories = readingStories.filter(s => s.level <= maxLevel);
+  const story = filteredStories.find(s => s.id === storyId);
+
+  if (!story) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="📖 Read Along" onBack={() => setMode(null)} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {filteredStories.map(s => (
+            <Card key={s.id} onClick={() => { setStoryId(s.id); setShowAnswer(false); }}
+              style={{ display: "flex", alignItems: "center", gap: 16, padding: 18 }}>
+              <div style={{ fontSize: 40 }}>{s.emoji}</div>
+              <div>
+                <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text }}>{s.title}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Level {s.level}</div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const q = story.questions[0];
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title={`📖 ${story.title}`} onBack={() => setStoryId(null)} />
+      <Card style={{ padding: 24, marginBottom: 16, lineHeight: 2.2 }}>
+        <p style={{ fontFamily: T.font, fontSize: 20, fontWeight: 600, color: T.text, margin: 0 }}>{story.text}</p>
+      </Card>
+      <Btn color={T.blue} onClick={() => speak(story.text, settings)} style={{ width: "100%", marginBottom: 20 }}>🔊 Read It To Me</Btn>
+
+      <Card style={{ padding: 20, background: T.yellowGlow, border: `1.5px solid ${T.yellow}30` }}>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>📝 Question:</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.text, margin: "0 0 14px" }}>{q.q}</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {q.choices.map(c => (
+            <button key={c} onClick={() => {
+              setShowAnswer(true);
+              if (c === q.a) { setScore(s => s + 1); speak("Correct!", settings); }
+              else speak("Try again!", settings);
+            }} style={{
+              padding: 14, borderRadius: 14, border: `2px solid ${showAnswer && c === q.a ? T.green : T.border}`,
+              background: showAnswer && c === q.a ? T.greenGlow : T.surface,
+              fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text, cursor: "pointer", textAlign: "left",
+            }}>{c}</button>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ─── EMOTION METER ──────────────────────────────────────────────────────────
+function EmotionScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const [level, setLevel] = useState(3); // 1-5 scale
+  const [selectedCoping, setSelectedCoping] = useState(null);
+
+  const emotionScale = [
+    { level: 1, emoji: "😢", label: "Very Upset", color: "#FF4444" },
+    { level: 2, emoji: "😟", label: "Upset", color: "#FF8844" },
+    { level: 3, emoji: "😐", label: "Okay", color: "#F7B731" },
+    { level: 4, emoji: "😊", label: "Good", color: "#4ECC7E" },
+    { level: 5, emoji: "🤩", label: "Great!", color: "#4E8AE6" },
+  ];
+
+  const current = emotionScale.find(e => e.level === level);
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="🌡️ How I Feel" onBack={() => setScreen("home")} />
+
+      {/* Emotion Meter */}
+      <Card style={{ textAlign: "center", padding: 28, marginBottom: 20, background: `${current.color}10`, border: `2px solid ${current.color}25` }}>
+        <div style={{ fontSize: 72, marginBottom: 8, transition: "all 0.3s ease" }}>{current.emoji}</div>
+        <div style={{ fontFamily: T.font, fontSize: 24, fontWeight: 800, color: current.color }}>{current.label}</div>
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 20 }}>
+          {emotionScale.map(e => (
+            <button key={e.level} onClick={() => { setLevel(e.level); speak(`I feel ${e.label.toLowerCase()}`, settings); }}
+              style={{
+                width: 52, height: 52, borderRadius: 16, border: `3px solid ${level === e.level ? e.color : T.border}`,
+                background: level === e.level ? `${e.color}20` : T.surface,
+                fontSize: 28, cursor: "pointer", transition: "all 0.2s ease",
+                transform: level === e.level ? "scale(1.15)" : "scale(1)",
+              }}>{e.emoji}</button>
+          ))}
+        </div>
+      </Card>
+
+      {/* Coping Strategies */}
+      <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 14 }}>
+        {level <= 2 ? "💡 Things That Can Help" : "🌟 Keep It Going!"}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+        {copingCards.slice(0, level <= 2 ? 8 : 6).map((card, i) => (
+          <button key={i} onClick={() => { setSelectedCoping(card); speak(card.desc, settings); }}
+            style={{
+              padding: 16, borderRadius: 18, border: `1.5px solid ${card.color}25`,
+              background: selectedCoping === card ? `${card.color}15` : T.surface,
+              cursor: "pointer", textAlign: "center", transition: "all 0.15s ease",
+            }}>
+            <div style={{ fontSize: 30, marginBottom: 4 }}>{card.emoji}</div>
+            <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.text }}>{card.label}</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 4, lineHeight: 1.3 }}>{card.desc}</div>
+          </button>
+        ))}
+      </div>
+
+      {level <= 2 && (
+        <Card style={{ background: T.pinkGlow, border: `1.5px solid ${T.pink}20`, textAlign: "center", padding: 20 }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>💪</div>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text }}>You are strong!</div>
+          <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginTop: 6, lineHeight: 1.5 }}>
+            Big feelings are okay. They always pass. You've got this!
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ─── FIDGET / SENSORY TOOLS ─────────────────────────────────────────────────
+function FidgetScreen({ setScreen }) {
+  const [tool, setTool] = useState(null);
+  const [popGrid, setPopGrid] = useState(() => Array(36).fill(false));
+  const [spinAngle, setSpinAngle] = useState(0);
+  const [spinning, setSpinning] = useState(false);
+  const [mixColor1, setMixColor1] = useState("#FF4444");
+  const [mixColor2, setMixColor2] = useState("#4488FF");
+  const [tapCount, setTapCount] = useState(0);
+
+  function resetPop() { setPopGrid(Array(36).fill(false)); }
+
+  function spin() {
+    if (spinning) return;
+    setSpinning(true);
+    const newAngle = spinAngle + 720 + Math.random() * 1440;
+    setSpinAngle(newAngle);
+    setTimeout(() => setSpinning(false), 2000);
+  }
+
+  function mixColors(c1, c2) {
+    const hex = s => parseInt(s, 16);
+    const r = Math.round((hex(c1.slice(1,3)) + hex(c2.slice(1,3))) / 2);
+    const g = Math.round((hex(c1.slice(3,5)) + hex(c2.slice(3,5))) / 2);
+    const b = Math.round((hex(c1.slice(5,7)) + hex(c2.slice(5,7))) / 2);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  const tools = [
+    { id: "pop", emoji: "🫧", label: "Pop It", color: T.pink },
+    { id: "spinner", emoji: "🌀", label: "Fidget Spinner", color: T.purple },
+    { id: "colors", emoji: "🎨", label: "Color Mixer", color: T.blue },
+    { id: "tap", emoji: "👆", label: "Tap Counter", color: T.green },
+  ];
+
+  if (!tool) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="🧸 Sensory Tools" onBack={() => setScreen("home")} />
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 20px", lineHeight: 1.6 }}>
+          Calming tools for when you need to fidget or focus.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          {tools.map(t => (
+            <Card key={t.id} onClick={() => setTool(t.id)}
+              style={{ textAlign: "center", padding: 24, background: `${t.color}10`, border: `1.5px solid ${t.color}20` }}>
+              <div style={{ fontSize: 48, marginBottom: 8 }}>{t.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text }}>{t.label}</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title={tools.find(t => t.id === tool)?.emoji + " " + tools.find(t => t.id === tool)?.label} onBack={() => setTool(null)} />
+
+      {tool === "pop" && (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 6, marginBottom: 16 }}>
+            {popGrid.map((popped, i) => (
+              <button key={i} onClick={() => setPopGrid(g => g.map((v, j) => j === i ? !v : v))}
+                style={{
+                  aspectRatio: "1", borderRadius: 50, border: "none", cursor: "pointer",
+                  background: popped ? T.border : `linear-gradient(135deg, ${T.pink} 0%, ${T.purple} 100%)`,
+                  transform: popped ? "scale(0.85)" : "scale(1)",
+                  boxShadow: popped ? "inset 0 2px 8px rgba(0,0,0,0.15)" : `0 4px 12px ${T.pink}30`,
+                  transition: "all 0.15s ease",
+                }} />
+            ))}
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontFamily: T.font, fontSize: 14, color: T.soft, marginBottom: 8 }}>
+              {popGrid.filter(Boolean).length}/{popGrid.length} popped
+            </div>
+            <Btn color={T.pink} onClick={resetPop} size="sm">Reset All</Btn>
+          </div>
+        </>
+      )}
+
+      {tool === "spinner" && (
+        <div style={{ textAlign: "center", padding: 20 }}>
+          <div onClick={spin} style={{
+            width: 200, height: 200, margin: "20px auto", borderRadius: "50%",
+            background: `conic-gradient(${T.purple}, ${T.blue}, ${T.green}, ${T.yellow}, ${T.pink}, ${T.primary}, ${T.purple})`,
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+            transform: `rotate(${spinAngle}deg)`, transition: spinning ? "transform 2s cubic-bezier(0.2, 0.8, 0.3, 1)" : "none",
+            boxShadow: "0 8px 40px rgba(139,108,246,0.3)",
+          }}>
+            <div style={{ width: 60, height: 60, borderRadius: "50%", background: T.surface, boxShadow: "0 2px 10px rgba(0,0,0,0.2)" }} />
+          </div>
+          <p style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginTop: 20 }}>
+            {spinning ? "Spinning..." : "Tap to spin!"}
+          </p>
+        </div>
+      )}
+
+      {tool === "colors" && (
+        <div style={{ textAlign: "center", padding: 20 }}>
+          <div style={{
+            width: 160, height: 160, borderRadius: "50%", margin: "0 auto 24px",
+            background: mixColors(mixColor1, mixColor2),
+            boxShadow: `0 8px 40px ${mixColors(mixColor1, mixColor2)}40`,
+            transition: "background 0.3s ease",
+          }} />
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 16 }}>Pick two colors to mix!</div>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 12 }}>
+            {["#FF4444", "#4488FF", "#44BB44", "#FFBB33", "#BB44FF", "#FF8844", "#FF69B4", "#000000"].map(c => (
+              <button key={c} onClick={() => !mixColor1 || mixColor2 ? setMixColor1(c) : setMixColor2(c)}
+                style={{
+                  width: 36, height: 36, borderRadius: 18, border: (mixColor1 === c || mixColor2 === c) ? "3px solid #000" : `2px solid ${T.border}`,
+                  background: c, cursor: "pointer",
+                }}
+              />
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>Color 1:</div>
+            <div style={{ width: 24, height: 24, borderRadius: 12, background: mixColor1 }} />
+            <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, marginLeft: 8 }}>Color 2:</div>
+            <div style={{ width: 24, height: 24, borderRadius: 12, background: mixColor2 }} />
+          </div>
+        </div>
+      )}
+
+      {tool === "tap" && (
+        <div style={{ textAlign: "center", padding: 20 }}>
+          <div style={{ fontFamily: T.font, fontSize: 80, fontWeight: 800, color: T.text, marginBottom: 20 }}>{tapCount}</div>
+          <button onClick={() => setTapCount(c => c + 1)} style={{
+            width: 180, height: 180, borderRadius: "50%", border: "none", cursor: "pointer",
+            background: `linear-gradient(135deg, ${T.green} 0%, #6DD598 100%)`,
+            fontSize: 60, color: "#fff", boxShadow: `0 8px 40px ${T.green}40`,
+            transition: "transform 0.1s ease", display: "flex", alignItems: "center", justifyContent: "center",
+          }} onPointerDown={e => e.currentTarget.style.transform = "scale(0.92)"}
+            onPointerUp={e => e.currentTarget.style.transform = "scale(1)"}>👆</button>
+          <div style={{ marginTop: 20 }}>
+            <Btn color={T.soft} onClick={() => setTapCount(0)} size="sm">Reset</Btn>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── PARENT DASHBOARD ───────────────────────────────────────────────────────
+function ParentDashboard({ setScreen }) {
+  const { progress, settings } = useApp();
+  const [showPin, setShowPin] = useState(settings.parentPin && settings.parentPin.length === 4);
+
+  if (showPin) {
+    return <PinEntry onSuccess={() => setShowPin(false)} onCancel={() => setScreen("settings")} />;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  const todayLog = progress.dailyLog[today] || {};
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="👨‍👩‍👧 Parent Dashboard" onBack={() => setScreen("settings")} />
+
+      <Card style={{ marginBottom: 16, background: "linear-gradient(135deg, #4E8AE6 0%, #7BA8F0 100%)", color: "#fff", padding: 22 }}>
+        <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Overview</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 13, opacity: 0.85 }}>
+          {settings.ageRange ? `${ageRanges.find(a => a.id === settings.ageRange)?.label} Mode` : "No age set"} · {progress.streak} day streak
+        </div>
+      </Card>
+
+      <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>📊 All-Time Stats</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+        {[
+          { label: "Games Played", value: progress.gamesPlayed, emoji: "🎮", color: T.purple },
+          { label: "Stars Earned", value: progress.totalStars, emoji: "⭐", color: T.yellow },
+          { label: "Words Spoken", value: progress.wordsSpoken, emoji: "💬", color: T.blue },
+          { label: "Focus Minutes", value: progress.focusMinutes, emoji: "🎯", color: T.green },
+          { label: "Breathing Min", value: progress.breathingMinutes, emoji: "🫁", color: T.pink },
+          { label: "Routines Done", value: progress.routinesCompleted, emoji: "✅", color: T.primary },
+        ].map(s => (
+          <Card key={s.label} style={{ padding: 16, textAlign: "center", background: `${s.color}08`, border: `1.5px solid ${s.color}15` }}>
+            <div style={{ fontSize: 28 }}>{s.emoji}</div>
+            <div style={{ fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.text }}>{s.value}</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 11, color: T.soft }}>{s.label}</div>
+          </Card>
+        ))}
+      </div>
+
+      <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>🏅 Badges Earned</div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+        {badgeDefs.filter(b => b.check(progress)).map(b => (
+          <div key={b.id} style={{
+            padding: "6px 14px", borderRadius: 50, background: T.yellowGlow, border: `1.5px solid ${T.yellow}30`,
+            fontFamily: T.font, fontSize: 13, fontWeight: 600, color: T.text,
+          }}>{b.emoji} {b.label}</div>
+        ))}
+        {badgeDefs.filter(b => b.check(progress)).length === 0 && (
+          <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>No badges yet — keep exploring!</div>
+        )}
+      </div>
+
+      <Card style={{ padding: 16, background: T.greenGlow, border: `1.5px solid ${T.green}20` }}>
+        <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 8 }}>💡 Tips for Parents</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, lineHeight: 1.8 }}>
+          • Celebrate small wins — each star matters!<br />
+          • Use Social Stories before new experiences<br />
+          • Let your child explore at their own pace<br />
+          • Add custom words for your child's specific needs<br />
+          • Set game timers for healthy screen limits
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 // ─── NAV ─────────────────────────────────────────────────────────────────────
 function BottomNav({ screen, setScreen }) {
   const items = [
     { id: "home", emoji: "🏠", label: "Home" },
     { id: "soundboard", emoji: "💬", label: "Talk" },
     { id: "games", emoji: "🎮", label: "Games" },
-    { id: "focus", emoji: "🎯", label: "Focus" },
+    { id: "emotions", emoji: "🌡️", label: "Feelings" },
     { id: "calm", emoji: "🫧", label: "Calm" },
   ];
-  const activeId = screen.startsWith("game_") ? "games" : screen === "habits" ? "home" : screen === "settings" ? "home" : screen;
+  const nonNavScreens = ["habits", "settings", "rewards", "stories", "reading", "fidget", "focus", "parent_dash"];
+  const activeId = screen.startsWith("game_") ? "games" : nonNavScreens.includes(screen) ? "home" : screen;
 
   return (
     <div style={{
@@ -2053,12 +2792,48 @@ function BottomNav({ screen, setScreen }) {
 // ─── APP ─────────────────────────────────────────────────────────────────────
 export default function App() {
   const [settings, setSettings] = useState(() => loadState("settings", defaultSettings));
+  const [progress, setProgress] = useState(() => loadState("progress", defaultProgress));
   const [screen, setScreen] = useState("home");
+
+  // Apply dark mode theme
+  T = settings.darkMode ? darkTheme : lightTheme;
 
   function updateSettings(patch) {
     setSettings(prev => {
       const next = { ...prev, ...patch };
       saveState("settings", next);
+      return next;
+    });
+  }
+
+  function addProgress(patch) {
+    setProgress(prev => {
+      const today = new Date().toISOString().split("T")[0];
+      const wasActiveYesterday = prev.lastActiveDate === new Date(Date.now() - 86400000).toISOString().split("T")[0];
+      const isNewDay = prev.lastActiveDate !== today;
+      const streak = isNewDay ? (wasActiveYesterday ? prev.streak + 1 : 1) : prev.streak;
+
+      const next = {
+        ...prev,
+        totalStars: (prev.totalStars || 0) + (patch.stars || 0),
+        gamesPlayed: (prev.gamesPlayed || 0) + (patch.gamesPlayed || 0),
+        wordsSpoken: (prev.wordsSpoken || 0) + (patch.wordsSpoken || 0),
+        routinesCompleted: (prev.routinesCompleted || 0) + (patch.routinesCompleted || 0),
+        breathingMinutes: (prev.breathingMinutes || 0) + (patch.breathingMinutes || 0),
+        focusMinutes: (prev.focusMinutes || 0) + (patch.focusMinutes || 0),
+        streak,
+        lastActiveDate: today,
+        badges: prev.badges || [],
+        dailyLog: { ...prev.dailyLog, [today]: { ...(prev.dailyLog?.[today] || {}), ...patch } },
+      };
+
+      // Check for new badges
+      const newBadges = badgeDefs.filter(b => b.check(next) && !(prev.badges || []).includes(b.id)).map(b => b.id);
+      if (newBadges.length > 0) {
+        next.badges = [...(next.badges || []), ...newBadges];
+      }
+
+      saveState("progress", next);
       return next;
     });
   }
@@ -2073,7 +2848,7 @@ export default function App() {
   // Show onboarding if no age range selected
   if (!settings.ageRange) {
     return (
-      <AppContext.Provider value={{ settings, updateSettings }}>
+      <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
         <div style={{
           background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
           fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
@@ -2100,6 +2875,12 @@ export default function App() {
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
     settings: <SettingsScreen setScreen={setScreen} />,
+    stories: <SocialStoriesScreen setScreen={setScreen} />,
+    reading: <ReadingScreen setScreen={setScreen} />,
+    emotions: <EmotionScreen setScreen={setScreen} />,
+    fidget: <FidgetScreen setScreen={setScreen} />,
+    rewards: <RewardsScreen setScreen={setScreen} />,
+    parent_dash: <ParentDashboard setScreen={setScreen} />,
   };
 
   const globalCSS = `
@@ -2115,7 +2896,7 @@ export default function App() {
   `;
 
   return (
-    <AppContext.Provider value={{ settings, updateSettings }}>
+    <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
       <div style={{
         background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
         fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
