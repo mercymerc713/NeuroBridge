@@ -40,8 +40,8 @@ const defaultSettings = {
   gameTimerMinutes: 0, // 0 = no limit
   parentPin: "",
   voiceId: "default",
-  voiceRate: 0.9,
-  voicePitch: 1.1,
+  voiceRate: 0.85,
+  voicePitch: 1.0,
   fontSize: "medium", // "small" | "medium" | "large"
   highContrast: false,
   hapticFeedback: true,
@@ -281,22 +281,50 @@ function getVoices() {
   return window.speechSynthesis?.getVoices() || [];
 }
 
+function findBestVoice(voices) {
+  // Only consider clear English voices (US, UK, AU)
+  const enVoices = voices.filter(v => /^en[-_](US|GB|AU)/i.test(v.lang));
+
+  // Priority 1: Google's high-quality US English voices
+  const googleUS = enVoices.find(v => /google\s+us\s+english/i.test(v.name));
+  if (googleUS) return googleUS;
+
+  // Priority 2: Any neural/natural/enhanced voice
+  const neural = enVoices.find(v => /natural|neural|premium|enhanced|online/i.test(v.name));
+  if (neural) return neural;
+
+  // Priority 3: Well-known clear voices by name
+  const known = enVoices.find(v => /samantha|alex|zira|david|google|microsoft.*online/i.test(v.name));
+  if (known) return known;
+
+  // Priority 4: Any US English voice
+  const anyUS = voices.find(v => /^en[-_]US/i.test(v.lang));
+  if (anyUS) return anyUS;
+
+  // Priority 5: Any UK English voice
+  const anyUK = voices.find(v => /^en[-_]GB/i.test(v.lang));
+  if (anyUK) return anyUK;
+
+  // Priority 6: Any English voice at all
+  const anyEn = voices.find(v => v.lang.startsWith("en"));
+  if (anyEn) return anyEn;
+
+  return null;
+}
+
 function speak(text, settings = {}) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.rate = settings.voiceRate || 0.9;
-  u.pitch = settings.voicePitch || 1.1;
+  u.rate = settings.voiceRate ?? 0.85;
+  u.pitch = settings.voicePitch ?? 1.0;
   const voices = getVoices();
   if (settings.voiceId && settings.voiceId !== "default") {
     const v = voices.find(v => v.voiceURI === settings.voiceId);
     if (v) u.voice = v;
   } else {
-    // Try to find a natural-sounding voice
-    const natural = voices.find(v => /natural|neural|premium|enhanced/i.test(v.name))
-      || voices.find(v => /samantha|karen|daniel|google/i.test(v.name))
-      || voices.find(v => v.lang.startsWith("en"));
-    if (natural) u.voice = natural;
+    const best = findBestVoice(voices);
+    if (best) u.voice = best;
   }
   window.speechSynthesis.speak(u);
 }
@@ -567,6 +595,16 @@ function SettingsScreen({ setScreen }) {
   useEffect(() => {
     function loadVoices() {
       const v = getVoices().filter(v => v.lang.startsWith("en"));
+      // Sort: US English first, then neural/natural voices, then alphabetical
+      v.sort((a, b) => {
+        const aUS = /en[-_]US/i.test(a.lang) ? 0 : 1;
+        const bUS = /en[-_]US/i.test(b.lang) ? 0 : 1;
+        if (aUS !== bUS) return aUS - bUS;
+        const aNat = /natural|neural|premium|enhanced|google/i.test(a.name) ? 0 : 1;
+        const bNat = /natural|neural|premium|enhanced|google/i.test(b.name) ? 0 : 1;
+        if (aNat !== bNat) return aNat - bNat;
+        return a.name.localeCompare(b.name);
+      });
       setVoices(v);
     }
     loadVoices();
@@ -609,12 +647,18 @@ function SettingsScreen({ setScreen }) {
             fontFamily: T.fontAlt, fontSize: 14, color: T.text, background: T.surface, marginBottom: 12,
             appearance: "auto", cursor: "pointer",
           }}>
-          <option value="default">Auto (Best Available)</option>
-          {voices.map(v => (
-            <option key={v.voiceURI} value={v.voiceURI}>
-              {v.name} {/natural|neural|premium|enhanced/i.test(v.name) ? "⭐" : ""}
-            </option>
-          ))}
+          <option value="default">Auto (Clearest US English)</option>
+          {voices.map(v => {
+            const isNatural = /natural|neural|premium|enhanced/i.test(v.name);
+            const isGoogle = /google/i.test(v.name);
+            const isUS = /en[-_]US/i.test(v.lang);
+            const tag = isNatural ? " ⭐ Natural" : isGoogle ? " ⭐ Clear" : isUS ? " 🇺🇸" : " 🇬🇧";
+            return (
+              <option key={v.voiceURI} value={v.voiceURI}>
+                {v.name}{tag}
+              </option>
+            );
+          })}
         </select>
 
         <div style={{ display: "flex", gap: 14, marginBottom: 12 }}>
