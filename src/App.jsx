@@ -1276,23 +1276,98 @@ function SettingsScreen({ setScreen }) {
   );
 }
 
-// ─── SOUNDBOARD (Enhanced for full sentences) ────────────────────────────────
+// ─── SOUNDBOARD (AAC Board + Category Views) ───────────────────────────────
+// Board columns for sentence-building layout
+const boardColumns = [
+  {
+    id: "starters", label: "I", color: "#F7B731", items: [
+      { label: "I", speech: "I" }, { label: "I want", speech: "I want" }, { label: "I need", speech: "I need" },
+      { label: "I like", speech: "I like" }, { label: "I feel", speech: "I feel" }, { label: "I am", speech: "I am" },
+      { label: "I don't", speech: "I don't" }, { label: "I can", speech: "I can" }, { label: "Can I", speech: "Can I" },
+      { label: "I see", speech: "I see" }, { label: "I have", speech: "I have" },
+      { label: "You", speech: "you" }, { label: "We", speech: "we" }, { label: "He", speech: "he" },
+      { label: "She", speech: "she" }, { label: "They", speech: "they" }, { label: "It", speech: "it" },
+    ],
+  },
+  {
+    id: "verbs", label: "Do", color: "#3EBB6E", items: [
+      { label: "want", speech: "want" }, { label: "need", speech: "need" }, { label: "like", speech: "like" },
+      { label: "go", speech: "go" }, { label: "eat", speech: "eat" }, { label: "drink", speech: "drink" },
+      { label: "play", speech: "play" }, { label: "help", speech: "help" }, { label: "see", speech: "see" },
+      { label: "have", speech: "have" }, { label: "make", speech: "make" }, { label: "read", speech: "read" },
+      { label: "stop", speech: "stop" }, { label: "give", speech: "give" }, { label: "put", speech: "put" },
+      { label: "take", speech: "take" }, { label: "come", speech: "come" }, { label: "sit", speech: "sit" },
+      { label: "look", speech: "look" }, { label: "get", speech: "get" }, { label: "open", speech: "open" },
+      { label: "close", speech: "close" }, { label: "turn on", speech: "turn on" }, { label: "turn off", speech: "turn off" },
+    ],
+  },
+  {
+    id: "describers", label: "Kind", color: "#8B6CF6", items: [
+      { label: "more", speech: "more" }, { label: "big", speech: "big" }, { label: "little", speech: "little" },
+      { label: "good", speech: "good" }, { label: "bad", speech: "bad" }, { label: "hot", speech: "hot" },
+      { label: "cold", speech: "cold" }, { label: "new", speech: "new" }, { label: "different", speech: "different" },
+      { label: "same", speech: "same" }, { label: "all", speech: "all" }, { label: "my", speech: "my" },
+      { label: "your", speech: "your" }, { label: "this", speech: "this" }, { label: "that", speech: "that" },
+      { label: "happy", speech: "happy" }, { label: "sad", speech: "sad" }, { label: "tired", speech: "tired" },
+      { label: "scared", speech: "scared" }, { label: "yummy", speech: "yummy" }, { label: "favorite", speech: "favorite" },
+      { label: "some", speech: "some" }, { label: "the", speech: "the" }, { label: "a", speech: "a" },
+    ],
+  },
+  {
+    id: "things", label: "Thing", color: "#4E8AE6", items: [
+      { label: "water", speech: "water" }, { label: "food", speech: "food" }, { label: "snack", speech: "snack" },
+      { label: "juice", speech: "juice" }, { label: "milk", speech: "milk" }, { label: "book", speech: "book" },
+      { label: "phone", speech: "phone" }, { label: "toy", speech: "toy" }, { label: "movie", speech: "movie" },
+      { label: "game", speech: "game" }, { label: "music", speech: "music" }, { label: "shoes", speech: "shoes" },
+      { label: "jacket", speech: "jacket" }, { label: "ball", speech: "ball" }, { label: "blanket", speech: "blanket" },
+      { label: "medicine", speech: "medicine" }, { label: "bath", speech: "bath" }, { label: "bed", speech: "bed" },
+      { label: "breakfast", speech: "breakfast" }, { label: "lunch", speech: "lunch" }, { label: "dinner", speech: "dinner" },
+      { label: "pizza", speech: "pizza" }, { label: "chicken", speech: "chicken" }, { label: "cookie", speech: "cookie" },
+    ],
+  },
+  {
+    id: "places", label: "Where", color: "#E84E8A", items: [
+      { label: "here", speech: "here" }, { label: "there", speech: "there" }, { label: "home", speech: "home" },
+      { label: "school", speech: "school" }, { label: "outside", speech: "outside" }, { label: "inside", speech: "inside" },
+      { label: "bathroom", speech: "the bathroom" }, { label: "bedroom", speech: "my room" }, { label: "kitchen", speech: "the kitchen" },
+      { label: "car", speech: "the car" }, { label: "park", speech: "the park" }, { label: "store", speech: "the store" },
+      { label: "up", speech: "up" }, { label: "down", speech: "down" }, { label: "in", speech: "in" },
+      { label: "out", speech: "out" }, { label: "on", speech: "on" }, { label: "off", speech: "off" },
+      { label: "to", speech: "to" }, { label: "with", speech: "with" }, { label: "away", speech: "away" },
+    ],
+  },
+  {
+    id: "social", label: "Chat", color: "#FF6B3D", items: [
+      { label: "yes", speech: "yes" }, { label: "no", speech: "no" }, { label: "please", speech: "please" },
+      { label: "thank you", speech: "thank you" }, { label: "sorry", speech: "sorry" }, { label: "hi", speech: "hi" },
+      { label: "bye", speech: "bye" }, { label: "OK", speech: "okay" }, { label: "help", speech: "help me" },
+      { label: "wait", speech: "wait" }, { label: "stop", speech: "stop" }, { label: "again", speech: "again" },
+      { label: "all done", speech: "all done" }, { label: "not yet", speech: "not yet" }, { label: "excuse me", speech: "excuse me" },
+      { label: "I love you", speech: "I love you" }, { label: "my turn", speech: "my turn" }, { label: "your turn", speech: "your turn" },
+      { label: "now", speech: "now" }, { label: "later", speech: "later" }, { label: "and", speech: "and" },
+    ],
+  },
+];
+
 function SoundboardScreen({ setScreen }) {
-  const { settings } = useApp();
-  const [cat, setCat] = useState(null);
+  const { settings, addProgress } = useApp();
   const [sentence, setSentence] = useState([]);
   const [lastSpoken, setLastSpoken] = useState(null);
+  const [viewMode, setViewMode] = useState(() => loadState("boardView", "board")); // "board" | "categories"
+  const [cat, setCat] = useState(null);
   const [customWords, setCustomWords] = useState(() => loadState("customWords", []));
   const [showAddWord, setShowAddWord] = useState(false);
   const [newWordLabel, setNewWordLabel] = useState("");
   const [newWordEmoji, setNewWordEmoji] = useState("🗣️");
   const [newWordSpeech, setNewWordSpeech] = useState("");
   const [newWordCat, setNewWordCat] = useState("custom");
+  const scrollRef = useRef(null);
 
   function tapItem(item) {
     speak(item.speech, settings);
     setLastSpoken(item.label);
     setSentence(prev => [...prev, item]);
+    addProgress({ wordsSpoken: 1 });
     setTimeout(() => setLastSpoken(null), 600);
   }
 
@@ -1322,15 +1397,17 @@ function SoundboardScreen({ setScreen }) {
     saveState("customWords", updated);
   }
 
-  // Build full categories list including custom words
+  function switchView(v) {
+    setViewMode(v);
+    saveState("boardView", v);
+    setCat(null);
+  }
+
   const customCategory = customWords.length > 0 ? {
     id: "custom", label: "My Words", emoji: "⭐", color: T.primary, glow: T.primaryGlow,
     items: customWords.filter(w => w.catId === "custom"),
   } : null;
-
   const allCategories = customCategory ? [customCategory, ...aacCategories] : aacCategories;
-
-  // Get items for current category, including custom words added to built-in categories
   function getCatItems(catId) {
     const builtIn = aacCategories.find(c => c.id === catId);
     const builtInItems = builtIn ? builtIn.items : [];
@@ -1338,174 +1415,190 @@ function SoundboardScreen({ setScreen }) {
     return [...builtInItems, ...customInCat];
   }
 
-  const quickPhrases = [
-    { label: "I want", emoji: "👉", speech: "I want" },
-    { label: "I need", emoji: "🙋", speech: "I need" },
-    { label: "I like", emoji: "💛", speech: "I like" },
-    { label: "I don't like", emoji: "👎", speech: "I don't like" },
-    { label: "Can I have", emoji: "🤲", speech: "Can I have" },
-    { label: "Let's go", emoji: "🚶", speech: "Let's go" },
-    { label: "to the", emoji: "➡️", speech: "to the" },
-    { label: "with", emoji: "🤝", speech: "with" },
-    { label: "and", emoji: "➕", speech: "and" },
-    { label: "the", emoji: "📎", speech: "the" },
-    { label: "is", emoji: "🟰", speech: "is" },
-    { label: "my", emoji: "🙋", speech: "my" },
-  ];
-
   return (
-    <div style={{ padding: "24px 20px 120px" }}>
+    <div style={{ padding: "16px 12px 120px" }}>
       <Header title="💬 Soundboard" onBack={() => setScreen("home")}
         right={
-          <button onClick={() => setShowAddWord(!showAddWord)} style={{
-            padding: "6px 12px", borderRadius: 12, border: `1.5px solid ${T.primary}40`,
-            background: T.primaryGlow, fontFamily: T.font, fontSize: 12, fontWeight: 700,
-            color: T.primary, cursor: "pointer",
-          }}>+ Add Word</button>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={() => setShowAddWord(!showAddWord)} style={{
+              padding: "5px 10px", borderRadius: 10, border: `1.5px solid ${T.primary}40`,
+              background: T.primaryGlow, fontFamily: T.font, fontSize: 11, fontWeight: 700,
+              color: T.primary, cursor: "pointer",
+            }}>+ Add</button>
+          </div>
         }
       />
 
-      {/* Add Word Panel (for parents) */}
+      {/* View Toggle */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 10, background: T.border, borderRadius: 12, padding: 3 }}>
+        <button onClick={() => switchView("board")} style={{
+          flex: 1, padding: "7px 0", borderRadius: 10, border: "none", cursor: "pointer",
+          background: viewMode === "board" ? T.surface : "transparent",
+          fontFamily: T.font, fontSize: 12, fontWeight: 700,
+          color: viewMode === "board" ? T.text : T.soft,
+          boxShadow: viewMode === "board" ? T.shadow : "none",
+        }}>Board View</button>
+        <button onClick={() => switchView("categories")} style={{
+          flex: 1, padding: "7px 0", borderRadius: 10, border: "none", cursor: "pointer",
+          background: viewMode === "categories" ? T.surface : "transparent",
+          fontFamily: T.font, fontSize: 12, fontWeight: 700,
+          color: viewMode === "categories" ? T.text : T.soft,
+          boxShadow: viewMode === "categories" ? T.shadow : "none",
+        }}>Categories</button>
+      </div>
+
+      {/* Add Word Panel */}
       {showAddWord && (
-        <Card style={{ marginBottom: 16, padding: 18, border: `2px solid ${T.primary}30`, animation: "scaleIn 0.2s ease-out" }}>
-          <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 12 }}>
-            ⭐ Add Custom Word
-          </div>
-          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+        <Card style={{ marginBottom: 12, padding: 16, border: `2px solid ${T.primary}30`, animation: "scaleIn 0.2s ease-out" }}>
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 10 }}>⭐ Add Custom Word</div>
+          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
             <input value={newWordEmoji} onChange={e => setNewWordEmoji(e.target.value)}
-              style={{ width: 50, padding: 10, borderRadius: 12, border: `1.5px solid ${T.border}`, fontSize: 24, textAlign: "center" }}
-              placeholder="😊" />
+              style={{ width: 44, padding: 8, borderRadius: 10, border: `1.5px solid ${T.border}`, fontSize: 22, textAlign: "center" }} placeholder="😊" />
             <input value={newWordLabel} onChange={e => setNewWordLabel(e.target.value)}
-              style={{ flex: 1, padding: 10, borderRadius: 12, border: `1.5px solid ${T.border}`, fontFamily: T.fontAlt, fontSize: 14 }}
-              placeholder="Button label (e.g. Juice)" />
+              style={{ flex: 1, padding: 8, borderRadius: 10, border: `1.5px solid ${T.border}`, fontFamily: T.fontAlt, fontSize: 13 }} placeholder="Label (e.g. Juice)" />
           </div>
           <input value={newWordSpeech} onChange={e => setNewWordSpeech(e.target.value)}
-            style={{ width: "100%", padding: 10, borderRadius: 12, border: `1.5px solid ${T.border}`, fontFamily: T.fontAlt, fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
-            placeholder="What to say (e.g. I want juice please)" />
-          <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-            {[{ id: "custom", label: "My Words" }, ...aacCategories.slice(0, 6)].map(c => (
-              <button key={c.id} onClick={() => setNewWordCat(c.id)} style={{
-                padding: "4px 10px", borderRadius: 10, fontSize: 11, fontFamily: T.font, fontWeight: 600,
-                border: `1.5px solid ${newWordCat === c.id ? T.primary : T.border}`,
-                background: newWordCat === c.id ? T.primaryGlow : T.surface,
-                color: newWordCat === c.id ? T.primary : T.soft, cursor: "pointer",
-              }}>{c.label}</button>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
+            style={{ width: "100%", padding: 8, borderRadius: 10, border: `1.5px solid ${T.border}`, fontFamily: T.fontAlt, fontSize: 13, marginBottom: 8, boxSizing: "border-box" }}
+            placeholder="Speech (e.g. I want juice please)" />
+          <div style={{ display: "flex", gap: 6 }}>
             <Btn color={T.soft} size="sm" onClick={() => setShowAddWord(false)}>Cancel</Btn>
-            <Btn color={T.primary} size="sm" onClick={addCustomWord} disabled={!newWordLabel.trim() || !newWordSpeech.trim()}>Add Word</Btn>
+            <Btn color={T.primary} size="sm" onClick={addCustomWord} disabled={!newWordLabel.trim() || !newWordSpeech.trim()}>Add</Btn>
           </div>
         </Card>
       )}
 
-      {/* Sentence Builder Bar */}
+      {/* Sentence Builder */}
       <div style={{
-        background: T.surface, borderRadius: 18, padding: 14, marginBottom: 10,
-        border: `2px solid ${T.blue}30`, minHeight: 56,
-        display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", boxShadow: T.shadow,
+        background: T.surface, borderRadius: 16, padding: 12, marginBottom: 8,
+        border: `2px solid ${T.blue}30`, minHeight: 48,
+        display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", boxShadow: T.shadow,
       }}>
         {sentence.length === 0 ? (
-          <span style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Tap cards to build a sentence...</span>
+          <span style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>Tap words to build a sentence...</span>
         ) : sentence.map((s, i) => (
           <button key={i} onClick={() => removeWord(i)} style={{
-            background: T.blueGlow, padding: "5px 10px", borderRadius: 10, border: `1px solid ${T.blue}30`,
-            fontFamily: T.font, fontSize: 13, fontWeight: 600, color: T.blue, cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 4,
+            background: T.blueGlow, padding: "4px 8px", borderRadius: 8, border: `1px solid ${T.blue}30`,
+            fontFamily: T.font, fontSize: 12, fontWeight: 600, color: T.blue, cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 3,
           }}>
-            {s.emoji} {s.label}
-            <span style={{ fontSize: 10, opacity: 0.5 }}>✕</span>
+            {s.label} <span style={{ fontSize: 9, opacity: 0.5 }}>✕</span>
           </button>
         ))}
       </div>
 
-      {/* Sentence preview */}
       {sentence.length > 0 && (
         <div style={{
-          fontFamily: T.fontAlt, fontSize: 14, color: T.text, padding: "8px 14px",
-          background: T.yellowGlow, borderRadius: 12, marginBottom: 10, fontStyle: "italic",
+          fontFamily: T.fontAlt, fontSize: 13, color: T.text, padding: "6px 12px",
+          background: T.yellowGlow, borderRadius: 10, marginBottom: 8, fontStyle: "italic",
           border: `1px solid ${T.yellow}30`,
-        }}>
-          "{sentence.map(s => s.speech).join(" ")}"
-        </div>
+        }}>"{sentence.map(s => s.speech).join(" ")}"</div>
       )}
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
         <Btn color={T.blue} onClick={speakSentence} style={{ flex: 1 }} disabled={sentence.length === 0} size="sm">🔊 Speak</Btn>
         <Btn color={T.soft} onClick={() => setSentence([])} disabled={sentence.length === 0} size="sm">Clear</Btn>
       </div>
 
-      {/* Quick Phrase Starters */}
-      {cat === null && (
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.soft, marginBottom: 8 }}>Quick phrases:</div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {quickPhrases.map((p, i) => (
-              <button key={i} onClick={() => tapItem(p)} style={{
-                padding: "5px 10px", borderRadius: 10, border: `1.5px solid ${T.purple}25`,
-                background: T.purpleGlow, fontFamily: T.font, fontSize: 12, fontWeight: 600,
-                color: T.purple, cursor: "pointer",
-              }}>{p.emoji} {p.label}</button>
+      {/* ─── BOARD VIEW ─── */}
+      {viewMode === "board" && (
+        <div ref={scrollRef} style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", paddingBottom: 8 }}>
+          <div style={{ display: "flex", gap: 6, minWidth: boardColumns.length * 110 }}>
+            {boardColumns.map(col => (
+              <div key={col.id} style={{ minWidth: 105, flex: "0 0 105px" }}>
+                {/* Column Header */}
+                <div style={{
+                  background: col.color, color: "#fff", borderRadius: "12px 12px 0 0",
+                  padding: "8px 4px", textAlign: "center",
+                  fontFamily: T.font, fontSize: 13, fontWeight: 800,
+                }}>
+                  {col.label}
+                </div>
+                {/* Column Words */}
+                <div style={{
+                  background: `${col.color}08`, border: `1.5px solid ${col.color}20`,
+                  borderTop: "none", borderRadius: "0 0 12px 12px",
+                  display: "flex", flexDirection: "column", gap: 2, padding: 3,
+                }}>
+                  {col.items.map((item, i) => {
+                    const isActive = lastSpoken === item.label;
+                    return (
+                      <button key={i} onClick={() => tapItem(item)} style={{
+                        padding: "8px 4px", borderRadius: 8, border: "none", cursor: "pointer",
+                        background: isActive ? col.color : T.surface,
+                        fontFamily: T.font, fontSize: 12, fontWeight: 600, textAlign: "center",
+                        color: isActive ? "#fff" : T.text,
+                        transition: "all 0.12s ease",
+                        boxShadow: isActive ? `0 2px 8px ${col.color}40` : "0 1px 2px rgba(0,0,0,0.04)",
+                      }}>{item.label}</button>
+                    );
+                  })}
+                </div>
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {cat === null ? (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-          {allCategories.map(c => {
-            const itemCount = c.id === "custom" ? c.items.length : getCatItems(c.id).length;
-            return (
-              <Card key={c.id} onClick={() => setCat(c.id)}
-                style={{ textAlign: "center", padding: 14, background: c.glow, border: `1.5px solid ${c.color}25` }}>
-                <div style={{ fontSize: 28, marginBottom: 4 }}>{c.emoji}</div>
-                <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: c.color }}>{c.label}</div>
-                <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{itemCount}</div>
-              </Card>
-            );
-          })}
-        </div>
-      ) : (
+      {/* ─── CATEGORIES VIEW ─── */}
+      {viewMode === "categories" && (
         <>
-          <button onClick={() => setCat(null)} style={{
-            fontFamily: T.font, fontSize: 14, fontWeight: 600, color: T.soft,
-            background: "none", border: "none", cursor: "pointer", marginBottom: 12,
-            display: "flex", alignItems: "center", gap: 6,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 19l-7-7 7-7"/></svg>
-            All Categories
-          </button>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {getCatItems(cat).map((item, i) => {
-              const catData = allCategories.find(c => c.id === cat) || { color: T.primary };
-              const isActive = lastSpoken === item.label;
-              return (
-                <button key={i} onClick={() => tapItem(item)}
-                  style={{
-                    background: isActive ? catData.color : T.surface,
-                    border: `2px solid ${isActive ? catData.color : catData.color + "30"}`,
-                    borderRadius: 16, padding: "12px 6px", cursor: "pointer",
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-                    transition: "all 0.15s ease", position: "relative",
-                    transform: isActive ? "scale(1.05)" : "scale(1)",
-                    boxShadow: isActive ? `0 4px 20px ${catData.color}40` : "none",
-                  }}>
-                  {item.custom && (
-                    <button onClick={e => { e.stopPropagation(); removeCustomWord(customWords.indexOf(item)); }} style={{
-                      position: "absolute", top: 2, right: 2, width: 18, height: 18, borderRadius: 9,
-                      background: T.primary, border: "none", color: "#fff", fontSize: 10, cursor: "pointer",
-                      display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
-                    }}>✕</button>
-                  )}
-                  <span style={{ fontSize: 28 }}>{item.emoji}</span>
-                  <span style={{
-                    fontFamily: T.font, fontSize: 11, fontWeight: 700,
-                    color: isActive ? "#fff" : T.text, lineHeight: 1.2, textAlign: "center",
-                  }}>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          {cat === null ? (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              {allCategories.map(c => {
+                const itemCount = c.id === "custom" ? c.items.length : getCatItems(c.id).length;
+                return (
+                  <Card key={c.id} onClick={() => setCat(c.id)}
+                    style={{ textAlign: "center", padding: 14, background: c.glow, border: `1.5px solid ${c.color}25` }}>
+                    <div style={{ fontSize: 28, marginBottom: 4 }}>{c.emoji}</div>
+                    <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: c.color }}>{c.label}</div>
+                    <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{itemCount}</div>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              <button onClick={() => setCat(null)} style={{
+                fontFamily: T.font, fontSize: 14, fontWeight: 600, color: T.soft,
+                background: "none", border: "none", cursor: "pointer", marginBottom: 12,
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 19l-7-7 7-7"/></svg>
+                All Categories
+              </button>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                {getCatItems(cat).map((item, i) => {
+                  const catData = allCategories.find(c => c.id === cat) || { color: T.primary };
+                  const isActive = lastSpoken === item.label;
+                  return (
+                    <button key={i} onClick={() => tapItem(item)}
+                      style={{
+                        background: isActive ? catData.color : T.surface,
+                        border: `2px solid ${isActive ? catData.color : catData.color + "30"}`,
+                        borderRadius: 16, padding: "12px 6px", cursor: "pointer",
+                        display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                        transition: "all 0.15s ease", position: "relative",
+                        transform: isActive ? "scale(1.05)" : "scale(1)",
+                        boxShadow: isActive ? `0 4px 20px ${catData.color}40` : "none",
+                      }}>
+                      {item.custom && (
+                        <button onClick={e => { e.stopPropagation(); removeCustomWord(customWords.indexOf(item)); }} style={{
+                          position: "absolute", top: 2, right: 2, width: 18, height: 18, borderRadius: 9,
+                          background: T.primary, border: "none", color: "#fff", fontSize: 10, cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
+                        }}>✕</button>
+                      )}
+                      <span style={{ fontSize: 28 }}>{item.emoji}</span>
+                      <span style={{
+                        fontFamily: T.font, fontSize: 11, fontWeight: 700,
+                        color: isActive ? "#fff" : T.text, lineHeight: 1.2, textAlign: "center",
+                      }}>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
