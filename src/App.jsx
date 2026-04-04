@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, createContext, useContext } from "react";
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 const T = {
@@ -24,6 +24,39 @@ const T = {
   font: "'Baloo 2', cursive",
   fontAlt: "'Atkinson Hyperlegible', sans-serif",
 };
+
+// ─── Persistent Storage ──────────────────────────────────────────────────────
+function loadState(key, fallback) {
+  try { const v = localStorage.getItem(`nb_${key}`); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+}
+function saveState(key, value) {
+  try { localStorage.setItem(`nb_${key}`, JSON.stringify(value)); } catch {}
+}
+
+// ─── App Context ─────────────────────────────────────────────────────────────
+const defaultSettings = {
+  ageRange: null, // "child" | "teen" | "young_adult" | "adult"
+  kidsMode: false,
+  gameTimerMinutes: 0, // 0 = no limit
+  parentPin: "",
+  voiceId: "default",
+  voiceRate: 0.9,
+  voicePitch: 1.1,
+  fontSize: "medium", // "small" | "medium" | "large"
+  highContrast: false,
+  hapticFeedback: true,
+};
+
+const AppContext = createContext();
+function useApp() { return useContext(AppContext); }
+
+// ─── Age Range Config ────────────────────────────────────────────────────────
+const ageRanges = [
+  { id: "child", label: "Child", ages: "4-10", emoji: "🧒", color: T.primary, desc: "Simple words, big buttons, fun sounds" },
+  { id: "teen", label: "Teen", ages: "11-17", emoji: "🧑", color: T.blue, desc: "More vocabulary, social tools, study aids" },
+  { id: "young_adult", label: "Young Adult", ages: "18-25", emoji: "🧑‍🎓", color: T.purple, desc: "Life skills, work communication, independence" },
+  { id: "adult", label: "Adult", ages: "26+", emoji: "🧑‍💼", color: T.green, desc: "Full tools, professional communication, routines" },
+];
 
 // ─── AAC Soundboard Data ─────────────────────────────────────────────────────
 const aacCategories = [
@@ -108,20 +141,90 @@ const aacCategories = [
       { label: "Library", emoji: "📚", speech: "I want to go to the library" },
     ],
   },
+  {
+    id: "actions", label: "Actions", emoji: "🏃", color: T.pink, glow: T.pinkGlow,
+    items: [
+      { label: "Eat", emoji: "🍽️", speech: "eat" },
+      { label: "Drink", emoji: "🥤", speech: "drink" },
+      { label: "Go", emoji: "🚶", speech: "go" },
+      { label: "Come", emoji: "🫳", speech: "come" },
+      { label: "Sit", emoji: "🪑", speech: "sit down" },
+      { label: "Stand", emoji: "🧍", speech: "stand up" },
+      { label: "Read", emoji: "📖", speech: "read" },
+      { label: "Write", emoji: "✏️", speech: "write" },
+      { label: "Listen", emoji: "👂", speech: "listen" },
+      { label: "Watch", emoji: "👁️", speech: "watch" },
+      { label: "Open", emoji: "📂", speech: "open" },
+      { label: "Close", emoji: "📁", speech: "close" },
+    ],
+  },
+  {
+    id: "people", label: "People", emoji: "👥", color: T.blue, glow: T.blueGlow,
+    items: [
+      { label: "I", emoji: "🙋", speech: "I" },
+      { label: "You", emoji: "👉", speech: "you" },
+      { label: "Mom", emoji: "👩", speech: "mom" },
+      { label: "Dad", emoji: "👨", speech: "dad" },
+      { label: "Teacher", emoji: "🧑‍🏫", speech: "teacher" },
+      { label: "Friend", emoji: "🧑‍🤝‍🧑", speech: "my friend" },
+      { label: "Brother", emoji: "👦", speech: "brother" },
+      { label: "Sister", emoji: "👧", speech: "sister" },
+      { label: "Doctor", emoji: "👨‍⚕️", speech: "doctor" },
+      { label: "We", emoji: "👫", speech: "we" },
+      { label: "They", emoji: "👥", speech: "they" },
+      { label: "Everyone", emoji: "🌍", speech: "everyone" },
+    ],
+  },
+  {
+    id: "descriptors", label: "Describing", emoji: "🌈", color: T.yellow, glow: T.yellowGlow,
+    items: [
+      { label: "Big", emoji: "🐘", speech: "big" },
+      { label: "Small", emoji: "🐜", speech: "small" },
+      { label: "Hot", emoji: "🔥", speech: "hot" },
+      { label: "Cold", emoji: "🥶", speech: "cold" },
+      { label: "Good", emoji: "👍", speech: "good" },
+      { label: "Bad", emoji: "👎", speech: "bad" },
+      { label: "Fast", emoji: "⚡", speech: "fast" },
+      { label: "Slow", emoji: "🐌", speech: "slow" },
+      { label: "New", emoji: "✨", speech: "new" },
+      { label: "Old", emoji: "📜", speech: "old" },
+      { label: "Same", emoji: "🟰", speech: "same" },
+      { label: "Different", emoji: "🔀", speech: "different" },
+    ],
+  },
+  {
+    id: "time", label: "Time", emoji: "🕐", color: T.green, glow: T.greenGlow,
+    items: [
+      { label: "Now", emoji: "⏰", speech: "now" },
+      { label: "Later", emoji: "🔜", speech: "later" },
+      { label: "Today", emoji: "📅", speech: "today" },
+      { label: "Tomorrow", emoji: "🌅", speech: "tomorrow" },
+      { label: "Yesterday", emoji: "⏪", speech: "yesterday" },
+      { label: "Morning", emoji: "🌤️", speech: "in the morning" },
+      { label: "Night", emoji: "🌙", speech: "at night" },
+      { label: "Soon", emoji: "⏳", speech: "soon" },
+      { label: "Always", emoji: "♾️", speech: "always" },
+      { label: "Never", emoji: "🚫", speech: "never" },
+      { label: "Before", emoji: "⬅️", speech: "before" },
+      { label: "After", emoji: "➡️", speech: "after" },
+    ],
+  },
 ];
 
 // ─── Learning Games Data ─────────────────────────────────────────────────────
 const wordGames = [
-  { image: "🐱", word: "CAT", choices: ["CAT", "BAT", "HAT", "RAT"], hint: "A furry pet that purrs" },
-  { image: "☀️", word: "SUN", choices: ["BUN", "SUN", "FUN", "RUN"], hint: "Bright in the sky" },
-  { image: "🐕", word: "DOG", choices: ["LOG", "FOG", "DOG", "HOG"], hint: "A pet that barks" },
-  { image: "🐟", word: "FISH", choices: ["DISH", "FISH", "WISH", "SWISH"], hint: "Swims in water" },
-  { image: "🌳", word: "TREE", choices: ["FREE", "THREE", "TREE", "SEE"], hint: "Tall with leaves" },
-  { image: "🌙", word: "MOON", choices: ["MOON", "NOON", "SOON", "SPOON"], hint: "In the night sky" },
-  { image: "⭐", word: "STAR", choices: ["CAR", "STAR", "FAR", "BAR"], hint: "Twinkles at night" },
-  { image: "🏠", word: "HOME", choices: ["DOME", "HOME", "SOME", "COME"], hint: "Where you live" },
-  { image: "🎵", word: "SONG", choices: ["LONG", "SONG", "GONG", "BONG"], hint: "Music you sing" },
-  { image: "🦋", word: "FLY", choices: ["FLY", "TRY", "CRY", "SKY"], hint: "Wings help you do this" },
+  { image: "🐱", word: "CAT", choices: ["CAT", "BAT", "HAT", "RAT"], hint: "A furry pet that purrs", level: 1 },
+  { image: "☀️", word: "SUN", choices: ["BUN", "SUN", "FUN", "RUN"], hint: "Bright in the sky", level: 1 },
+  { image: "🐕", word: "DOG", choices: ["LOG", "FOG", "DOG", "HOG"], hint: "A pet that barks", level: 1 },
+  { image: "🐟", word: "FISH", choices: ["DISH", "FISH", "WISH", "SWISH"], hint: "Swims in water", level: 1 },
+  { image: "🌳", word: "TREE", choices: ["FREE", "THREE", "TREE", "SEE"], hint: "Tall with leaves", level: 1 },
+  { image: "🌙", word: "MOON", choices: ["MOON", "NOON", "SOON", "SPOON"], hint: "In the night sky", level: 2 },
+  { image: "⭐", word: "STAR", choices: ["CAR", "STAR", "FAR", "BAR"], hint: "Twinkles at night", level: 2 },
+  { image: "🏠", word: "HOME", choices: ["DOME", "HOME", "SOME", "COME"], hint: "Where you live", level: 2 },
+  { image: "🎵", word: "SONG", choices: ["LONG", "SONG", "GONG", "BONG"], hint: "Music you sing", level: 2 },
+  { image: "🦋", word: "FLY", choices: ["FLY", "TRY", "CRY", "SKY"], hint: "Wings help you do this", level: 2 },
+  { image: "🌊", word: "OCEAN", choices: ["OCEAN", "MOTION", "POTION", "LOTION"], hint: "Big body of salt water", level: 3 },
+  { image: "🏔️", word: "MOUNTAIN", choices: ["FOUNTAIN", "MOUNTAIN", "CAPTAIN", "CURTAIN"], hint: "Very tall land formation", level: 3 },
 ];
 
 const colorMatchGame = [
@@ -134,34 +237,54 @@ const colorMatchGame = [
 ];
 
 const patternData = [
-  { pattern: ["🔴", "🔵", "🔴", "🔵", "?"], answer: "🔴", choices: ["🔴", "🟢", "🔵"] },
-  { pattern: ["⭐", "⭐", "🌙", "⭐", "⭐", "?"], answer: "🌙", choices: ["⭐", "🌙", "☀️"] },
-  { pattern: ["🐱", "🐕", "🐱", "🐕", "?"], answer: "🐱", choices: ["🐟", "🐱", "🐕"] },
-  { pattern: ["1", "2", "3", "4", "?"], answer: "5", choices: ["5", "6", "3"] },
-  { pattern: ["🍎", "🍌", "🍎", "🍌", "🍎", "?"], answer: "🍌", choices: ["🍎", "🍌", "🍇"] },
-  { pattern: ["△", "○", "□", "△", "○", "?"], answer: "□", choices: ["△", "○", "□"] },
+  { pattern: ["🔴", "🔵", "🔴", "🔵", "?"], answer: "🔴", choices: ["🔴", "🟢", "🔵"], level: 1 },
+  { pattern: ["⭐", "⭐", "🌙", "⭐", "⭐", "?"], answer: "🌙", choices: ["⭐", "🌙", "☀️"], level: 1 },
+  { pattern: ["🐱", "🐕", "🐱", "🐕", "?"], answer: "🐱", choices: ["🐟", "🐱", "🐕"], level: 1 },
+  { pattern: ["1", "2", "3", "4", "?"], answer: "5", choices: ["5", "6", "3"], level: 2 },
+  { pattern: ["🍎", "🍌", "🍎", "🍌", "🍎", "?"], answer: "🍌", choices: ["🍎", "🍌", "🍇"], level: 2 },
+  { pattern: ["△", "○", "□", "△", "○", "?"], answer: "□", choices: ["△", "○", "□"], level: 2 },
+  { pattern: ["2", "4", "6", "8", "?"], answer: "10", choices: ["9", "10", "12"], level: 3 },
+  { pattern: ["🔴", "🔵", "🟢", "🔴", "🔵", "?"], answer: "🟢", choices: ["🔴", "🔵", "🟢"], level: 3 },
 ];
 
 const mathProblems = [
-  { q: "1 + 1", a: 2, choices: [1, 2, 3] },
-  { q: "2 + 3", a: 5, choices: [4, 5, 6] },
-  { q: "5 - 2", a: 3, choices: [2, 3, 4] },
-  { q: "3 + 4", a: 7, choices: [6, 7, 8] },
-  { q: "6 - 1", a: 5, choices: [4, 5, 6] },
-  { q: "4 + 4", a: 8, choices: [7, 8, 9] },
-  { q: "10 - 3", a: 7, choices: [6, 7, 8] },
-  { q: "2 + 6", a: 8, choices: [7, 8, 9] },
+  { q: "1 + 1", a: 2, choices: [1, 2, 3], level: 1 },
+  { q: "2 + 3", a: 5, choices: [4, 5, 6], level: 1 },
+  { q: "5 - 2", a: 3, choices: [2, 3, 4], level: 1 },
+  { q: "3 + 4", a: 7, choices: [6, 7, 8], level: 2 },
+  { q: "6 - 1", a: 5, choices: [4, 5, 6], level: 2 },
+  { q: "4 + 4", a: 8, choices: [7, 8, 9], level: 2 },
+  { q: "10 - 3", a: 7, choices: [6, 7, 8], level: 2 },
+  { q: "2 + 6", a: 8, choices: [7, 8, 9], level: 2 },
+  { q: "7 × 3", a: 21, choices: [18, 21, 24], level: 3 },
+  { q: "15 - 8", a: 7, choices: [6, 7, 8], level: 3 },
+  { q: "12 ÷ 4", a: 3, choices: [2, 3, 4], level: 3 },
+  { q: "9 × 6", a: 54, choices: [48, 54, 56], level: 3 },
 ];
 
 // ─── Speech ──────────────────────────────────────────────────────────────────
-function speak(text, rate = 0.9) {
-  if ("speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = rate;
-    u.pitch = 1.1;
-    window.speechSynthesis.speak(u);
+function getVoices() {
+  return window.speechSynthesis?.getVoices() || [];
+}
+
+function speak(text, settings = {}) {
+  if (!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = settings.voiceRate || 0.9;
+  u.pitch = settings.voicePitch || 1.1;
+  const voices = getVoices();
+  if (settings.voiceId && settings.voiceId !== "default") {
+    const v = voices.find(v => v.voiceURI === settings.voiceId);
+    if (v) u.voice = v;
+  } else {
+    // Try to find a natural-sounding voice
+    const natural = voices.find(v => /natural|neural|premium|enhanced/i.test(v.name))
+      || voices.find(v => /samantha|karen|daniel|google/i.test(v.name))
+      || voices.find(v => v.lang.startsWith("en"));
+    if (natural) u.voice = natural;
   }
+  window.speechSynthesis.speak(u);
 }
 
 // ─── Shared UI ───────────────────────────────────────────────────────────────
@@ -222,27 +345,142 @@ function Confetti({ active }) {
   const colors = [T.primary, T.blue, T.purple, T.green, T.yellow, T.pink];
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 999, overflow: "hidden" }}>
-      {Array.from({ length: 40 }).map((_, i) => {
-        const rot = 360 + Math.random() * 360;
-        return (
-          <div key={i} style={{
-            position: "absolute", left: `${Math.random() * 100}%`, top: -20,
-            width: Math.random() * 10 + 6, height: Math.random() * 10 + 6,
-            background: colors[Math.floor(Math.random() * colors.length)],
-            borderRadius: Math.random() > 0.5 ? "50%" : "2px",
-            animation: `confFall ${1.5 + Math.random() * 2}s ease-in forwards`,
-            animationDelay: `${Math.random() * 0.5}s`,
-          }} />
-        );
-      })}
+      {Array.from({ length: 40 }).map((_, i) => (
+        <div key={i} style={{
+          position: "absolute", left: `${Math.random() * 100}%`, top: -20,
+          width: Math.random() * 10 + 6, height: Math.random() * 10 + 6,
+          background: colors[Math.floor(Math.random() * colors.length)],
+          borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+          animation: `confFall ${1.5 + Math.random() * 2}s ease-in forwards`,
+          animationDelay: `${Math.random() * 0.5}s`,
+        }} />
+      ))}
       <style>{`@keyframes confFall { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(100vh) rotate(720deg); opacity:0; } }`}</style>
+    </div>
+  );
+}
+
+function PinEntry({ onSuccess, onCancel }) {
+  const { settings } = useApp();
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState(false);
+
+  function handleSubmit() {
+    if (pin === settings.parentPin) { onSuccess(); }
+    else { setError(true); setPin(""); setTimeout(() => setError(false), 1500); }
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <Card style={{ maxWidth: 320, width: "100%", textAlign: "center", padding: 32 }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+        <h2 style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text, margin: "0 0 8px" }}>Parent PIN Required</h2>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 20px" }}>Enter your 4-digit PIN to access settings</p>
+        <input type="password" inputMode="numeric" maxLength={4} value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, ""))}
+          style={{
+            width: "100%", padding: 16, fontSize: 28, textAlign: "center", letterSpacing: 12,
+            border: `2.5px solid ${error ? T.primary : T.border}`, borderRadius: 16,
+            fontFamily: T.font, fontWeight: 700, outline: "none", boxSizing: "border-box",
+            background: error ? T.primaryGlow : T.surface,
+          }}
+          placeholder="• • • •" autoFocus
+        />
+        {error && <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.primary, margin: "10px 0 0" }}>Incorrect PIN. Try again.</p>}
+        <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+          <Btn color={T.soft} onClick={onCancel} style={{ flex: 1 }}>Cancel</Btn>
+          <Btn color={T.primary} onClick={handleSubmit} disabled={pin.length < 4} style={{ flex: 1 }}>Enter</Btn>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ─── ONBOARDING ──────────────────────────────────────────────────────────────
+function OnboardingScreen() {
+  const { updateSettings } = useApp();
+  const [step, setStep] = useState(0);
+  const [selected, setSelected] = useState(null);
+
+  function finish(ageRange) {
+    updateSettings({ ageRange, kidsMode: ageRange === "child" });
+  }
+
+  if (step === 0) {
+    return (
+      <div style={{ padding: "40px 20px", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div style={{ fontSize: 72, marginBottom: 16 }}>🧠</div>
+          <h1 style={{ fontFamily: T.font, fontSize: 34, fontWeight: 800, color: T.text, margin: "0 0 12px", lineHeight: 1.2 }}>
+            Welcome to<br />NeuroBridge
+          </h1>
+          <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, lineHeight: 1.6, maxWidth: 300, margin: "0 auto" }}>
+            Learning tools built for the way <em>your</em> brain works.
+          </p>
+        </div>
+        <Btn color={T.primary} size="lg" onClick={() => setStep(1)} style={{ width: "100%", maxWidth: 300, margin: "0 auto" }}>
+          Get Started
+        </Btn>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, textAlign: "center", marginTop: 16, lineHeight: 1.6 }}>
+          Designed for dyslexia, ADHD, autism & all neurodivergent minds
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "40px 20px 40px" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <h1 style={{ fontFamily: T.font, fontSize: 26, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>Who is this for?</h1>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, lineHeight: 1.5 }}>
+          Choose an age range to customize the experience
+        </p>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 400, margin: "0 auto" }}>
+        {ageRanges.map(ar => (
+          <Card key={ar.id} onClick={() => setSelected(ar.id)}
+            style={{
+              display: "flex", alignItems: "center", gap: 16, padding: 20,
+              background: selected === ar.id ? `${ar.color}12` : T.surface,
+              border: `2.5px solid ${selected === ar.id ? ar.color : T.border}`,
+              transition: "all 0.15s ease",
+            }}>
+            <div style={{
+              width: 60, height: 60, borderRadius: 20, background: `${ar.color}15`,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, flexShrink: 0,
+            }}>{ar.emoji}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>{ar.label} <span style={{ fontSize: 14, color: T.soft, fontWeight: 500 }}>({ar.ages})</span></div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, marginTop: 4, lineHeight: 1.4 }}>{ar.desc}</div>
+            </div>
+            {selected === ar.id && (
+              <div style={{ width: 28, height: 28, borderRadius: 14, background: ar.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+      <div style={{ marginTop: 28, maxWidth: 400, margin: "28px auto 0" }}>
+        <Btn color={T.primary} size="lg" onClick={() => finish(selected)} disabled={!selected} style={{ width: "100%" }}>
+          Continue
+        </Btn>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, textAlign: "center", marginTop: 12 }}>
+          You can change this anytime in Settings
+        </p>
+      </div>
     </div>
   );
 }
 
 // ─── HOME ────────────────────────────────────────────────────────────────────
 function HomeScreen({ setScreen }) {
-  const tips = ["Every step forward counts! 🌟", "Your brain is amazing! 🧠", "Take breaks when you need them! 💛", "You're doing great! ⭐"];
+  const { settings } = useApp();
+  const ageInfo = ageRanges.find(a => a.id === settings.ageRange);
+  const tips = [
+    "Every step forward counts! 🌟", "Your brain is amazing! 🧠",
+    "Take breaks when you need them! 💛", "You're doing great! ⭐",
+    "Progress, not perfection! 🌈", "Be kind to yourself today! 💜",
+  ];
   const [tip] = useState(tips[Math.floor(Math.random() * tips.length)]);
 
   return (
@@ -252,18 +490,35 @@ function HomeScreen({ setScreen }) {
         borderRadius: 28, padding: "28px 24px", marginBottom: 24, color: "#fff", position: "relative", overflow: "hidden",
       }}>
         <div style={{ position: "absolute", top: -20, right: -20, fontSize: 100, opacity: 0.15 }}>🧠</div>
-        <h1 style={{ fontFamily: T.font, fontSize: 30, fontWeight: 800, margin: 0, lineHeight: 1.2 }}>NeuroBridge</h1>
-        <p style={{ fontFamily: T.fontAlt, fontSize: 15, margin: "8px 0 0", opacity: 0.9, lineHeight: 1.5 }}>
-          Learning tools built for the way <em>your</em> brain works.
-        </p>
-        <p style={{ fontFamily: T.font, fontSize: 14, margin: "14px 0 0", background: "rgba(255,255,255,0.2)", display: "inline-block", padding: "6px 14px", borderRadius: 50 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+          <div>
+            <h1 style={{ fontFamily: T.font, fontSize: 30, fontWeight: 800, margin: 0, lineHeight: 1.2 }}>NeuroBridge</h1>
+            <p style={{ fontFamily: T.fontAlt, fontSize: 15, margin: "8px 0 0", opacity: 0.9, lineHeight: 1.5 }}>
+              Learning tools built for the way <em>your</em> brain works.
+            </p>
+          </div>
+          <button onClick={() => setScreen("settings")} style={{
+            width: 40, height: 40, borderRadius: 14, background: "rgba(255,255,255,0.2)",
+            border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+        {ageInfo && (
+          <div style={{ marginTop: 12, background: "rgba(255,255,255,0.2)", display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 50, fontSize: 13, fontFamily: T.font }}>
+            {ageInfo.emoji} {ageInfo.label} Mode
+          </div>
+        )}
+        <p style={{ fontFamily: T.font, fontSize: 14, margin: "10px 0 0", background: "rgba(255,255,255,0.2)", display: "inline-block", padding: "6px 14px", borderRadius: 50 }}>
           {tip}
         </p>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {[
-          { emoji: "💬", title: "Soundboard", desc: "Communicate with picture cards & voice", color: T.blue, glow: T.blueGlow, screen: "soundboard" },
+          { emoji: "💬", title: "Soundboard", desc: "Build sentences & communicate with voice", color: T.blue, glow: T.blueGlow, screen: "soundboard" },
           { emoji: "🎮", title: "Learning Games", desc: "Words, colors, patterns, & math", color: T.purple, glow: T.purpleGlow, screen: "games" },
           { emoji: "🎯", title: "Focus Timer", desc: "Stay on track with gentle reminders", color: T.green, glow: T.greenGlow, screen: "focus" },
           { emoji: "🫧", title: "Calm Corner", desc: "Breathing, sounds, & sensory tools", color: T.pink, glow: T.pinkGlow, screen: "calm" },
@@ -283,64 +538,253 @@ function HomeScreen({ setScreen }) {
           </Card>
         ))}
       </div>
-
-      <div style={{ marginTop: 24, padding: 18, borderRadius: 18, border: `1.5px dashed ${T.border}`, textAlign: "center" }}>
-        <span style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, lineHeight: 1.6 }}>
-          🧩 Designed for dyslexia, ADHD, autism & all neurodivergent minds
-        </span>
-      </div>
     </div>
   );
 }
 
-// ─── SOUNDBOARD ──────────────────────────────────────────────────────────────
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function SettingsScreen({ setScreen }) {
+  const { settings, updateSettings } = useApp();
+  const [showPin, setShowPin] = useState(false);
+  const [newPin, setNewPin] = useState(settings.parentPin || "");
+  const [voices, setVoices] = useState([]);
+  const [testText, setTestText] = useState("Hello! I am NeuroBridge.");
+
+  useEffect(() => {
+    function loadVoices() {
+      const v = getVoices().filter(v => v.lang.startsWith("en"));
+      setVoices(v);
+    }
+    loadVoices();
+    window.speechSynthesis?.addEventListener("voiceschanged", loadVoices);
+    return () => window.speechSynthesis?.removeEventListener("voiceschanged", loadVoices);
+  }, []);
+
+  const ageInfo = ageRanges.find(a => a.id === settings.ageRange);
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="⚙️ Settings" onBack={() => setScreen("home")} />
+
+      {/* Profile */}
+      <Card style={{ marginBottom: 16, background: ageInfo ? `${ageInfo.color}08` : T.surface }}>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 }}>👤 Profile</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 10 }}>Age Range</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {ageRanges.map(ar => (
+            <button key={ar.id} onClick={() => updateSettings({ ageRange: ar.id })} style={{
+              padding: "10px 8px", borderRadius: 14,
+              border: `2px solid ${settings.ageRange === ar.id ? ar.color : T.border}`,
+              background: settings.ageRange === ar.id ? `${ar.color}15` : T.surface,
+              cursor: "pointer", textAlign: "center", transition: "all 0.15s ease",
+            }}>
+              <div style={{ fontSize: 20 }}>{ar.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: settings.ageRange === ar.id ? ar.color : T.text }}>{ar.label}</div>
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      {/* Voice Settings */}
+      <Card style={{ marginBottom: 16 }}>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 }}>🎤 Voice</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 8 }}>Voice Style</div>
+        <select value={settings.voiceId} onChange={e => updateSettings({ voiceId: e.target.value })}
+          style={{
+            width: "100%", padding: 12, borderRadius: 12, border: `1.5px solid ${T.border}`,
+            fontFamily: T.fontAlt, fontSize: 14, color: T.text, background: T.surface, marginBottom: 12,
+            appearance: "auto", cursor: "pointer",
+          }}>
+          <option value="default">Auto (Best Available)</option>
+          {voices.map(v => (
+            <option key={v.voiceURI} value={v.voiceURI}>
+              {v.name} {/natural|neural|premium|enhanced/i.test(v.name) ? "⭐" : ""}
+            </option>
+          ))}
+        </select>
+
+        <div style={{ display: "flex", gap: 14, marginBottom: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, marginBottom: 6 }}>Speed: {settings.voiceRate.toFixed(1)}x</div>
+            <input type="range" min="0.5" max="1.5" step="0.1" value={settings.voiceRate}
+              onChange={e => updateSettings({ voiceRate: parseFloat(e.target.value) })}
+              style={{ width: "100%" }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, marginBottom: 6 }}>Pitch: {settings.voicePitch.toFixed(1)}</div>
+            <input type="range" min="0.5" max="1.5" step="0.1" value={settings.voicePitch}
+              onChange={e => updateSettings({ voicePitch: parseFloat(e.target.value) })}
+              style={{ width: "100%" }} />
+          </div>
+        </div>
+        <Btn color={T.blue} size="sm" onClick={() => speak(testText, settings)}>🔊 Test Voice</Btn>
+      </Card>
+
+      {/* Kids Mode / Parental Controls */}
+      <Card style={{ marginBottom: 16, background: settings.kidsMode ? T.greenGlow : T.surface, border: `1.5px solid ${settings.kidsMode ? T.green + "30" : T.border}` }}>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 }}>👶 Kids Mode & Parental Controls</div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>Kids Mode</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Simplified UI, locked settings</div>
+          </div>
+          <button onClick={() => updateSettings({ kidsMode: !settings.kidsMode })} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.kidsMode ? T.green : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.kidsMode ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 8 }}>Game Time Limit</div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          {[0, 15, 30, 45, 60].map(mins => (
+            <button key={mins} onClick={() => updateSettings({ gameTimerMinutes: mins })} style={{
+              flex: 1, padding: "10px 4px", borderRadius: 12,
+              border: `2px solid ${settings.gameTimerMinutes === mins ? T.primary : T.border}`,
+              background: settings.gameTimerMinutes === mins ? T.primaryGlow : T.surface,
+              fontFamily: T.font, fontSize: 13, fontWeight: 700, cursor: "pointer",
+              color: settings.gameTimerMinutes === mins ? T.primary : T.text,
+            }}>{mins === 0 ? "None" : `${mins}m`}</button>
+          ))}
+        </div>
+
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 8 }}>Parent PIN {settings.parentPin ? "(set)" : "(not set)"}</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input type="password" inputMode="numeric" maxLength={4} value={newPin}
+            onChange={e => setNewPin(e.target.value.replace(/\D/g, ""))}
+            placeholder="4-digit PIN"
+            style={{
+              flex: 1, padding: 12, borderRadius: 12, border: `1.5px solid ${T.border}`,
+              fontFamily: T.font, fontSize: 16, letterSpacing: 6, textAlign: "center",
+            }}
+          />
+          <Btn color={T.green} size="sm" onClick={() => { updateSettings({ parentPin: newPin }); }} disabled={newPin.length < 4}>Save</Btn>
+        </div>
+      </Card>
+
+      {/* Accessibility */}
+      <Card style={{ marginBottom: 16 }}>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 }}>♿ Accessibility</div>
+
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 8 }}>Font Size</div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          {["small", "medium", "large"].map(size => (
+            <button key={size} onClick={() => updateSettings({ fontSize: size })} style={{
+              flex: 1, padding: "10px 8px", borderRadius: 12,
+              border: `2px solid ${settings.fontSize === size ? T.blue : T.border}`,
+              background: settings.fontSize === size ? T.blueGlow : T.surface,
+              fontFamily: T.font, fontSize: size === "small" ? 13 : size === "medium" ? 15 : 18,
+              fontWeight: 700, cursor: "pointer", color: settings.fontSize === size ? T.blue : T.text,
+              textTransform: "capitalize",
+            }}>{size}</button>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>High Contrast</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Bolder colors & borders</div>
+          </div>
+          <button onClick={() => updateSettings({ highContrast: !settings.highContrast })} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.highContrast ? T.blue : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.highContrast ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ─── SOUNDBOARD (Enhanced for full sentences) ────────────────────────────────
 function SoundboardScreen({ setScreen }) {
+  const { settings } = useApp();
   const [cat, setCat] = useState(null);
   const [sentence, setSentence] = useState([]);
   const [lastSpoken, setLastSpoken] = useState(null);
+  const [mode, setMode] = useState("categories"); // "categories" | "sentence"
 
   function tapItem(item) {
-    speak(item.speech);
+    speak(item.speech, settings);
     setLastSpoken(item.label);
     setSentence(prev => [...prev, item]);
-    setTimeout(() => setLastSpoken(null), 800);
+    setTimeout(() => setLastSpoken(null), 600);
   }
 
   function speakSentence() {
-    if (sentence.length > 0) speak(sentence.map(s => s.speech).join(". "));
+    if (sentence.length > 0) {
+      const text = sentence.map(s => s.speech).join(" ");
+      speak(text, settings);
+    }
+  }
+
+  function removeWord(index) {
+    setSentence(prev => prev.filter((_, i) => i !== index));
   }
 
   return (
     <div style={{ padding: "24px 20px 120px" }}>
       <Header title="💬 Soundboard" onBack={() => setScreen("home")} />
 
+      {/* Sentence Builder Bar */}
       <div style={{
-        background: T.surface, borderRadius: 18, padding: 14, marginBottom: 16,
+        background: T.surface, borderRadius: 18, padding: 14, marginBottom: 12,
         border: `2px solid ${T.blue}30`, minHeight: 64,
-        display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", boxShadow: T.shadow,
+        display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", boxShadow: T.shadow,
       }}>
         {sentence.length === 0 ? (
           <span style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft }}>Tap cards to build a sentence...</span>
         ) : sentence.map((s, i) => (
-          <span key={i} style={{
-            background: T.blueGlow, padding: "6px 12px", borderRadius: 12,
-            fontFamily: T.font, fontSize: 14, fontWeight: 600, color: T.blue,
-          }}>{s.emoji} {s.label}</span>
+          <button key={i} onClick={() => removeWord(i)} style={{
+            background: T.blueGlow, padding: "5px 10px", borderRadius: 10, border: `1px solid ${T.blue}30`,
+            fontFamily: T.font, fontSize: 13, fontWeight: 600, color: T.blue, cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 4,
+          }}>
+            {s.emoji} {s.label}
+            <span style={{ fontSize: 10, opacity: 0.5 }}>✕</span>
+          </button>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-        <Btn color={T.blue} onClick={speakSentence} style={{ flex: 1 }} disabled={sentence.length === 0}>🔊 Speak All</Btn>
-        <Btn color={T.soft} onClick={() => setSentence([])} style={{}} disabled={sentence.length === 0}>Clear</Btn>
+
+      {/* Sentence preview */}
+      {sentence.length > 0 && (
+        <div style={{
+          fontFamily: T.fontAlt, fontSize: 15, color: T.text, padding: "8px 14px",
+          background: T.yellowGlow, borderRadius: 12, marginBottom: 12, fontStyle: "italic",
+          border: `1px solid ${T.yellow}30`,
+        }}>
+          "{sentence.map(s => s.speech).join(" ")}"
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        <Btn color={T.blue} onClick={speakSentence} style={{ flex: 1 }} disabled={sentence.length === 0} size="sm">🔊 Speak</Btn>
+        <Btn color={T.soft} onClick={() => setSentence([])} disabled={sentence.length === 0} size="sm">Clear</Btn>
+        <Btn color={T.green} onClick={() => {
+          if (sentence.length > 0) {
+            const last = sentence[sentence.length - 1];
+            setSentence(prev => [...prev, { label: ".", emoji: "", speech: "." }]);
+          }
+        }} disabled={sentence.length === 0} size="sm">+ Period</Btn>
       </div>
 
       {cat === null ? (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {aacCategories.map(c => (
             <Card key={c.id} onClick={() => setCat(c.id)}
-              style={{ textAlign: "center", padding: 24, background: c.glow, border: `1.5px solid ${c.color}25` }}>
-              <div style={{ fontSize: 40, marginBottom: 8 }}>{c.emoji}</div>
-              <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: c.color }}>{c.label}</div>
-              <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, marginTop: 4 }}>{c.items.length} cards</div>
+              style={{ textAlign: "center", padding: 14, background: c.glow, border: `1.5px solid ${c.color}25` }}>
+              <div style={{ fontSize: 28, marginBottom: 4 }}>{c.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 12, fontWeight: 700, color: c.color }}>{c.label}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: T.soft, marginTop: 2 }}>{c.items.length}</div>
             </Card>
           ))}
         </div>
@@ -348,13 +792,13 @@ function SoundboardScreen({ setScreen }) {
         <>
           <button onClick={() => setCat(null)} style={{
             fontFamily: T.font, fontSize: 14, fontWeight: 600, color: T.soft,
-            background: "none", border: "none", cursor: "pointer", marginBottom: 16,
+            background: "none", border: "none", cursor: "pointer", marginBottom: 12,
             display: "flex", alignItems: "center", gap: 6,
           }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 19l-7-7 7-7"/></svg>
             All Categories
           </button>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             {aacCategories.find(c => c.id === cat).items.map((item, i) => {
               const catData = aacCategories.find(c => c.id === cat);
               const isActive = lastSpoken === item.label;
@@ -363,15 +807,15 @@ function SoundboardScreen({ setScreen }) {
                   style={{
                     background: isActive ? catData.color : T.surface,
                     border: `2px solid ${isActive ? catData.color : catData.color + "30"}`,
-                    borderRadius: 18, padding: "16px 8px", cursor: "pointer",
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                    borderRadius: 16, padding: "12px 6px", cursor: "pointer",
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
                     transition: "all 0.15s ease",
                     transform: isActive ? "scale(1.05)" : "scale(1)",
                     boxShadow: isActive ? `0 4px 20px ${catData.color}40` : "none",
                   }}>
-                  <span style={{ fontSize: 32 }}>{item.emoji}</span>
+                  <span style={{ fontSize: 28 }}>{item.emoji}</span>
                   <span style={{
-                    fontFamily: T.font, fontSize: 13, fontWeight: 700,
+                    fontFamily: T.font, fontSize: 11, fontWeight: 700,
                     color: isActive ? "#fff" : T.text, lineHeight: 1.2, textAlign: "center",
                   }}>{item.label}</span>
                 </button>
@@ -386,15 +830,67 @@ function SoundboardScreen({ setScreen }) {
 
 // ─── GAMES HUB ───────────────────────────────────────────────────────────────
 function GamesScreen({ setScreen }) {
+  const { settings } = useApp();
+  const [gameTimerActive, setGameTimerActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(settings.gameTimerMinutes * 60);
+  const [timerDone, setTimerDone] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (settings.kidsMode && settings.gameTimerMinutes > 0 && !gameTimerActive) {
+      setGameTimerActive(true);
+      setTimeLeft(settings.gameTimerMinutes * 60);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gameTimerActive && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(t => {
+          if (t <= 1) {
+            clearInterval(timerRef.current);
+            setTimerDone(true);
+            speak("Game time is over! Time to take a break.", settings);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [gameTimerActive]);
+
+  if (timerDone) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <div style={{ textAlign: "center", padding: "60px 20px" }}>
+          <div style={{ fontSize: 80, marginBottom: 20 }}>⏰</div>
+          <h1 style={{ fontFamily: T.font, fontSize: 28, fontWeight: 800, color: T.text, margin: "0 0 12px" }}>Game Time is Up!</h1>
+          <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, lineHeight: 1.6, marginBottom: 24 }}>
+            Great job playing! Time to take a break and do something else.
+          </p>
+          <Btn color={T.primary} onClick={() => setScreen("home")}>Go Home</Btn>
+        </div>
+      </div>
+    );
+  }
+
   const games = [
     { id: "words", emoji: "🔤", title: "Word Match", desc: "Match pictures to words", color: T.primary, glow: T.primaryGlow },
     { id: "colors", emoji: "🎨", title: "Color Match", desc: "Learn your colors", color: T.blue, glow: T.blueGlow },
     { id: "patterns", emoji: "🔷", title: "Pattern Finder", desc: "What comes next?", color: T.purple, glow: T.purpleGlow },
     { id: "math", emoji: "🔢", title: "Number Fun", desc: "Simple adding & subtracting", color: T.green, glow: T.greenGlow },
   ];
+
   return (
     <div style={{ padding: "24px 20px 120px" }}>
-      <Header title="🎮 Learning Games" onBack={() => setScreen("home")} />
+      <Header title="🎮 Learning Games" onBack={() => setScreen("home")}
+        right={gameTimerActive && timeLeft > 0 ? (
+          <span style={{ fontFamily: T.font, fontSize: 14, color: timeLeft < 60 ? T.primary : T.soft, fontWeight: 700 }}>
+            ⏱️ {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+          </span>
+        ) : null}
+      />
       <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 20px", lineHeight: 1.6 }}>Pick a game! Take your time — no rush.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {games.map(g => (
@@ -417,6 +913,7 @@ function GamesScreen({ setScreen }) {
 
 // ─── WORD GAME ───────────────────────────────────────────────────────────────
 function WordGameScreen({ setScreen }) {
+  const { settings } = useApp();
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -428,11 +925,11 @@ function WordGameScreen({ setScreen }) {
     if (feedback) return;
     if (choice === game.word) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak("Great job!");
+      speak("Great job!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => { setFeedback(""); setShowHint(false); setIdx(i => (i + 1) % wordGames.length); }, 1800);
     } else {
-      setFeedback("wrong"); speak("Try again!");
+      setFeedback("wrong"); speak("Try again!", settings);
       setTimeout(() => setFeedback(""), 1000);
     }
   }
@@ -442,7 +939,8 @@ function WordGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔤 Word Match" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <Card style={{ textAlign: "center", padding: 32, marginBottom: 20 }}>
+      <ProgressBar value={idx + 1} max={wordGames.length} color={T.primary} h={6} />
+      <Card style={{ textAlign: "center", padding: 32, marginBottom: 20, marginTop: 16 }}>
         <div style={{ fontSize: 80, marginBottom: 12 }}>{game.image}</div>
         <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, margin: 0 }}>What word matches this picture?</p>
         {showHint && <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.blue, margin: "10px 0 0", fontStyle: "italic" }}>💡 {game.hint}</p>}
@@ -473,6 +971,7 @@ function WordGameScreen({ setScreen }) {
 
 // ─── COLOR GAME ──────────────────────────────────────────────────────────────
 function ColorGameScreen({ setScreen }) {
+  const { settings } = useApp();
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
@@ -491,10 +990,10 @@ function ColorGameScreen({ setScreen }) {
     if (feedback) return;
     if (name === target.name) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! That's ${target.name.toLowerCase()}!`);
+      speak(`Yes! That's ${target.name.toLowerCase()}!`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(newRound, 1500);
-    } else { setFeedback("wrong"); speak("Not quite!"); setTimeout(() => setFeedback(""), 800); }
+    } else { setFeedback("wrong"); speak("Not quite!", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
   if (!target) return null;
@@ -525,6 +1024,7 @@ function ColorGameScreen({ setScreen }) {
 
 // ─── PATTERN GAME ────────────────────────────────────────────────────────────
 function PatternGameScreen({ setScreen }) {
+  const { settings } = useApp();
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -535,10 +1035,10 @@ function PatternGameScreen({ setScreen }) {
     if (feedback) return;
     if (val === p.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak("You found the pattern!");
+      speak("You found the pattern!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % patternData.length); }, 1500);
-    } else { setFeedback("wrong"); speak("Look again"); setTimeout(() => setFeedback(""), 800); }
+    } else { setFeedback("wrong"); speak("Look again", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
   return (
@@ -546,7 +1046,8 @@ function PatternGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔷 Pattern Finder" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <Card style={{ textAlign: "center", padding: 28, marginBottom: 24 }}>
+      <ProgressBar value={idx + 1} max={patternData.length} color={T.purple} h={6} />
+      <Card style={{ textAlign: "center", padding: 28, marginBottom: 24, marginTop: 16 }}>
         <p style={{ fontFamily: T.font, fontSize: 16, color: T.soft, margin: "0 0 16px" }}>What comes next?</p>
         <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
           {p.pattern.map((item, i) => (
@@ -577,6 +1078,7 @@ function PatternGameScreen({ setScreen }) {
 
 // ─── MATH GAME ───────────────────────────────────────────────────────────────
 function MathGameScreen({ setScreen }) {
+  const { settings } = useApp();
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -587,10 +1089,10 @@ function MathGameScreen({ setScreen }) {
     if (feedback) return;
     if (val === prob.a) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${prob.q} equals ${prob.a}`);
+      speak(`Yes! ${prob.q} equals ${prob.a}`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % mathProblems.length); }, 1500);
-    } else { setFeedback("wrong"); speak("Not quite"); setTimeout(() => setFeedback(""), 800); }
+    } else { setFeedback("wrong"); speak("Not quite", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
   return (
@@ -598,7 +1100,8 @@ function MathGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔢 Number Fun" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <Card style={{ textAlign: "center", padding: 36, marginBottom: 24 }}>
+      <ProgressBar value={idx + 1} max={mathProblems.length} color={T.green} h={6} />
+      <Card style={{ textAlign: "center", padding: 36, marginBottom: 24, marginTop: 16 }}>
         <div style={{ fontFamily: T.font, fontSize: 56, fontWeight: 800, color: T.text, letterSpacing: 4 }}>{prob.q}</div>
         <div style={{ fontFamily: T.font, fontSize: 20, color: T.soft, marginTop: 8 }}>= ?</div>
       </Card>
@@ -620,6 +1123,7 @@ function MathGameScreen({ setScreen }) {
 
 // ─── FOCUS TIMER ─────────────────────────────────────────────────────────────
 function FocusScreen({ setScreen }) {
+  const { settings } = useApp();
   const [minutes, setMinutes] = useState(15);
   const [seconds, setSeconds] = useState(0);
   const [running, setRunning] = useState(false);
@@ -634,7 +1138,7 @@ function FocusScreen({ setScreen }) {
             setMinutes(m => {
               if (m === 0) {
                 clearInterval(intervalRef.current); setRunning(false);
-                speak(mode === "focus" ? "Time for a break!" : "Ready to focus again!");
+                speak(mode === "focus" ? "Time for a break!" : "Ready to focus again!", settings);
                 setMode(prev => prev === "focus" ? "break" : "focus");
                 setMinutes(mode === "focus" ? 5 : 15);
                 return 0;
@@ -700,6 +1204,7 @@ function FocusScreen({ setScreen }) {
 
 // ─── CALM CORNER ─────────────────────────────────────────────────────────────
 function CalmScreen({ setScreen }) {
+  const { settings } = useApp();
   const [breathing, setBreathing] = useState(false);
   const [breathPhase, setBreathPhase] = useState("in");
   const [breathCount, setBreathCount] = useState(4);
@@ -731,7 +1236,6 @@ function CalmScreen({ setScreen }) {
   return (
     <div style={{ padding: "24px 20px 120px" }}>
       <Header title="🫧 Calm Corner" onBack={() => { setBreathing(false); setScreen("home"); }} />
-
       <Card style={{ textAlign: "center", padding: 32, marginBottom: 20, background: breathing ? `${bi.color}08` : T.surface }}>
         <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 20 }}>Breathing Exercise</div>
         <div style={{
@@ -748,11 +1252,10 @@ function CalmScreen({ setScreen }) {
           {breathing ? "Stop" : "Start Breathing"}
         </Btn>
       </Card>
-
       <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 14 }}>Ambient Sounds</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 24 }}>
         {sounds.map(s => (
-          <button key={s.label} onClick={() => speak(s.label)} style={{
+          <button key={s.label} onClick={() => speak(s.label, settings)} style={{
             padding: "18px 8px", borderRadius: 18, border: `1.5px solid ${T.border}`,
             background: T.surface, cursor: "pointer", textAlign: "center",
           }}>
@@ -761,7 +1264,6 @@ function CalmScreen({ setScreen }) {
           </button>
         ))}
       </div>
-
       <Card style={{ background: T.purpleGlow, border: `1.5px solid ${T.purple}20` }}>
         <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.purple, marginBottom: 10 }}>🧘 5-4-3-2-1 Grounding</div>
         <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.text, lineHeight: 2.2 }}>
@@ -778,7 +1280,8 @@ function CalmScreen({ setScreen }) {
 
 // ─── HABITS ──────────────────────────────────────────────────────────────────
 function HabitsScreen({ setScreen }) {
-  const [habits, setHabits] = useState([
+  const { settings } = useApp();
+  const defaultHabits = [
     { id: 1, emoji: "🌅", label: "Wake up routine", done: false },
     { id: 2, emoji: "🪥", label: "Brush teeth", done: false },
     { id: 3, emoji: "🍎", label: "Eat breakfast", done: false },
@@ -789,7 +1292,10 @@ function HabitsScreen({ setScreen }) {
     { id: 8, emoji: "🛁", label: "Bath time", done: false },
     { id: 9, emoji: "📖", label: "Story time", done: false },
     { id: 10, emoji: "🌙", label: "Bedtime", done: false },
-  ]);
+  ];
+  const [habits, setHabits] = useState(() => loadState("habits", defaultHabits));
+
+  useEffect(() => { saveState("habits", habits); }, [habits]);
 
   const done = habits.filter(h => h.done).length;
 
@@ -809,7 +1315,7 @@ function HabitsScreen({ setScreen }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {habits.map(h => (
-          <button key={h.id} onClick={() => { setHabits(prev => prev.map(x => x.id === h.id ? { ...x, done: !x.done } : x)); if (!h.done) speak("Nice job!"); }}
+          <button key={h.id} onClick={() => { setHabits(prev => prev.map(x => x.id === h.id ? { ...x, done: !x.done } : x)); if (!h.done) speak("Nice job!", settings); }}
             style={{
               display: "flex", alignItems: "center", gap: 14, padding: 16,
               borderRadius: 18, border: `1.5px solid ${h.done ? T.green + "40" : T.border}`,
@@ -842,7 +1348,7 @@ function BottomNav({ screen, setScreen }) {
     { id: "focus", emoji: "🎯", label: "Focus" },
     { id: "calm", emoji: "🫧", label: "Calm" },
   ];
-  const activeId = screen.startsWith("game_") ? "games" : screen === "habits" ? "home" : screen;
+  const activeId = screen.startsWith("game_") ? "games" : screen === "habits" ? "home" : screen === "settings" ? "home" : screen;
 
   return (
     <div style={{
@@ -869,7 +1375,39 @@ function BottomNav({ screen, setScreen }) {
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [settings, setSettings] = useState(() => loadState("settings", defaultSettings));
   const [screen, setScreen] = useState("home");
+
+  function updateSettings(patch) {
+    setSettings(prev => {
+      const next = { ...prev, ...patch };
+      saveState("settings", next);
+      return next;
+    });
+  }
+
+  // Load voices on mount
+  useEffect(() => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+    }
+  }, []);
+
+  // Show onboarding if no age range selected
+  if (!settings.ageRange) {
+    return (
+      <AppContext.Provider value={{ settings, updateSettings }}>
+        <div style={{
+          background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
+          fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
+        }}>
+          <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; }`}</style>
+          <OnboardingScreen />
+        </div>
+      </AppContext.Provider>
+    );
+  }
+
   const screens = {
     home: <HomeScreen setScreen={setScreen} />,
     soundboard: <SoundboardScreen setScreen={setScreen} />,
@@ -881,16 +1419,19 @@ export default function App() {
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
+    settings: <SettingsScreen setScreen={setScreen} />,
   };
 
   return (
-    <div style={{
-      background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
-      fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
-    }}>
-      <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; }`}</style>
-      {screens[screen] || <HomeScreen setScreen={setScreen} />}
-      <BottomNav screen={screen} setScreen={setScreen} />
-    </div>
+    <AppContext.Provider value={{ settings, updateSettings }}>
+      <div style={{
+        background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
+        fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
+      }}>
+        <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; }`}</style>
+        {screens[screen] || <HomeScreen setScreen={setScreen} />}
+        <BottomNav screen={screen} setScreen={setScreen} />
+      </div>
+    </AppContext.Provider>
   );
 }
