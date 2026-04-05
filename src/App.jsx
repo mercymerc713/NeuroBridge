@@ -85,10 +85,32 @@ const AppContext = createContext();
 function useApp() { return useContext(AppContext); }
 
 // ─── Age-Adaptive Helpers ────────────────────────────────────────────────────
+// Kept for backward-compat where callers still ask for a ceiling value.
 function getMaxLevel(ageRange) {
   if (ageRange === "child") return 1;
   if (ageRange === "teen") return 2;
-  return 3; // young_adult, adult
+  if (ageRange === "young_adult") return 3;
+  return 4; // adult
+}
+// Exact lesson tier per age group — each age gets its own content band.
+function getLessonLevel(ageRange) {
+  if (ageRange === "child") return 1;
+  if (ageRange === "teen") return 2;
+  if (ageRange === "young_adult") return 3;
+  return 4; // adult
+}
+// Pick entries at the target level. If none exist at that exact level
+// (e.g. a game only has 3 tiers), fall back to the nearest lower tier that
+// does exist, so every age group still gets playable content.
+function lessonsFor(arr, ageRange) {
+  const target = getLessonLevel(ageRange);
+  let tier = target;
+  while (tier >= 1) {
+    const subset = arr.filter(x => x.level === tier);
+    if (subset.length) return subset;
+    tier -= 1;
+  }
+  return arr;
 }
 function shuffleArr(arr) {
   const a = [...arr];
@@ -466,6 +488,15 @@ const wordGames = [
   { image: "🌋", word: "VOLCANO", choices: ["VOLCANO", "TORNADO", "AVOCADO", "BUFFALO"], hint: "Erupts with lava", level: 3 },
   { image: "🦕", word: "DINOSAUR", choices: ["DINOSAUR", "DISCOVER", "DISORDER", "DINGASOR"], hint: "Extinct giant reptile", level: 3 },
   { image: "🏰", word: "CASTLE", choices: ["CASTLE", "HASSLE", "TASSEL", "VASSAL"], hint: "Where kings and queens live", level: 3 },
+  // Level 4 — Adult vocabulary
+  { image: "🏛️", word: "ARCHITECTURE", choices: ["ARCHITECTURE", "AGRICULTURE", "ARCHIPELAGO", "ARCHEOLOGY"], hint: "The art of designing buildings", level: 4 },
+  { image: "🔬", word: "MICROSCOPE", choices: ["MICROSCOPE", "TELESCOPE", "PERISCOPE", "STETHOSCOPE"], hint: "Tool for viewing tiny things", level: 4 },
+  { image: "⚖️", word: "JUSTICE", choices: ["JUSTICE", "JUNCTION", "JUVENILE", "JUBILANT"], hint: "Fairness under the law", level: 4 },
+  { image: "🧬", word: "GENETICS", choices: ["GENETICS", "GEOMETRY", "GEOLOGY", "GENEROSITY"], hint: "Study of inherited traits", level: 4 },
+  { image: "🌌", word: "UNIVERSE", choices: ["UNIVERSE", "UNIFORM", "UNIVERSAL", "UTENSIL"], hint: "All of space and time", level: 4 },
+  { image: "💼", word: "ENTREPRENEUR", choices: ["ENTREPRENEUR", "ENGINEER", "EMPLOYEE", "EXECUTIVE"], hint: "Someone who starts a business", level: 4 },
+  { image: "🏥", word: "PHYSICIAN", choices: ["PHYSICIAN", "MUSICIAN", "POLITICIAN", "TECHNICIAN"], hint: "A medical doctor", level: 4 },
+  { image: "📊", word: "ANALYTICS", choices: ["ANALYTICS", "ATHLETICS", "ANTARCTIC", "AUTHENTIC"], hint: "The study of data", level: 4 },
 ];
 
 const colorMatchGame = [
@@ -496,6 +527,14 @@ const patternData = [
   { pattern: ["🔴", "🔵", "🟢", "🔴", "🔵", "?"], answer: "🟢", choices: ["🔴", "🔵", "🟢"], level: 3 },
   { pattern: ["1", "1", "2", "3", "5", "?"], answer: "8", choices: ["7", "8", "6"], level: 3 },
   { pattern: ["△", "□", "⬠", "△", "□", "?"], answer: "⬠", choices: ["△", "□", "⬠"], level: 3 },
+  // Level 4 — Adult: prime numbers, squares, fibonacci variations, letter skips
+  { pattern: ["2", "3", "5", "7", "11", "?"], answer: "13", choices: ["12", "13", "15"], level: 4 },
+  { pattern: ["1", "4", "9", "16", "25", "?"], answer: "36", choices: ["30", "36", "49"], level: 4 },
+  { pattern: ["3", "6", "12", "24", "?"], answer: "48", choices: ["36", "48", "60"], level: 4 },
+  { pattern: ["A", "C", "E", "G", "I", "?"], answer: "K", choices: ["J", "K", "L"], level: 4 },
+  { pattern: ["Z", "Y", "X", "W", "?"], answer: "V", choices: ["V", "U", "T"], level: 4 },
+  { pattern: ["100", "81", "64", "49", "?"], answer: "36", choices: ["36", "42", "25"], level: 4 },
+  { pattern: ["2", "6", "12", "20", "30", "?"], answer: "42", choices: ["40", "42", "44"], level: 4 },
 ];
 
 const mathProblems = [
@@ -519,6 +558,17 @@ const mathProblems = [
   { q: "8 × 7", a: 56, choices: [54, 56, 58], level: 3 },
   { q: "100 ÷ 5", a: 20, choices: [15, 20, 25], level: 3 },
   { q: "13 + 19", a: 32, choices: [31, 32, 33], level: 3 },
+  // Level 4 — Adult: multi-digit, percentages, squares, order of operations
+  { q: "144 ÷ 12", a: 12, choices: [11, 12, 14], level: 4 },
+  { q: "25 × 8", a: 200, choices: [180, 200, 250], level: 4 },
+  { q: "15% of 200", a: 30, choices: [25, 30, 45], level: 4 },
+  { q: "17 × 13", a: 221, choices: [211, 221, 231], level: 4 },
+  { q: "√169", a: 13, choices: [12, 13, 14], level: 4 },
+  { q: "2³ + 5²", a: 33, choices: [30, 33, 36], level: 4 },
+  { q: "256 ÷ 16", a: 16, choices: [14, 16, 18], level: 4 },
+  { q: "7 × 9 + 4", a: 67, choices: [63, 67, 70], level: 4 },
+  { q: "45 + 38 − 17", a: 66, choices: [64, 66, 68], level: 4 },
+  { q: "20% of 150", a: 30, choices: [25, 30, 35], level: 4 },
 ];
 
 // Memory game pairs
@@ -547,6 +597,13 @@ const rhymingData = [
   { word: "PHONE", emoji: "📱", answer: "BONE", choices: ["BONE", "CALL", "RING", "TEXT"], level: 3 },
   { word: "FLOWER", emoji: "🌸", answer: "TOWER", choices: ["TOWER", "GARDEN", "PETAL", "SEED"], level: 3 },
   { word: "BRIGHT", emoji: "✨", answer: "FLIGHT", choices: ["FLIGHT", "DARK", "SHINE", "GLOW"], level: 3 },
+  // Level 4 — Adult multisyllabic rhymes
+  { word: "ACQUIRE", emoji: "🎯", answer: "INSPIRE", choices: ["INSPIRE", "OBTAIN", "REQUIRE", "DESIRE"], level: 4 },
+  { word: "COMMOTION", emoji: "🌪️", answer: "DEVOTION", choices: ["DEVOTION", "QUIET", "MOVEMENT", "CHAOS"], level: 4 },
+  { word: "INVENTION", emoji: "💡", answer: "DIMENSION", choices: ["DIMENSION", "IDEA", "CREATION", "NOTION"], level: 4 },
+  { word: "CELEBRATE", emoji: "🎉", answer: "DEMONSTRATE", choices: ["DEMONSTRATE", "CHEER", "PARTY", "REJOICE"], level: 4 },
+  { word: "MYSTERIOUS", emoji: "🕵️", answer: "VICTORIOUS", choices: ["VICTORIOUS", "STRANGE", "CRYPTIC", "SECRET"], level: 4 },
+  { word: "HORIZON", emoji: "🌅", answer: "BISON", choices: ["BISON", "SKYLINE", "SUNSET", "DISTANCE"], level: 4 },
 ];
 
 // Shape sorting data
@@ -561,6 +618,13 @@ const shapeSortData = [
   { shape: "Cold Things", emoji: "❄️", items: ["🍦", "🧊", "🔥", "⛄"], answer: "🔥", wrongLabel: "Not cold", level: 3 },
   { shape: "Musical", emoji: "🎵", items: ["🎸", "🥁", "📚", "🎹"], answer: "📚", wrongLabel: "Not musical", level: 3 },
   { shape: "School Items", emoji: "🏫", items: ["📚", "✏️", "🍕", "📐"], answer: "🍕", wrongLabel: "Not for school", level: 3 },
+  // Level 4 — Adult: abstract categories
+  { shape: "Office Tools", emoji: "💼", items: ["💻", "📎", "🎪", "📊"], answer: "🎪", wrongLabel: "Not office gear", level: 4 },
+  { shape: "Financial", emoji: "💰", items: ["💳", "🏦", "🎸", "📈"], answer: "🎸", wrongLabel: "Not financial", level: 4 },
+  { shape: "Scientific", emoji: "🔬", items: ["🧪", "🔭", "🍔", "🧬"], answer: "🍔", wrongLabel: "Not scientific", level: 4 },
+  { shape: "Legal Items", emoji: "⚖️", items: ["📜", "⚖️", "🍉", "🏛️"], answer: "🍉", wrongLabel: "Not legal", level: 4 },
+  { shape: "Medical", emoji: "⚕️", items: ["💊", "🩺", "🎮", "🏥"], answer: "🎮", wrongLabel: "Not medical", level: 4 },
+  { shape: "Renewable Energy", emoji: "♻️", items: ["☀️", "💨", "🛢️", "🌊"], answer: "🛢️", wrongLabel: "Not renewable", level: 4 },
 ];
 
 // ─── Spelling Bee Data ──────────────────────────────────────────────────────
@@ -584,6 +648,15 @@ const spellingWords = [
   { word: "friend", hint: "🤝 Someone you like", level: 3 },
   { word: "school", hint: "🏫 Where you learn", level: 3 },
   { word: "dragon", hint: "🐉 Breathes fire", level: 3 },
+  // Level 4 — Adult vocabulary
+  { word: "rhythm", hint: "🥁 The beat of music", level: 4 },
+  { word: "ancient", hint: "🏛️ Very, very old", level: 4 },
+  { word: "journey", hint: "🗺️ A long trip", level: 4 },
+  { word: "pharmacy", hint: "💊 Where you get medicine", level: 4 },
+  { word: "knowledge", hint: "📚 What you learn", level: 4 },
+  { word: "horizon", hint: "🌅 Where sky meets earth", level: 4 },
+  { word: "curious", hint: "🤔 Wanting to know more", level: 4 },
+  { word: "genuine", hint: "✅ Real and true", level: 4 },
 ];
 
 // ─── Opposite Match Data ────────────────────────────────────────────────────
@@ -604,6 +677,14 @@ const oppositeData = [
   { word: "Brave", emoji: "🦁", answer: "Scared", choices: ["Scared", "Shy", "Weak"], level: 3 },
   { word: "Generous", emoji: "🎁", answer: "Selfish", choices: ["Selfish", "Greedy", "Mean"], level: 3 },
   { word: "Remember", emoji: "🧠", answer: "Forget", choices: ["Forget", "Lose", "Miss"], level: 3 },
+  // Level 4 — Adult nuanced opposites
+  { word: "Abundant", emoji: "🌾", answer: "Scarce", choices: ["Scarce", "Rare", "Few"], level: 4 },
+  { word: "Optimistic", emoji: "😊", answer: "Pessimistic", choices: ["Pessimistic", "Sad", "Gloomy"], level: 4 },
+  { word: "Transparent", emoji: "🪟", answer: "Opaque", choices: ["Opaque", "Clear", "Solid"], level: 4 },
+  { word: "Frugal", emoji: "💰", answer: "Extravagant", choices: ["Extravagant", "Wealthy", "Cheap"], level: 4 },
+  { word: "Voluntary", emoji: "✋", answer: "Mandatory", choices: ["Mandatory", "Optional", "Forced"], level: 4 },
+  { word: "Coherent", emoji: "🧩", answer: "Incoherent", choices: ["Incoherent", "Broken", "Confused"], level: 4 },
+  { word: "Temporary", emoji: "⏳", answer: "Permanent", choices: ["Permanent", "Lasting", "Stable"], level: 4 },
 ];
 
 // ─── Counting Data ──────────────────────────────────────────────────────────
@@ -644,6 +725,12 @@ const clockData = [
   { hour: 4, minute: 15, display: "4:15", choices: ["4:15", "3:15", "4:45"], level: 3 },
   { hour: 8, minute: 45, display: "8:45", choices: ["8:45", "9:45", "8:15"], level: 3 },
   { hour: 11, minute: 20, display: "11:20", choices: ["11:20", "4:55", "11:40"], level: 3 },
+  // Level 4 — Adult: minute-precise times
+  { hour: 1, minute: 47, display: "1:47", choices: ["1:47", "1:43", "2:47"], level: 4 },
+  { hour: 5, minute: 52, display: "5:52", choices: ["5:52", "6:08", "5:08"], level: 4 },
+  { hour: 9, minute: 38, display: "9:38", choices: ["9:38", "9:22", "10:38"], level: 4 },
+  { hour: 12, minute: 14, display: "12:14", choices: ["12:14", "12:46", "1:14"], level: 4 },
+  { hour: 6, minute: 3, display: "6:03", choices: ["6:03", "5:57", "6:33"], level: 4 },
 ];
 
 // ─── Money Data ─────────────────────────────────────────────────────────────
@@ -658,6 +745,12 @@ const moneyData = [
   { coins: ["$1", "25¢", "10¢"], total: 135, display: "$1.35", choices: ["$1.35", "$1.25", "$1.45"], level: 3 },
   { coins: ["$1", "$1", "25¢", "10¢", "5¢"], total: 240, display: "$2.40", choices: ["$2.40", "$2.35", "$2.50"], level: 3 },
   { coins: ["$5", "$1", "25¢", "25¢", "10¢"], total: 660, display: "$6.60", choices: ["$6.60", "$5.60", "$6.50"], level: 3 },
+  // Level 4 — Adult: budgeting amounts, mixed bills/coins
+  { coins: ["$10", "$5", "$1", "$1", "25¢"], total: 1725, display: "$17.25", choices: ["$17.25", "$16.25", "$17.75"], level: 4 },
+  { coins: ["$20", "$5", "$1", "25¢", "10¢", "5¢"], total: 2640, display: "$26.40", choices: ["$26.40", "$25.40", "$26.50"], level: 4 },
+  { coins: ["$20", "$20", "$10", "$5"], total: 5500, display: "$55.00", choices: ["$55.00", "$50.00", "$60.00"], level: 4 },
+  { coins: ["$50", "$10", "$5", "$1", "$1"], total: 6700, display: "$67.00", choices: ["$67.00", "$66.00", "$70.00"], level: 4 },
+  { coins: ["$100", "$20", "$5", "25¢", "25¢"], total: 12550, display: "$125.50", choices: ["$125.50", "$125.00", "$130.50"], level: 4 },
 ];
 
 // ─── Emotion Match Data ─────────────────────────────────────────────────────
@@ -676,6 +769,14 @@ const emotionMatchData = [
   { face: "🤗", answer: "Affectionate", choices: ["Affectionate", "Happy", "Grateful"], level: 3 },
   { face: "😏", answer: "Smug", choices: ["Smug", "Happy", "Confident"], level: 3 },
   { face: "🫣", answer: "Embarrassed", choices: ["Embarrassed", "Shy", "Nervous"], level: 3 },
+  // Level 4 — Adult: complex emotional states
+  { face: "😮‍💨", answer: "Relieved", choices: ["Relieved", "Tired", "Bored"], level: 4 },
+  { face: "🙄", answer: "Unimpressed", choices: ["Unimpressed", "Annoyed", "Distracted"], level: 4 },
+  { face: "😔", answer: "Remorseful", choices: ["Remorseful", "Sad", "Tired"], level: 4 },
+  { face: "🤨", answer: "Skeptical", choices: ["Skeptical", "Confused", "Curious"], level: 4 },
+  { face: "😩", answer: "Overwhelmed", choices: ["Overwhelmed", "Exhausted", "Frustrated"], level: 4 },
+  { face: "🥲", answer: "Bittersweet", choices: ["Bittersweet", "Happy", "Sad"], level: 4 },
+  { face: "😶", answer: "Speechless", choices: ["Speechless", "Bored", "Calm"], level: 4 },
 ];
 
 // ─── What's Missing Data ────────────────────────────────────────────────────
@@ -690,6 +791,13 @@ const missingData = [
   { items: ["A", "B", "C", "D", "E", "F"], missing: "D", choices: ["D", "G", "H"], level: 3 },
   { items: ["🌑", "🌒", "🌓", "🌔", "🌕"], missing: "🌓", choices: ["🌓", "🌙", "⭐"], level: 3 },
   { items: ["👶", "🧒", "🧑", "🧓"], missing: "🧑", choices: ["🧑", "👦", "👴"], level: 3 },
+  // Level 4 — Adult: roman numerals, chemistry, geography, sequences
+  { items: ["I", "II", "III", "IV", "V", "VI"], missing: "IV", choices: ["IV", "VII", "IX"], level: 4 },
+  { items: ["Mercury", "Venus", "Earth", "Mars", "Jupiter"], missing: "Mars", choices: ["Mars", "Pluto", "Saturn"], level: 4 },
+  { items: ["Spring", "Summer", "Autumn", "Winter"], missing: "Autumn", choices: ["Autumn", "Rainy", "Dry"], level: 4 },
+  { items: ["2", "4", "8", "16", "32"], missing: "8", choices: ["8", "6", "12"], level: 4 },
+  { items: ["Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet"], missing: "Indigo", choices: ["Indigo", "Pink", "Brown"], level: 4 },
+  { items: ["H", "He", "Li", "Be", "B", "C"], missing: "Be", choices: ["Be", "Na", "Fe"], level: 4 },
 ];
 
 // ─── Story Builder (Mad Libs) Templates ─────────────────────────────────────
@@ -778,6 +886,31 @@ const mazeData = [
     [0,1,0,1,0,0,0,0,0],
     [0,1,1,1,0,1,1,1,0],
     [0,0,0,0,0,1,0,1,3],
+  ]},
+  // Level 4 — Adult: larger serpentine mazes
+  { level: 4, rows: 11, cols: 11, grid: [
+    [2,1,1,1,1,1,1,1,1,1,0],
+    [0,0,0,0,0,0,0,0,0,1,0],
+    [0,1,1,1,1,1,1,1,0,1,0],
+    [0,1,0,0,0,0,0,1,0,1,0],
+    [0,1,0,1,1,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1,0,1,0],
+    [0,1,0,0,0,0,0,0,0,1,3],
+  ]},
+  { level: 4, rows: 9, cols: 11, grid: [
+    [2,1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,1,1,1,1,0,1,0,1],
+    [1,0,1,0,0,0,1,0,1,0,1],
+    [1,0,1,0,1,1,1,0,1,0,1],
+    [1,0,1,0,0,0,0,0,1,0,1],
+    [0,0,1,1,1,1,1,1,1,0,3],
   ]},
 ];
 
@@ -878,6 +1011,7 @@ const sightWords = {
   level1: ["the", "and", "is", "it", "to", "in", "I", "a", "my", "we", "go", "no", "so", "he", "me", "be", "do", "up", "at", "on"],
   level2: ["said", "have", "with", "they", "this", "from", "that", "what", "were", "when", "your", "each", "make", "like", "just", "over", "such", "take", "than", "them"],
   level3: ["about", "could", "would", "there", "their", "which", "other", "because", "through", "before", "should", "between", "people", "different", "important", "another", "together", "something", "sometimes", "everything"],
+  level4: ["although", "however", "therefore", "nevertheless", "consequently", "furthermore", "specifically", "generally", "particularly", "essentially", "significantly", "previously", "immediately", "approximately", "effectively", "independently", "additionally", "ultimately", "eventually", "occasionally"],
 };
 
 const readingStories = [
@@ -905,6 +1039,22 @@ const readingStories = [
     id: "ocean_story", title: "Under the Sea", emoji: "🌊", level: 3,
     text: "The ocean is full of amazing creatures. Dolphins swim together in groups called pods. Octopuses have eight arms and are very smart. The coral reef is like an underwater city where thousands of fish live. Scientists are working to protect these beautiful places for the future.",
     questions: [{ q: "What are groups of dolphins called?", choices: ["Herds", "Pods", "Schools"], a: "Pods" }],
+  },
+  // Level 4 — Adult reading
+  {
+    id: "climate", title: "A Changing Climate", emoji: "🌍", level: 4,
+    text: "Climate change is one of the most significant challenges facing humanity today. Scientists have observed rising global temperatures over the past century, primarily driven by greenhouse gas emissions from burning fossil fuels. The consequences include melting ice caps, rising sea levels, and more extreme weather events. However, renewable energy sources like solar and wind power offer promising solutions, and many countries are now investing heavily in sustainable technologies.",
+    questions: [{ q: "What primarily drives global temperature rise?", choices: ["Ocean currents", "Greenhouse gas emissions", "Volcanic activity"], a: "Greenhouse gas emissions" }],
+  },
+  {
+    id: "ai_story", title: "The Rise of Artificial Intelligence", emoji: "🤖", level: 4,
+    text: "Artificial intelligence has transformed the way we work, communicate, and make decisions. Machine learning algorithms can analyze enormous datasets, identify patterns that humans might miss, and generate insights that accelerate scientific discovery. Yet these capabilities raise important ethical questions about privacy, employment, and accountability. Responsible development requires collaboration between engineers, policymakers, and ordinary citizens to ensure the technology benefits everyone.",
+    questions: [{ q: "What do machine learning algorithms analyze?", choices: ["Only text", "Enormous datasets", "Physical objects"], a: "Enormous datasets" }],
+  },
+  {
+    id: "history_story", title: "Ancient Civilizations", emoji: "🏛️", level: 4,
+    text: "Throughout history, civilizations have risen and fallen, leaving behind remarkable achievements in architecture, art, and governance. The ancient Egyptians built monumental pyramids that still stand thousands of years later. The Greeks developed philosophy, democracy, and theater that continue to influence modern society. Each civilization contributed ideas and innovations that shape how we live today, reminding us that progress is built upon the foundations of those who came before.",
+    questions: [{ q: "What did the ancient Greeks develop?", choices: ["Only pyramids", "Philosophy and democracy", "Space travel"], a: "Philosophy and democracy" }],
   },
 ];
 
@@ -2017,8 +2167,7 @@ function GamesScreen({ setScreen }) {
 // ─── WORD GAME ───────────────────────────────────────────────────────────────
 function WordGameScreen({ setScreen }) {
   const { settings } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(wordGames.filter(g => g.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(wordGames, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -2028,7 +2177,7 @@ function WordGameScreen({ setScreen }) {
   const game = items[idx];
 
   function restart() {
-    setItems(shuffleArr(wordGames.filter(g => g.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(wordGames, settings.ageRange)));
     setIdx(0); setFeedback(""); setScore(0); setShowHint(false); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2141,8 +2290,7 @@ function ColorGameScreen({ setScreen }) {
 // ─── PATTERN GAME ────────────────────────────────────────────────────────────
 function PatternGameScreen({ setScreen }) {
   const { settings } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(patternData.filter(p => p.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(patternData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -2152,7 +2300,7 @@ function PatternGameScreen({ setScreen }) {
   const filtered = items;
 
   function restart() {
-    setItems(shuffleArr(patternData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(patternData, settings.ageRange)));
     setIdx(0); setFeedback(""); setScore(0); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2209,8 +2357,7 @@ function PatternGameScreen({ setScreen }) {
 // ─── MATH GAME ───────────────────────────────────────────────────────────────
 function MathGameScreen({ setScreen }) {
   const { settings } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(mathProblems.filter(p => p.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(mathProblems, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -2220,7 +2367,7 @@ function MathGameScreen({ setScreen }) {
   const filtered = items;
 
   function restart() {
-    setItems(shuffleArr(mathProblems.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(mathProblems, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2348,8 +2495,7 @@ function MemoryGameScreen({ setScreen }) {
 // ─── RHYMING GAME ───────────────────────────────────────────────────────────
 function RhymingGameScreen({ setScreen }) {
   const { settings } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(rhymingData.filter(r => r.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(rhymingData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -2359,7 +2505,7 @@ function RhymingGameScreen({ setScreen }) {
   const filtered = items;
 
   function restart() {
-    setItems(shuffleArr(rhymingData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(rhymingData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2414,8 +2560,7 @@ function RhymingGameScreen({ setScreen }) {
 // ─── SHAPE SORTING GAME ─────────────────────────────────────────────────────
 function ShapeSortScreen({ setScreen }) {
   const { settings } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(shapeSortData.filter(s => s.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(shapeSortData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -2425,7 +2570,7 @@ function ShapeSortScreen({ setScreen }) {
   const filtered = items;
 
   function restart() {
-    setItems(shuffleArr(shapeSortData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(shapeSortData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2480,8 +2625,7 @@ function ShapeSortScreen({ setScreen }) {
 // ─── SPELLING BEE ────────────────────────────────────────────────────────────
 function SpellingBeeScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(spellingWords.filter(w => w.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(spellingWords, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [typed, setTyped] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -2492,7 +2636,7 @@ function SpellingBeeScreen({ setScreen }) {
   const current = items[idx];
 
   function restart() {
-    setItems(shuffleArr(spellingWords.filter(w => w.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(spellingWords, settings.ageRange)));
     setIdx(0); setTyped(""); setFeedback(""); setScore(0); setRevealed(false); setDone(false);
   }
 
@@ -2602,8 +2746,7 @@ function SpellingBeeScreen({ setScreen }) {
 // ─── OPPOSITE MATCH ──────────────────────────────────────────────────────────
 function OppositeMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(oppositeData.filter(o => o.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(oppositeData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -2618,7 +2761,7 @@ function OppositeMatchScreen({ setScreen }) {
   }, [idx, current]);
 
   function restart() {
-    setItems(shuffleArr(oppositeData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(oppositeData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2674,8 +2817,7 @@ function OppositeMatchScreen({ setScreen }) {
 // ─── COUNTING GAME ───────────────────────────────────────────────────────────
 function CountingGameScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(countingData.filter(c => c.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(countingData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -2685,7 +2827,7 @@ function CountingGameScreen({ setScreen }) {
   const filtered = items;
 
   function restart() {
-    setItems(shuffleArr(countingData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(countingData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2743,8 +2885,7 @@ function CountingGameScreen({ setScreen }) {
 // ─── SIZE SORTING ────────────────────────────────────────────────────────────
 function SizeSortScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(sizeSortData.filter(s => s.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(sizeSortData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [order, setOrder] = useState([]);
   const [available, setAvailable] = useState([]);
@@ -2764,7 +2905,7 @@ function SizeSortScreen({ setScreen }) {
   }, [idx, current]);
 
   function restart() {
-    setItems(shuffleArr(sizeSortData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(sizeSortData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setOrder([]); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2844,8 +2985,7 @@ function SizeSortScreen({ setScreen }) {
 // ─── CLOCK READER ────────────────────────────────────────────────────────────
 function ClockReaderScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(clockData.filter(c => c.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(clockData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -2860,7 +3000,7 @@ function ClockReaderScreen({ setScreen }) {
   }, [idx, current]);
 
   function restart() {
-    setItems(shuffleArr(clockData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(clockData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -2938,8 +3078,7 @@ function ClockReaderScreen({ setScreen }) {
 // ─── MONEY MATCH ─────────────────────────────────────────────────────────────
 function MoneyMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(moneyData.filter(m => m.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(moneyData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -2954,7 +3093,7 @@ function MoneyMatchScreen({ setScreen }) {
   }, [idx, current]);
 
   function restart() {
-    setItems(shuffleArr(moneyData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(moneyData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -3030,8 +3169,7 @@ function MoneyMatchScreen({ setScreen }) {
 // ─── EMOTION MATCH ───────────────────────────────────────────────────────────
 function EmotionMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(emotionMatchData.filter(e => e.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(emotionMatchData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -3046,7 +3184,7 @@ function EmotionMatchScreen({ setScreen }) {
   }, [idx, current]);
 
   function restart() {
-    setItems(shuffleArr(emotionMatchData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(emotionMatchData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -3100,8 +3238,7 @@ function EmotionMatchScreen({ setScreen }) {
 // ─── WHAT'S MISSING ──────────────────────────────────────────────────────────
 function WhatsMissingScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const [items, setItems] = useState(() => shuffleArr(missingData.filter(m => m.level <= maxLevel)));
+  const [items, setItems] = useState(() => shuffleArr(lessonsFor(missingData, settings.ageRange)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -3121,7 +3258,7 @@ function WhatsMissingScreen({ setScreen }) {
   }, [idx, current]);
 
   function restart() {
-    setItems(shuffleArr(missingData.filter(x => x.level <= maxLevel)));
+    setItems(shuffleArr(lessonsFor(missingData, settings.ageRange)));
     setIdx(0); setScore(0); setFeedback(""); setPhase("show"); setDone(false);
   }
   if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
@@ -3293,8 +3430,7 @@ function StoryBuilderScreen({ setScreen }) {
 // ─── MAZE RUNNER ─────────────────────────────────────────────────────────────
 function MazeRunnerScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = mazeData.filter(m => m.level <= maxLevel);
+  const filtered = lessonsFor(mazeData, settings.ageRange);
   const [idx, setIdx] = useState(0);
   const [pos, setPos] = useState({ r: 0, c: 0 });
   const [score, setScore] = useState(0);
@@ -4267,7 +4403,7 @@ function ReadingScreen({ setScreen }) {
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState(0);
 
-  const levelKey = maxLevel === 1 ? "level1" : maxLevel === 2 ? "level2" : "level3";
+  const levelKey = maxLevel === 1 ? "level1" : maxLevel === 2 ? "level2" : maxLevel === 3 ? "level3" : "level4";
   const words = sightWords[levelKey];
 
   if (!mode) {
@@ -4316,7 +4452,7 @@ function ReadingScreen({ setScreen }) {
   }
 
   // Stories mode
-  const filteredStories = readingStories.filter(s => s.level <= maxLevel);
+  const filteredStories = lessonsFor(readingStories, settings.ageRange);
   const story = filteredStories.find(s => s.id === storyId);
 
   if (!story) {
