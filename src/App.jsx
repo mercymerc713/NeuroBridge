@@ -2086,12 +2086,20 @@ function ColorGameScreen({ setScreen }) {
 function PatternGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = patternData.filter(p => p.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(patternData.filter(p => p.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const p = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const p = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(patternData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setFeedback(""); setScore(0); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(val) {
     if (feedback) return;
@@ -2099,7 +2107,11 @@ function PatternGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak("You found the pattern!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else { setFeedback("wrong"); speak("Look again", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
