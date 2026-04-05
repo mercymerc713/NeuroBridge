@@ -1004,6 +1004,127 @@ const socialStories = [
       { text: "Making friends takes time. I'm doing a great job!", emoji: "⭐" },
     ],
   },
+  {
+    id: "dentist", title: "Going to the Dentist", emoji: "🦷", color: "#06B6D4",
+    pages: [
+      { text: "Today I am going to the dentist. The dentist helps keep my teeth healthy.", emoji: "🦷" },
+      { text: "I will sit in a big chair that leans back. It is shiny and soft.", emoji: "💺" },
+      { text: "The dentist will wear a mask and gloves. This keeps everyone safe.", emoji: "😷" },
+      { text: "They will count my teeth and look at them with a little mirror.", emoji: "🪞" },
+      { text: "Sometimes there is a buzzing sound. That's the tooth cleaner.", emoji: "🔊" },
+      { text: "When it's done, I get to pick a sticker or a new toothbrush!", emoji: "⭐" },
+    ],
+  },
+  {
+    id: "airplane", title: "Flying on an Airplane", emoji: "✈️", color: "#2563EB",
+    pages: [
+      { text: "Today we are flying on an airplane. We will go through the airport first.", emoji: "🛫" },
+      { text: "We will go through security. I need to put my bag on the belt.", emoji: "🎒" },
+      { text: "The airport might be busy and loud. I can wear headphones if I want.", emoji: "🎧" },
+      { text: "When we board the plane, I will sit in my seat and buckle my seatbelt.", emoji: "💺" },
+      { text: "Takeoff can feel bumpy. My ears might pop. I can chew gum to help.", emoji: "🫧" },
+      { text: "When we land, we are in a new place. It was a big adventure!", emoji: "🌍" },
+    ],
+  },
+  {
+    id: "birthday", title: "A Birthday Party", emoji: "🎂", color: "#EC4899",
+    pages: [
+      { text: "I am going to a birthday party. There will be lots of kids there.", emoji: "🎉" },
+      { text: "It might be loud with people singing and laughing. That's normal.", emoji: "🎵" },
+      { text: "I can bring a gift for the birthday person. Giving feels good.", emoji: "🎁" },
+      { text: "We might play games, eat cake, and sing 'Happy Birthday'.", emoji: "🎂" },
+      { text: "If I need a quiet break, I can ask a grown-up to help me find one.", emoji: "😌" },
+      { text: "Parties can be fun. I don't have to do everything—only what feels okay.", emoji: "🥳" },
+    ],
+  },
+  {
+    id: "sharing", title: "Sharing and Taking Turns", emoji: "🤲", color: "#F59E0B",
+    pages: [
+      { text: "Sometimes I want to play with a toy, but someone else is using it.", emoji: "🧸" },
+      { text: "I can wait my turn. Waiting is hard, but I can do it.", emoji: "⏳" },
+      { text: "I can say, 'Can I have a turn when you're done, please?'", emoji: "🗣️" },
+      { text: "When it's my turn, I get to play with the toy too.", emoji: "😊" },
+      { text: "Sharing makes playing more fun for everyone.", emoji: "🤝" },
+      { text: "I am a good friend when I share and take turns.", emoji: "⭐" },
+    ],
+  },
+  {
+    id: "losing_game", title: "When I Lose a Game", emoji: "🎲", color: "#7C3AED",
+    pages: [
+      { text: "Sometimes I play a game and I don't win. That's part of playing.", emoji: "🎲" },
+      { text: "Losing can make me feel sad, mad, or frustrated. Those feelings are okay.", emoji: "😠" },
+      { text: "I can take a deep breath and remind myself it is just a game.", emoji: "🫁" },
+      { text: "I can say 'good game' to the person who won. That is being a good sport.", emoji: "🤝" },
+      { text: "The more I practice, the better I get. Trying is what matters.", emoji: "💪" },
+      { text: "There will be more games. Next time I might win!", emoji: "🌟" },
+    ],
+  },
+  {
+    id: "asking_help", title: "Asking for Help", emoji: "🙋", color: "#10B981",
+    pages: [
+      { text: "Sometimes things feel hard and I don't know what to do.", emoji: "🤔" },
+      { text: "It's okay to ask for help. Everyone needs help sometimes.", emoji: "💡" },
+      { text: "I can find a safe grown-up like a parent, teacher, or friend.", emoji: "👨‍👩‍👧" },
+      { text: "I can say, 'Excuse me, I need help with ___.'", emoji: "🗣️" },
+      { text: "Asking for help is brave and smart. It is not a bad thing.", emoji: "💪" },
+      { text: "When I get help, I can say 'thank you' to show I appreciate it.", emoji: "🙏" },
+    ],
+  },
+  {
+    id: "fire_drill", title: "A Fire Drill at School", emoji: "🚨", color: "#DC2626",
+    pages: [
+      { text: "Sometimes at school we practice what to do if there is a fire.", emoji: "🚨" },
+      { text: "A loud alarm will ring. It can be startling. I can cover my ears.", emoji: "🔔" },
+      { text: "My teacher will ask everyone to line up quietly and calmly.", emoji: "🧑‍🏫" },
+      { text: "We will walk outside together to a safe spot.", emoji: "🚶" },
+      { text: "The teacher will check that everyone is there. I stay with my class.", emoji: "📋" },
+      { text: "When it's safe, we walk back inside. A drill keeps us ready and safe.", emoji: "✅" },
+    ],
+  },
+  {
+    id: "public_bathroom", title: "Using a Public Bathroom", emoji: "🚻", color: "#06B6D4",
+    pages: [
+      { text: "Sometimes when I'm out, I need to use a public bathroom.", emoji: "🚻" },
+      { text: "Public bathrooms might echo or have loud hand dryers. That's normal.", emoji: "🔊" },
+      { text: "The toilet might flush by itself. It can be surprising but it's safe.", emoji: "🚽" },
+      { text: "I can wash my hands with soap and warm water after.", emoji: "🧼" },
+      { text: "If the dryer is too loud, I can use paper towels or shake my hands dry.", emoji: "🖐️" },
+      { text: "I did a great job taking care of myself!", emoji: "⭐" },
+    ],
+  },
+  {
+    id: "morning", title: "My Morning Routine", emoji: "🌅", color: "#F59E0B",
+    pages: [
+      { text: "Every morning, I start my day by waking up.", emoji: "⏰" },
+      { text: "First, I use the bathroom and wash my face.", emoji: "🚿" },
+      { text: "Then I brush my teeth so they stay clean and healthy.", emoji: "🪥" },
+      { text: "I put on clothes that feel good on my body.", emoji: "👕" },
+      { text: "I eat breakfast to give my body energy for the day.", emoji: "🥣" },
+      { text: "Now I am ready for a great day!", emoji: "🌞" },
+    ],
+  },
+  {
+    id: "bad_day", title: "When I Have a Hard Day", emoji: "🌧️", color: "#8B5CF6",
+    pages: [
+      { text: "Some days are hard. Things don't go the way I want them to.", emoji: "😔" },
+      { text: "It's okay to feel upset. My feelings are real and important.", emoji: "💭" },
+      { text: "I can take slow, deep breaths to help my body feel calmer.", emoji: "🫁" },
+      { text: "I can do something that makes me feel better, like a walk or a hug.", emoji: "🚶" },
+      { text: "Hard days don't last forever. Tomorrow is a new day.", emoji: "🌅" },
+      { text: "I am strong, and I can get through this.", emoji: "💪" },
+    ],
+  },
+  {
+    id: "new_place", title: "Visiting a New Place", emoji: "🗺️", color: "#10B981",
+    pages: [
+      { text: "Today I am going somewhere I haven't been before.", emoji: "🗺️" },
+      { text: "New places can feel exciting or a little scary. Both feelings are okay.", emoji: "🤔" },
+      { text: "I can look around and notice new sights, sounds, and smells.", emoji: "👀" },
+      { text: "If I feel worried, I can hold something from home, like a stuffed toy.", emoji: "🧸" },
+      { text: "I can ask questions if I want to know what will happen.", emoji: "❓" },
+      { text: "Every new place is an adventure. I am brave for trying it.", emoji: "🌟" },
+    ],
+  },
 ];
 
 // ─── Reading Practice Data ──────────────────────────────────────────────────
@@ -1026,6 +1147,21 @@ const readingStories = [
     questions: [{ q: "What did you see?", choices: ["A cat", "A dog", "A bird"], a: "A dog" }],
   },
   {
+    id: "red_ball", title: "My Red Ball", emoji: "⚽", level: 1,
+    text: "I have a red ball. The ball is round. I kick the ball. The ball rolls far. I run to get my red ball.",
+    questions: [{ q: "What color is the ball?", choices: ["Blue", "Red", "Green"], a: "Red" }],
+  },
+  {
+    id: "apple_tree", title: "The Apple Tree", emoji: "🍎", level: 1,
+    text: "There is a tree in my yard. The tree has apples. The apples are red. I pick one apple. The apple is yummy.",
+    questions: [{ q: "What is on the tree?", choices: ["Apples", "Leaves only", "Birds"], a: "Apples" }],
+  },
+  {
+    id: "my_dog", title: "My Dog Max", emoji: "🐕", level: 1,
+    text: "Max is my dog. Max is brown. Max likes to play. I throw a stick. Max runs fast and brings it back.",
+    questions: [{ q: "What color is Max?", choices: ["Black", "Brown", "White"], a: "Brown" }],
+  },
+  {
     id: "rain_story", title: "Rainy Day", emoji: "🌧️", level: 2,
     text: "Today it is raining outside. I put on my rain boots and my jacket. I like to jump in puddles. The rain makes everything smell fresh. When I go inside, I have hot chocolate.",
     questions: [{ q: "What does the rain make?", choices: ["Everything wet", "Everything smell fresh", "Everything cold"], a: "Everything smell fresh" }],
@@ -1036,9 +1172,39 @@ const readingStories = [
     questions: [{ q: "Who is brave?", choices: ["Teachers", "Astronauts", "Doctors"], a: "Astronauts" }],
   },
   {
+    id: "garden_story", title: "Grandma's Garden", emoji: "🌻", level: 2,
+    text: "My grandma has a big garden behind her house. She grows tomatoes, carrots, and sunflowers. The sunflowers are taller than me! Grandma lets me help water the plants. I love visiting her garden in the summer.",
+    questions: [{ q: "What is taller than the child?", choices: ["Tomatoes", "Sunflowers", "Carrots"], a: "Sunflowers" }],
+  },
+  {
+    id: "library_story", title: "The Library", emoji: "📚", level: 2,
+    text: "Every Saturday, I go to the library with my mom. The library has thousands of books on tall shelves. I love finding new stories to read. The librarian helps me pick a good one. I can borrow books and take them home for two weeks.",
+    questions: [{ q: "How long can you borrow a book?", choices: ["One week", "Two weeks", "One month"], a: "Two weeks" }],
+  },
+  {
+    id: "snow_day", title: "The First Snow", emoji: "⛄", level: 2,
+    text: "I woke up and looked out my window. Everything was white! The first snow of winter had come. I put on my warm coat, gloves, and boots. My sister and I built a snowman with a carrot nose. We laughed and played until our cheeks turned pink.",
+    questions: [{ q: "What did they use for the snowman's nose?", choices: ["A button", "A carrot", "A stick"], a: "A carrot" }],
+  },
+  {
     id: "ocean_story", title: "Under the Sea", emoji: "🌊", level: 3,
     text: "The ocean is full of amazing creatures. Dolphins swim together in groups called pods. Octopuses have eight arms and are very smart. The coral reef is like an underwater city where thousands of fish live. Scientists are working to protect these beautiful places for the future.",
     questions: [{ q: "What are groups of dolphins called?", choices: ["Herds", "Pods", "Schools"], a: "Pods" }],
+  },
+  {
+    id: "rainforest_story", title: "The Rainforest", emoji: "🌴", level: 3,
+    text: "Rainforests are some of the most incredible places on Earth. They are home to more than half of all the plant and animal species in the world. Colorful parrots fly through the trees while monkeys swing from branch to branch. The rainforest receives huge amounts of rain, which helps the plants grow thick and tall. Protecting rainforests is important because they help keep our planet healthy.",
+    questions: [{ q: "What fraction of species live in rainforests?", choices: ["One third", "More than half", "All of them"], a: "More than half" }],
+  },
+  {
+    id: "invention_story", title: "The Lightbulb", emoji: "💡", level: 3,
+    text: "Before the lightbulb was invented, people used candles and oil lamps to see at night. Thomas Edison worked for many years to create a safe, long-lasting electric light. He tried thousands of materials before he found one that worked. When his invention finally succeeded, it changed the world. Now we can light our homes, streets, and schools at the flip of a switch.",
+    questions: [{ q: "Who invented the lightbulb?", choices: ["Albert Einstein", "Thomas Edison", "Isaac Newton"], a: "Thomas Edison" }],
+  },
+  {
+    id: "volcano_story", title: "How Volcanoes Work", emoji: "🌋", level: 3,
+    text: "Deep inside the Earth, there is a layer of hot, melted rock called magma. Sometimes this magma finds a way to push up through cracks in the ground. When it reaches the surface, it becomes lava and a volcano erupts. Volcanoes can be dangerous, but they also create new land and rich soil that is great for growing plants. Scientists study volcanoes to keep people safe.",
+    questions: [{ q: "What is magma called when it reaches the surface?", choices: ["Ash", "Lava", "Steam"], a: "Lava" }],
   },
   // Level 4 — Adult reading
   {
@@ -1745,8 +1911,10 @@ const boardColumns = [
     id: "starters", label: "I", color: "#F7B731", items: [
       { label: "I", speech: "I" }, { label: "I want", speech: "I want" }, { label: "I need", speech: "I need" },
       { label: "I like", speech: "I like" }, { label: "I feel", speech: "I feel" }, { label: "I am", speech: "I am" },
-      { label: "I don't", speech: "I don't" }, { label: "I can", speech: "I can" }, { label: "Can I", speech: "Can I" },
-      { label: "I see", speech: "I see" }, { label: "I have", speech: "I have" },
+      { label: "I don't", speech: "I don't" }, { label: "I can", speech: "I can" }, { label: "I can't", speech: "I can't" },
+      { label: "Can I", speech: "Can I" }, { label: "I see", speech: "I see" }, { label: "I hear", speech: "I hear" },
+      { label: "I have", speech: "I have" }, { label: "I know", speech: "I know" }, { label: "I think", speech: "I think" },
+      { label: "I love", speech: "I love" }, { label: "I miss", speech: "I miss" }, { label: "I will", speech: "I will" },
       { label: "You", speech: "you" }, { label: "We", speech: "we" }, { label: "He", speech: "he" },
       { label: "She", speech: "she" }, { label: "They", speech: "they" }, { label: "It", speech: "it" },
     ],
@@ -1759,54 +1927,68 @@ const boardColumns = [
       { label: "have", speech: "have" }, { label: "make", speech: "make" }, { label: "read", speech: "read" },
       { label: "stop", speech: "stop" }, { label: "give", speech: "give" }, { label: "put", speech: "put" },
       { label: "take", speech: "take" }, { label: "come", speech: "come" }, { label: "sit", speech: "sit" },
+      { label: "stand", speech: "stand" }, { label: "walk", speech: "walk" }, { label: "run", speech: "run" },
       { label: "look", speech: "look" }, { label: "get", speech: "get" }, { label: "open", speech: "open" },
       { label: "close", speech: "close" }, { label: "turn on", speech: "turn on" }, { label: "turn off", speech: "turn off" },
+      { label: "sleep", speech: "sleep" }, { label: "wake up", speech: "wake up" }, { label: "listen", speech: "listen" },
+      { label: "say", speech: "say" }, { label: "try", speech: "try" },
     ],
   },
   {
     id: "describers", label: "Kind", color: "#8B6CF6", items: [
-      { label: "more", speech: "more" }, { label: "big", speech: "big" }, { label: "little", speech: "little" },
-      { label: "good", speech: "good" }, { label: "bad", speech: "bad" }, { label: "hot", speech: "hot" },
-      { label: "cold", speech: "cold" }, { label: "new", speech: "new" }, { label: "different", speech: "different" },
+      { label: "more", speech: "more" }, { label: "less", speech: "less" }, { label: "big", speech: "big" },
+      { label: "little", speech: "little" }, { label: "good", speech: "good" }, { label: "bad", speech: "bad" },
+      { label: "hot", speech: "hot" }, { label: "cold", speech: "cold" }, { label: "warm", speech: "warm" },
+      { label: "new", speech: "new" }, { label: "old", speech: "old" }, { label: "different", speech: "different" },
       { label: "same", speech: "same" }, { label: "all", speech: "all" }, { label: "my", speech: "my" },
       { label: "your", speech: "your" }, { label: "this", speech: "this" }, { label: "that", speech: "that" },
       { label: "happy", speech: "happy" }, { label: "sad", speech: "sad" }, { label: "tired", speech: "tired" },
-      { label: "scared", speech: "scared" }, { label: "yummy", speech: "yummy" }, { label: "favorite", speech: "favorite" },
+      { label: "scared", speech: "scared" }, { label: "angry", speech: "angry" }, { label: "calm", speech: "calm" },
+      { label: "excited", speech: "excited" }, { label: "yummy", speech: "yummy" }, { label: "favorite", speech: "favorite" },
+      { label: "soft", speech: "soft" }, { label: "loud", speech: "loud" }, { label: "quiet", speech: "quiet" },
       { label: "some", speech: "some" }, { label: "the", speech: "the" }, { label: "a", speech: "a" },
     ],
   },
   {
     id: "things", label: "Thing", color: "#4E8AE6", items: [
       { label: "water", speech: "water" }, { label: "food", speech: "food" }, { label: "snack", speech: "snack" },
-      { label: "juice", speech: "juice" }, { label: "milk", speech: "milk" }, { label: "book", speech: "book" },
-      { label: "phone", speech: "phone" }, { label: "toy", speech: "toy" }, { label: "movie", speech: "movie" },
+      { label: "juice", speech: "juice" }, { label: "milk", speech: "milk" }, { label: "coffee", speech: "coffee" },
+      { label: "book", speech: "book" }, { label: "phone", speech: "phone" }, { label: "tablet", speech: "tablet" },
+      { label: "toy", speech: "toy" }, { label: "movie", speech: "movie" }, { label: "TV", speech: "TV" },
       { label: "game", speech: "game" }, { label: "music", speech: "music" }, { label: "shoes", speech: "shoes" },
       { label: "jacket", speech: "jacket" }, { label: "ball", speech: "ball" }, { label: "blanket", speech: "blanket" },
-      { label: "medicine", speech: "medicine" }, { label: "bath", speech: "bath" }, { label: "bed", speech: "bed" },
-      { label: "breakfast", speech: "breakfast" }, { label: "lunch", speech: "lunch" }, { label: "dinner", speech: "dinner" },
-      { label: "pizza", speech: "pizza" }, { label: "chicken", speech: "chicken" }, { label: "cookie", speech: "cookie" },
+      { label: "pillow", speech: "pillow" }, { label: "medicine", speech: "medicine" }, { label: "bath", speech: "bath" },
+      { label: "bed", speech: "bed" }, { label: "breakfast", speech: "breakfast" }, { label: "lunch", speech: "lunch" },
+      { label: "dinner", speech: "dinner" }, { label: "pizza", speech: "pizza" }, { label: "chicken", speech: "chicken" },
+      { label: "fruit", speech: "fruit" }, { label: "cookie", speech: "cookie" }, { label: "ice cream", speech: "ice cream" },
+      { label: "hug", speech: "a hug" }, { label: "break", speech: "a break" },
     ],
   },
   {
     id: "places", label: "Where", color: "#E84E8A", items: [
       { label: "here", speech: "here" }, { label: "there", speech: "there" }, { label: "home", speech: "home" },
-      { label: "school", speech: "school" }, { label: "outside", speech: "outside" }, { label: "inside", speech: "inside" },
-      { label: "bathroom", speech: "the bathroom" }, { label: "bedroom", speech: "my room" }, { label: "kitchen", speech: "the kitchen" },
-      { label: "car", speech: "the car" }, { label: "park", speech: "the park" }, { label: "store", speech: "the store" },
-      { label: "up", speech: "up" }, { label: "down", speech: "down" }, { label: "in", speech: "in" },
-      { label: "out", speech: "out" }, { label: "on", speech: "on" }, { label: "off", speech: "off" },
-      { label: "to", speech: "to" }, { label: "with", speech: "with" }, { label: "away", speech: "away" },
+      { label: "school", speech: "school" }, { label: "work", speech: "work" }, { label: "outside", speech: "outside" },
+      { label: "inside", speech: "inside" }, { label: "bathroom", speech: "the bathroom" }, { label: "bedroom", speech: "my room" },
+      { label: "kitchen", speech: "the kitchen" }, { label: "car", speech: "the car" }, { label: "bus", speech: "the bus" },
+      { label: "park", speech: "the park" }, { label: "store", speech: "the store" }, { label: "doctor", speech: "the doctor" },
+      { label: "library", speech: "the library" }, { label: "playground", speech: "the playground" }, { label: "up", speech: "up" },
+      { label: "down", speech: "down" }, { label: "in", speech: "in" }, { label: "out", speech: "out" },
+      { label: "on", speech: "on" }, { label: "off", speech: "off" }, { label: "to", speech: "to" },
+      { label: "from", speech: "from" }, { label: "with", speech: "with" }, { label: "away", speech: "away" },
     ],
   },
   {
     id: "social", label: "Chat", color: "#FF6B3D", items: [
-      { label: "yes", speech: "yes" }, { label: "no", speech: "no" }, { label: "please", speech: "please" },
-      { label: "thank you", speech: "thank you" }, { label: "sorry", speech: "sorry" }, { label: "hi", speech: "hi" },
-      { label: "bye", speech: "bye" }, { label: "OK", speech: "okay" }, { label: "help", speech: "help me" },
-      { label: "wait", speech: "wait" }, { label: "stop", speech: "stop" }, { label: "again", speech: "again" },
-      { label: "all done", speech: "all done" }, { label: "not yet", speech: "not yet" }, { label: "excuse me", speech: "excuse me" },
-      { label: "I love you", speech: "I love you" }, { label: "my turn", speech: "my turn" }, { label: "your turn", speech: "your turn" },
-      { label: "now", speech: "now" }, { label: "later", speech: "later" }, { label: "and", speech: "and" },
+      { label: "yes", speech: "yes" }, { label: "no", speech: "no" }, { label: "maybe", speech: "maybe" },
+      { label: "please", speech: "please" }, { label: "thank you", speech: "thank you" }, { label: "you're welcome", speech: "you're welcome" },
+      { label: "sorry", speech: "sorry" }, { label: "hi", speech: "hi" }, { label: "hello", speech: "hello" },
+      { label: "bye", speech: "bye" }, { label: "see you", speech: "see you later" }, { label: "OK", speech: "okay" },
+      { label: "help", speech: "help me" }, { label: "wait", speech: "wait" }, { label: "stop", speech: "stop" },
+      { label: "again", speech: "again" }, { label: "all done", speech: "all done" }, { label: "not yet", speech: "not yet" },
+      { label: "excuse me", speech: "excuse me" }, { label: "I love you", speech: "I love you" }, { label: "my turn", speech: "my turn" },
+      { label: "your turn", speech: "your turn" }, { label: "good job", speech: "good job" }, { label: "I'm ready", speech: "I'm ready" },
+      { label: "I don't know", speech: "I don't know" }, { label: "now", speech: "now" }, { label: "later", speech: "later" },
+      { label: "and", speech: "and" }, { label: "but", speech: "but" }, { label: "because", speech: "because" },
     ],
   },
 ];
@@ -1823,7 +2005,6 @@ function SoundboardScreen({ setScreen }) {
   const [newWordEmoji, setNewWordEmoji] = useState("🗣️");
   const [newWordSpeech, setNewWordSpeech] = useState("");
   const [newWordCat, setNewWordCat] = useState("custom");
-  const scrollRef = useRef(null);
 
   function tapItem(item) {
     speak(item.speech, settings);
@@ -1963,34 +2144,40 @@ function SoundboardScreen({ setScreen }) {
 
       {/* ─── BOARD VIEW ─── */}
       {viewMode === "board" && (
-        <div ref={scrollRef} style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", paddingBottom: 8 }}>
-          <div style={{ display: "flex", gap: 6, minWidth: boardColumns.length * 110 }}>
+        <div style={{ paddingBottom: 8 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${boardColumns.length}, minmax(0, 1fr))`,
+            gap: 8,
+          }}>
             {boardColumns.map(col => (
-              <div key={col.id} style={{ minWidth: 105, flex: "0 0 105px" }}>
+              <div key={col.id} style={{ minWidth: 0 }}>
                 {/* Column Header */}
                 <div style={{
-                  background: col.color, color: "#fff", borderRadius: "12px 12px 0 0",
-                  padding: "8px 4px", textAlign: "center",
-                  fontFamily: T.font, fontSize: 13, fontWeight: 800,
+                  background: col.color, color: "#fff", borderRadius: "14px 14px 0 0",
+                  padding: "10px 6px", textAlign: "center",
+                  fontFamily: T.font, fontSize: 15, fontWeight: 800, letterSpacing: 0.3,
                 }}>
                   {col.label}
                 </div>
                 {/* Column Words */}
                 <div style={{
-                  background: `${col.color}08`, border: `1.5px solid ${col.color}20`,
-                  borderTop: "none", borderRadius: "0 0 12px 12px",
-                  display: "flex", flexDirection: "column", gap: 2, padding: 3,
+                  background: `${col.color}10`, border: `1.5px solid ${col.color}25`,
+                  borderTop: "none", borderRadius: "0 0 14px 14px",
+                  display: "flex", flexDirection: "column", gap: 4, padding: 5,
                 }}>
                   {col.items.map((item, i) => {
                     const isActive = lastSpoken === item.label;
                     return (
                       <button key={i} onClick={() => tapItem(item)} style={{
-                        padding: "8px 4px", borderRadius: 8, border: "none", cursor: "pointer",
+                        padding: "12px 6px", borderRadius: 10, border: "none", cursor: "pointer",
                         background: isActive ? col.color : T.surface,
-                        fontFamily: T.font, fontSize: 12, fontWeight: 600, textAlign: "center",
+                        fontFamily: T.font, fontSize: 14, fontWeight: 700, textAlign: "center",
                         color: isActive ? "#fff" : T.text,
                         transition: "all 0.12s ease",
-                        boxShadow: isActive ? `0 2px 8px ${col.color}40` : "0 1px 2px rgba(0,0,0,0.04)",
+                        boxShadow: isActive ? `0 3px 12px ${col.color}50` : "0 1px 3px rgba(0,0,0,0.06)",
+                        minHeight: 44,
+                        wordBreak: "break-word",
                       }}>{item.label}</button>
                     );
                   })}
@@ -4943,8 +5130,11 @@ export default function App() {
   return (
     <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
       <div style={{
-        background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
+        background: T.bg, minHeight: "100vh",
+        maxWidth: screen === "soundboard" ? 1200 : 480,
+        margin: "0 auto",
         fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
+        transition: "max-width 0.25s ease",
       }}>
         <style>{globalCSS}</style>
         <div key={screen} className="page-enter">
