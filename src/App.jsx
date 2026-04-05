@@ -85,6 +85,14 @@ function getMaxLevel(ageRange) {
   if (ageRange === "teen") return 2;
   return 3; // young_adult, adult
 }
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 function getFontScale(settings) {
   const base = settings.fontSize === "small" ? 0.85 : settings.fontSize === "large" ? 1.18 : 1;
   return base;
@@ -1033,6 +1041,36 @@ function Confetti({ active }) {
         }} />
       ))}
       <style>{`@keyframes confFall { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(100vh) rotate(720deg); opacity:0; } }`}</style>
+    </div>
+  );
+}
+
+function GameComplete({ score, total, onPlayAgain, onExit, title = "You Did It!" }) {
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+  const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : 1;
+  return (
+    <div style={{ padding: "24px 20px 120px", textAlign: "center" }}>
+      <Confetti active={true} />
+      <div style={{ fontSize: 90, marginTop: 20, marginBottom: 8 }}>🏆</div>
+      <h2 style={{ fontFamily: T.font, fontSize: 30, fontWeight: 800, color: T.text, margin: "0 0 6px" }}>{title}</h2>
+      <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, margin: "0 0 18px" }}>Great job finishing the round!</p>
+      <div style={{ fontSize: 44, marginBottom: 12, letterSpacing: 4 }}>
+        {"⭐".repeat(stars)}{"☆".repeat(3 - stars)}
+      </div>
+      <Card style={{ padding: 20, marginBottom: 20 }}>
+        <div style={{ fontFamily: T.font, fontSize: 36, fontWeight: 800, color: T.primary }}>{score} / {total}</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginTop: 4 }}>{pct}% correct</div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <button onClick={onExit} style={{
+          padding: 16, borderRadius: 16, border: `2px solid ${T.border}`, background: T.surface,
+          fontFamily: T.font, fontSize: 15, fontWeight: 800, color: T.soft, cursor: "pointer",
+        }}>← Back to Games</button>
+        <button onClick={onPlayAgain} style={{
+          padding: 16, borderRadius: 16, border: "none", background: T.primary,
+          fontFamily: T.font, fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer",
+        }}>Play Again ↻</button>
+      </div>
     </div>
   );
 }
@@ -2328,14 +2366,22 @@ function ShapeSortScreen({ setScreen }) {
 function SpellingBeeScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = spellingWords.filter(w => w.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(spellingWords.filter(w => w.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [typed, setTyped] = useState("");
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [revealed, setRevealed] = useState(false);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+
+  function restart() {
+    setItems(shuffleArr(spellingWords.filter(w => w.level <= maxLevel)));
+    setIdx(0); setTyped(""); setFeedback(""); setScore(0); setRevealed(false); setDone(false);
+  }
+
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function addLetter(l) {
     if (feedback) return;
@@ -2354,7 +2400,8 @@ function SpellingBeeScreen({ setScreen }) {
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback(""); setTyped(""); setRevealed(false);
-        setIdx(i => (i + 1) % filtered.length);
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
       }, 1800);
     } else {
       setFeedback("wrong"); speak("Try again!", settings);
