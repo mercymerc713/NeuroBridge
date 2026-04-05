@@ -2975,17 +2975,25 @@ function MoneyMatchScreen({ setScreen }) {
 function EmotionMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = emotionMatchData.filter(e => e.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(emotionMatchData.filter(e => e.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(emotionMatchData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(c) {
     if (feedback) return;
@@ -2994,7 +3002,11 @@ function EmotionMatchScreen({ setScreen }) {
       speak(`Yes! This face looks ${current.answer}.`, settings);
       addProgress({ stars: 1, wordsSpoken: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Look again!", settings);
       setTimeout(() => setFeedback(""), 900);
