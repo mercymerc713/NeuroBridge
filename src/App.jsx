@@ -2883,17 +2883,25 @@ function ClockReaderScreen({ setScreen }) {
 function MoneyMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = moneyData.filter(m => m.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(moneyData.filter(m => m.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(moneyData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(c) {
     if (feedback) return;
@@ -2902,7 +2910,11 @@ function MoneyMatchScreen({ setScreen }) {
       speak(`Yes! ${current.display}`, settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Add them up again!", settings);
       setTimeout(() => setFeedback(""), 900);
