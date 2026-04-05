@@ -1,26 +1,31 @@
 import { useState, useEffect, useRef, useCallback, createContext, useContext } from "react";
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
+// Color palette tuned for neurodivergent eyes: warm cream bg (dyslexia-friendly,
+// low glare), bold saturated accent colors with strong contrast, pastel glows
+// that still pop without being harsh.
 const lightTheme = {
-  bg: "#FFF8F0", surface: "#FFFFFF", text: "#2B2520", soft: "#9E9589",
-  primary: "#FF6B3D", primaryGlow: "#FFF0EB",
-  blue: "#4E8AE6", blueGlow: "#EBF2FF",
-  purple: "#8B6CF6", purpleGlow: "#F3EFFF",
-  green: "#3EBB6E", greenGlow: "#E6F9ED",
-  yellow: "#F7B731", yellowGlow: "#FFF7E0",
-  pink: "#E84E8A", pinkGlow: "#FFEBF3",
-  border: "#F0EBE3", shadow: "0 4px 20px rgba(43,37,32,0.06)",
+  bg: "#FFF8F0", surface: "#FFFFFF", text: "#2B2520", soft: "#8B8275",
+  primary: "#FF5722", primaryGlow: "#FFEDE5",
+  blue: "#2563EB", blueGlow: "#DCE7FF",
+  purple: "#7C3AED", purpleGlow: "#EDE1FF",
+  green: "#10B981", greenGlow: "#D1FBE7",
+  yellow: "#F59E0B", yellowGlow: "#FFF0CC",
+  pink: "#EC4899", pinkGlow: "#FFDCEB",
+  teal: "#06B6D4", tealGlow: "#CFF4FA",
+  border: "#F0EBE3", shadow: "0 4px 20px rgba(43,37,32,0.08)",
   radius: 22, font: "'Baloo 2', cursive", fontAlt: "'Atkinson Hyperlegible', sans-serif",
 };
 const darkTheme = {
-  bg: "#1A1A2E", surface: "#16213E", text: "#E8E8E8", soft: "#8888AA",
-  primary: "#FF6B3D", primaryGlow: "#2A1A15",
-  blue: "#5B9BF0", blueGlow: "#1A2540",
-  purple: "#9B7FF0", purpleGlow: "#1E1A35",
-  green: "#4ECC7E", greenGlow: "#152520",
-  yellow: "#FFD044", yellowGlow: "#2A2515",
-  pink: "#F06B9E", pinkGlow: "#2A1520",
-  border: "#2A2A4A", shadow: "0 4px 20px rgba(0,0,0,0.3)",
+  bg: "#14142B", surface: "#1E1E3F", text: "#F0F0F5", soft: "#9B93B8",
+  primary: "#FF6B3D", primaryGlow: "#3A1E15",
+  blue: "#5B8CFF", blueGlow: "#192545",
+  purple: "#A78BFA", purpleGlow: "#231A3E",
+  green: "#34D399", greenGlow: "#152A23",
+  yellow: "#FBBF24", yellowGlow: "#2E2415",
+  pink: "#F472B6", pinkGlow: "#2E1A28",
+  teal: "#22D3EE", tealGlow: "#14262E",
+  border: "#2D2D52", shadow: "0 4px 20px rgba(0,0,0,0.4)",
   radius: 22, font: "'Baloo 2', cursive", fontAlt: "'Atkinson Hyperlegible', sans-serif",
 };
 let T = lightTheme;
@@ -1201,25 +1206,25 @@ function HomeScreen({ setScreen }) {
 
   const { progress } = useApp();
   const menuItems = [
-    { emoji: "💬", title: "Soundboard", desc: "Build sentences & communicate", color: T.blue, glow: T.blueGlow, screen: "soundboard", gradient: "linear-gradient(135deg, #4E8AE6 0%, #7BA8F0 100%)" },
-    { emoji: "🎮", title: "Learning Games", desc: "7 games: words, memory & more", color: T.purple, glow: T.purpleGlow, screen: "games", gradient: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 100%)" },
-    { emoji: "📖", title: "Social Stories", desc: "Prepare for new experiences", color: T.primary, glow: T.primaryGlow, screen: "stories", gradient: "linear-gradient(135deg, #FF6B3D 0%, #FF8F6B 100%)" },
-    { emoji: "📚", title: "Reading Practice", desc: "Sight words & read-along stories", color: T.blue, glow: T.blueGlow, screen: "reading", gradient: "linear-gradient(135deg, #4E8AE6 0%, #7BA8F0 100%)" },
-    { emoji: "🌡️", title: "How I Feel", desc: "Emotion check-in & coping tools", color: T.pink, glow: T.pinkGlow, screen: "emotions", gradient: "linear-gradient(135deg, #E84E8A 0%, #F08CB4 100%)" },
-    { emoji: "🎯", title: "Focus Timer", desc: "Stay on track with reminders", color: T.green, glow: T.greenGlow, screen: "focus", gradient: "linear-gradient(135deg, #3EBB6E 0%, #6DD598 100%)" },
-    { emoji: "🫧", title: "Calm Corner", desc: "Breathing & grounding exercises", color: T.purple, glow: T.purpleGlow, screen: "calm", gradient: "linear-gradient(135deg, #8B6CF6 0%, #A78BFA 100%)" },
-    { emoji: "🧸", title: "Sensory Tools", desc: "Pop-it, spinner, color mixer", color: T.pink, glow: T.pinkGlow, screen: "fidget", gradient: "linear-gradient(135deg, #E84E8A 0%, #F08CB4 100%)" },
-    { emoji: "✅", title: "My Routines", desc: "Daily schedules & checklists", color: T.yellow, glow: T.yellowGlow, screen: "habits", gradient: "linear-gradient(135deg, #F7B731 0%, #FFCF5C 100%)" },
-    { emoji: "🏆", title: "My Rewards", desc: `${progress.totalStars} stars · ${badgeDefs.filter(b => b.check(progress)).length} badges`, color: T.yellow, glow: T.yellowGlow, screen: "rewards", gradient: "linear-gradient(135deg, #F7B731 0%, #FFCF5C 100%)" },
+    { emoji: "💬", title: "Soundboard", desc: "Build sentences & communicate", color: T.blue, glow: T.blueGlow, screen: "soundboard", gradient: "linear-gradient(135deg, #2563EB 0%, #60A5FA 100%)" },
+    { emoji: "🎮", title: "Learning Games", desc: "18 games: words, memory & more", color: T.purple, glow: T.purpleGlow, screen: "games", gradient: "linear-gradient(135deg, #7C3AED 0%, #C084FC 100%)" },
+    { emoji: "📖", title: "Social Stories", desc: "Prepare for new experiences", color: T.primary, glow: T.primaryGlow, screen: "stories", gradient: "linear-gradient(135deg, #FF5722 0%, #FF8A5B 100%)" },
+    { emoji: "📚", title: "Reading Practice", desc: "Sight words & read-along stories", color: T.teal, glow: T.tealGlow, screen: "reading", gradient: "linear-gradient(135deg, #06B6D4 0%, #67E8F9 100%)" },
+    { emoji: "🌡️", title: "How I Feel", desc: "Emotion check-in & coping tools", color: T.pink, glow: T.pinkGlow, screen: "emotions", gradient: "linear-gradient(135deg, #EC4899 0%, #F9A8D4 100%)" },
+    { emoji: "🎯", title: "Focus Timer", desc: "Stay on track with reminders", color: T.green, glow: T.greenGlow, screen: "focus", gradient: "linear-gradient(135deg, #10B981 0%, #6EE7B7 100%)" },
+    { emoji: "🫧", title: "Calm Corner", desc: "Breathing & grounding exercises", color: T.purple, glow: T.purpleGlow, screen: "calm", gradient: "linear-gradient(135deg, #7C3AED 0%, #C084FC 100%)" },
+    { emoji: "🧸", title: "Sensory Tools", desc: "Pop-it, spinner, color mixer", color: T.pink, glow: T.pinkGlow, screen: "fidget", gradient: "linear-gradient(135deg, #EC4899 0%, #F9A8D4 100%)" },
+    { emoji: "✅", title: "My Routines", desc: "Daily schedules & checklists", color: T.yellow, glow: T.yellowGlow, screen: "habits", gradient: "linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%)" },
+    { emoji: "🏆", title: "My Rewards", desc: `${progress.totalStars} stars · ${badgeDefs.filter(b => b.check(progress)).length} badges`, color: T.yellow, glow: T.yellowGlow, screen: "rewards", gradient: "linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%)" },
   ];
 
   return (
     <div style={{ padding: "20px 16px 120px" }}>
       {/* Hero Banner */}
       <div style={{
-        background: "linear-gradient(135deg, #FF6B3D 0%, #FF8F6B 40%, #FFB088 100%)",
+        background: "linear-gradient(135deg, #FF5722 0%, #FF7A45 40%, #FFA26B 100%)",
         borderRadius: 28, padding: "26px 22px 22px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden",
-        boxShadow: "0 8px 32px rgba(255,107,61,0.3)",
+        boxShadow: "0 8px 32px rgba(255,87,34,0.35)",
       }}>
         <div style={{ position: "absolute", top: -30, right: -10, fontSize: 120, opacity: 0.12, transform: "rotate(15deg)" }}>🧠</div>
         <div style={{ position: "absolute", bottom: -20, left: -10, fontSize: 80, opacity: 0.08 }}>✨</div>
