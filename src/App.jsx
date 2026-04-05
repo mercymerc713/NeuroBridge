@@ -550,6 +550,224 @@ const shapeSortData = [
   { shape: "School Items", emoji: "🏫", items: ["📚", "✏️", "🍕", "📐"], answer: "🍕", wrongLabel: "Not for school", level: 3 },
 ];
 
+// ─── Spelling Bee Data ──────────────────────────────────────────────────────
+const spellingWords = [
+  { word: "cat", hint: "🐱 A furry pet", level: 1 },
+  { word: "dog", hint: "🐕 It barks", level: 1 },
+  { word: "sun", hint: "☀️ In the sky", level: 1 },
+  { word: "hat", hint: "🎩 Goes on your head", level: 1 },
+  { word: "red", hint: "🔴 A color", level: 1 },
+  { word: "cup", hint: "🥤 You drink from it", level: 1 },
+  { word: "bed", hint: "🛏️ Where you sleep", level: 1 },
+  { word: "fish", hint: "🐟 Swims in water", level: 2 },
+  { word: "tree", hint: "🌳 Has leaves", level: 2 },
+  { word: "star", hint: "⭐ Twinkles at night", level: 2 },
+  { word: "jump", hint: "🤸 Leap in the air", level: 2 },
+  { word: "play", hint: "🎮 Have fun", level: 2 },
+  { word: "blue", hint: "🔵 Color of the sky", level: 2 },
+  { word: "happy", hint: "😊 Feeling good", level: 3 },
+  { word: "water", hint: "💧 You drink it", level: 3 },
+  { word: "house", hint: "🏠 Where you live", level: 3 },
+  { word: "friend", hint: "🤝 Someone you like", level: 3 },
+  { word: "school", hint: "🏫 Where you learn", level: 3 },
+  { word: "dragon", hint: "🐉 Breathes fire", level: 3 },
+];
+
+// ─── Opposite Match Data ────────────────────────────────────────────────────
+const oppositeData = [
+  { word: "Hot", emoji: "🔥", answer: "Cold", choices: ["Cold", "Warm", "Wet"], level: 1 },
+  { word: "Big", emoji: "🐘", answer: "Small", choices: ["Small", "Tall", "Wide"], level: 1 },
+  { word: "Happy", emoji: "😊", answer: "Sad", choices: ["Sad", "Mad", "Glad"], level: 1 },
+  { word: "Up", emoji: "⬆️", answer: "Down", choices: ["Down", "Left", "Right"], level: 1 },
+  { word: "Fast", emoji: "⚡", answer: "Slow", choices: ["Slow", "Quick", "Quiet"], level: 1 },
+  { word: "Day", emoji: "☀️", answer: "Night", choices: ["Night", "Dark", "Moon"], level: 1 },
+  { word: "Open", emoji: "📂", answer: "Close", choices: ["Close", "Shut", "Lock"], level: 2 },
+  { word: "Full", emoji: "🥛", answer: "Empty", choices: ["Empty", "Half", "Spill"], level: 2 },
+  { word: "Loud", emoji: "🔊", answer: "Quiet", choices: ["Quiet", "Silent", "Soft"], level: 2 },
+  { word: "Light", emoji: "💡", answer: "Dark", choices: ["Dark", "Dim", "Black"], level: 2 },
+  { word: "Hard", emoji: "🪨", answer: "Soft", choices: ["Soft", "Easy", "Light"], level: 2 },
+  { word: "Push", emoji: "👐", answer: "Pull", choices: ["Pull", "Drag", "Lift"], level: 2 },
+  { word: "Ancient", emoji: "🏛️", answer: "Modern", choices: ["Modern", "Recent", "Fresh"], level: 3 },
+  { word: "Brave", emoji: "🦁", answer: "Scared", choices: ["Scared", "Shy", "Weak"], level: 3 },
+  { word: "Generous", emoji: "🎁", answer: "Selfish", choices: ["Selfish", "Greedy", "Mean"], level: 3 },
+  { word: "Remember", emoji: "🧠", answer: "Forget", choices: ["Forget", "Lose", "Miss"], level: 3 },
+];
+
+// ─── Counting Data ──────────────────────────────────────────────────────────
+const countingData = [
+  { items: ["🍎", "🍎", "🍎"], answer: 3, choices: [2, 3, 4], level: 1 },
+  { items: ["⭐", "⭐", "⭐", "⭐", "⭐"], answer: 5, choices: [4, 5, 6], level: 1 },
+  { items: ["🐟", "🐟"], answer: 2, choices: [1, 2, 3], level: 1 },
+  { items: ["🎈", "🎈", "🎈", "🎈"], answer: 4, choices: [3, 4, 5], level: 1 },
+  { items: ["🌸"], answer: 1, choices: [1, 2, 3], level: 1 },
+  { items: ["🐱", "🐱", "🐱", "🐱", "🐱", "🐱"], answer: 6, choices: [5, 6, 7], level: 1 },
+  { items: ["🍪", "🍪", "🍪", "🍪", "🍪", "🍪", "🍪"], answer: 7, choices: [6, 7, 8], level: 2 },
+  { items: ["🦋", "🦋", "🦋", "🦋", "🦋", "🦋", "🦋", "🦋", "🦋"], answer: 9, choices: [8, 9, 10], level: 2 },
+  { items: ["🌙", "🌙", "🌙", "🌙", "🌙", "🌙", "🌙", "🌙"], answer: 8, choices: [7, 8, 9], level: 2 },
+  { items: ["🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵"], answer: 10, choices: [9, 10, 11], level: 2 },
+  { items: ["🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎"], answer: 12, choices: [11, 12, 13], level: 3 },
+  { items: ["⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐"], answer: 15, choices: [14, 15, 16], level: 3 },
+];
+
+// ─── Size Sorting Data ──────────────────────────────────────────────────────
+const sizeSortData = [
+  { items: [{ emoji: "🐘", label: "Elephant", size: 3 }, { emoji: "🐱", label: "Cat", size: 2 }, { emoji: "🐜", label: "Ant", size: 1 }], level: 1 },
+  { items: [{ emoji: "🌳", label: "Tree", size: 3 }, { emoji: "🌻", label: "Flower", size: 2 }, { emoji: "🌱", label: "Sprout", size: 1 }], level: 1 },
+  { items: [{ emoji: "🏠", label: "House", size: 3 }, { emoji: "🚗", label: "Car", size: 2 }, { emoji: "📱", label: "Phone", size: 1 }], level: 1 },
+  { items: [{ emoji: "🌊", label: "Ocean", size: 4 }, { emoji: "🏔️", label: "Mountain", size: 3 }, { emoji: "🏠", label: "House", size: 2 }, { emoji: "🧸", label: "Teddy", size: 1 }], level: 2 },
+  { items: [{ emoji: "🐋", label: "Whale", size: 4 }, { emoji: "🐕", label: "Dog", size: 3 }, { emoji: "🐸", label: "Frog", size: 2 }, { emoji: "🐛", label: "Bug", size: 1 }], level: 2 },
+  { items: [{ emoji: "🌍", label: "Earth", size: 5 }, { emoji: "🏔️", label: "Mountain", size: 4 }, { emoji: "🏢", label: "Building", size: 3 }, { emoji: "🧑", label: "Person", size: 2 }, { emoji: "🐜", label: "Ant", size: 1 }], level: 3 },
+];
+
+// ─── Clock Data ─────────────────────────────────────────────────────────────
+const clockData = [
+  { hour: 3, minute: 0, display: "3:00", choices: ["3:00", "6:00", "9:00"], level: 1 },
+  { hour: 6, minute: 0, display: "6:00", choices: ["6:00", "12:00", "3:00"], level: 1 },
+  { hour: 12, minute: 0, display: "12:00", choices: ["12:00", "6:00", "9:00"], level: 1 },
+  { hour: 9, minute: 0, display: "9:00", choices: ["9:00", "3:00", "6:00"], level: 1 },
+  { hour: 2, minute: 30, display: "2:30", choices: ["2:30", "3:00", "6:30"], level: 2 },
+  { hour: 7, minute: 30, display: "7:30", choices: ["7:30", "8:30", "7:00"], level: 2 },
+  { hour: 10, minute: 30, display: "10:30", choices: ["10:30", "11:30", "10:00"], level: 2 },
+  { hour: 4, minute: 15, display: "4:15", choices: ["4:15", "3:15", "4:45"], level: 3 },
+  { hour: 8, minute: 45, display: "8:45", choices: ["8:45", "9:45", "8:15"], level: 3 },
+  { hour: 11, minute: 20, display: "11:20", choices: ["11:20", "4:55", "11:40"], level: 3 },
+];
+
+// ─── Money Data ─────────────────────────────────────────────────────────────
+const moneyData = [
+  { coins: ["25¢"], total: 25, display: "$0.25", choices: ["$0.25", "$0.50", "$0.10"], level: 1 },
+  { coins: ["10¢", "10¢"], total: 20, display: "$0.20", choices: ["$0.20", "$0.10", "$0.30"], level: 1 },
+  { coins: ["25¢", "25¢"], total: 50, display: "$0.50", choices: ["$0.50", "$0.25", "$0.75"], level: 1 },
+  { coins: ["5¢", "5¢", "5¢"], total: 15, display: "$0.15", choices: ["$0.15", "$0.10", "$0.20"], level: 1 },
+  { coins: ["25¢", "10¢", "5¢"], total: 40, display: "$0.40", choices: ["$0.40", "$0.35", "$0.45"], level: 2 },
+  { coins: ["25¢", "25¢", "10¢"], total: 60, display: "$0.60", choices: ["$0.60", "$0.50", "$0.70"], level: 2 },
+  { coins: ["25¢", "10¢", "10¢", "5¢"], total: 50, display: "$0.50", choices: ["$0.50", "$0.45", "$0.55"], level: 2 },
+  { coins: ["$1", "25¢", "10¢"], total: 135, display: "$1.35", choices: ["$1.35", "$1.25", "$1.45"], level: 3 },
+  { coins: ["$1", "$1", "25¢", "10¢", "5¢"], total: 240, display: "$2.40", choices: ["$2.40", "$2.35", "$2.50"], level: 3 },
+  { coins: ["$5", "$1", "25¢", "25¢", "10¢"], total: 660, display: "$6.60", choices: ["$6.60", "$5.60", "$6.50"], level: 3 },
+];
+
+// ─── Emotion Match Data ─────────────────────────────────────────────────────
+const emotionMatchData = [
+  { face: "😊", answer: "Happy", choices: ["Happy", "Sad", "Angry"], level: 1 },
+  { face: "😢", answer: "Sad", choices: ["Happy", "Sad", "Scared"], level: 1 },
+  { face: "😠", answer: "Angry", choices: ["Angry", "Happy", "Tired"], level: 1 },
+  { face: "😨", answer: "Scared", choices: ["Scared", "Excited", "Bored"], level: 1 },
+  { face: "😴", answer: "Tired", choices: ["Tired", "Sad", "Calm"], level: 1 },
+  { face: "🤩", answer: "Excited", choices: ["Excited", "Happy", "Surprised"], level: 1 },
+  { face: "😕", answer: "Confused", choices: ["Confused", "Worried", "Bored"], level: 2 },
+  { face: "😤", answer: "Frustrated", choices: ["Frustrated", "Angry", "Annoyed"], level: 2 },
+  { face: "🥰", answer: "Loved", choices: ["Loved", "Happy", "Grateful"], level: 2 },
+  { face: "😬", answer: "Nervous", choices: ["Nervous", "Scared", "Worried"], level: 2 },
+  { face: "😞", answer: "Disappointed", choices: ["Disappointed", "Sad", "Bored"], level: 3 },
+  { face: "🤗", answer: "Affectionate", choices: ["Affectionate", "Happy", "Grateful"], level: 3 },
+  { face: "😏", answer: "Smug", choices: ["Smug", "Happy", "Confident"], level: 3 },
+  { face: "🫣", answer: "Embarrassed", choices: ["Embarrassed", "Shy", "Nervous"], level: 3 },
+];
+
+// ─── What's Missing Data ────────────────────────────────────────────────────
+const missingData = [
+  { items: ["🍎", "🍌", "🍇", "🍊"], missing: "🍌", choices: ["🍌", "🍕", "🥕"], level: 1 },
+  { items: ["🐱", "🐕", "🐟", "🐦"], missing: "🐟", choices: ["🐟", "🐸", "🐍"], level: 1 },
+  { items: ["⭐", "🌙", "☀️", "🌈"], missing: "☀️", choices: ["☀️", "💧", "⚡"], level: 1 },
+  { items: ["🚗", "🚌", "✈️", "🚢"], missing: "✈️", choices: ["✈️", "🚲", "🛹"], level: 1 },
+  { items: ["❤️", "💛", "💚", "💙", "💜"], missing: "💚", choices: ["💚", "🧡", "🤍"], level: 2 },
+  { items: ["🎸", "🥁", "🎹", "🎺", "🎻"], missing: "🎹", choices: ["🎹", "📻", "🔔"], level: 2 },
+  { items: ["1", "2", "3", "4", "5", "6"], missing: "4", choices: ["4", "7", "9"], level: 2 },
+  { items: ["A", "B", "C", "D", "E", "F"], missing: "D", choices: ["D", "G", "H"], level: 3 },
+  { items: ["🌑", "🌒", "🌓", "🌔", "🌕"], missing: "🌓", choices: ["🌓", "🌙", "⭐"], level: 3 },
+  { items: ["👶", "🧒", "🧑", "🧓"], missing: "🧑", choices: ["🧑", "👦", "👴"], level: 3 },
+];
+
+// ─── Story Builder (Mad Libs) Templates ─────────────────────────────────────
+const storyTemplates = [
+  {
+    id: "adventure", title: "The Adventure", emoji: "🗺️",
+    template: "One day, a {adjective} {animal} went to the {place}. It found a {adjective2} {thing} and felt very {feeling}!",
+    blanks: [
+      { key: "adjective", label: "Describe it", choices: ["silly", "brave", "tiny", "magical", "sneaky", "sparkly"] },
+      { key: "animal", label: "Pick an animal", choices: ["cat", "dragon", "penguin", "unicorn", "puppy", "bear"] },
+      { key: "place", label: "Pick a place", choices: ["moon", "castle", "jungle", "ocean", "candy shop", "cloud"] },
+      { key: "adjective2", label: "Describe it", choices: ["golden", "glowing", "giant", "invisible", "rainbow", "fluffy"] },
+      { key: "thing", label: "Pick a thing", choices: ["treasure", "sandwich", "spaceship", "crown", "magic wand", "pizza"] },
+      { key: "feeling", label: "Pick a feeling", choices: ["happy", "excited", "surprised", "proud", "giggly", "amazed"] },
+    ],
+  },
+  {
+    id: "school", title: "School Day", emoji: "🏫",
+    template: "At school, my {adjective} teacher said we would learn about {topic}. I used my {color} {supply} and made a {adjective2} {creation}. Everyone said {exclamation}!",
+    blanks: [
+      { key: "adjective", label: "Describe teacher", choices: ["funny", "kind", "tall", "smart", "silly", "cool"] },
+      { key: "topic", label: "What to learn", choices: ["dinosaurs", "space", "robots", "animals", "magic", "cooking"] },
+      { key: "color", label: "Pick a color", choices: ["red", "blue", "purple", "rainbow", "gold", "green"] },
+      { key: "supply", label: "School supply", choices: ["pencil", "crayon", "glitter", "paintbrush", "marker", "chalk"] },
+      { key: "adjective2", label: "Describe it", choices: ["amazing", "huge", "sparkly", "wiggly", "beautiful", "funny"] },
+      { key: "creation", label: "What you made", choices: ["robot", "picture", "volcano", "rocket", "monster", "cake"] },
+      { key: "exclamation", label: "They said", choices: ["Wow!", "Amazing!", "Cool!", "Awesome!", "Incredible!", "Yay!"] },
+    ],
+  },
+  {
+    id: "pet", title: "My Pet", emoji: "🐾",
+    template: "I have a pet {animal}. Its name is {name} and it loves to {action}. It eats {food} every day. My pet is very {adjective} and makes me feel {feeling}.",
+    blanks: [
+      { key: "animal", label: "Pick a pet", choices: ["dinosaur", "cloud", "robot", "dragon", "unicorn", "alien"] },
+      { key: "name", label: "Name your pet", choices: ["Sparkle", "Zoom", "Bubbles", "Captain", "Noodle", "Pickle"] },
+      { key: "action", label: "What it does", choices: ["dance", "fly", "sing", "surf", "paint", "skateboard"] },
+      { key: "food", label: "What it eats", choices: ["pizza", "rainbows", "stars", "cookies", "clouds", "tacos"] },
+      { key: "adjective", label: "Describe it", choices: ["fluffy", "sparkly", "bouncy", "giggly", "cuddly", "wild"] },
+      { key: "feeling", label: "How you feel", choices: ["happy", "lucky", "loved", "proud", "giggly", "warm"] },
+    ],
+  },
+];
+
+// ─── Maze Data ──────────────────────────────────────────────────────────────
+// Simple grid mazes: 0=wall, 1=path, 2=start, 3=end
+const mazeData = [
+  { level: 1, rows: 5, cols: 5, grid: [
+    [2,1,0,0,0],
+    [0,1,1,1,0],
+    [0,0,0,1,0],
+    [0,1,1,1,0],
+    [0,1,0,0,3],
+  ]},
+  { level: 1, rows: 5, cols: 5, grid: [
+    [2,1,1,0,0],
+    [0,0,1,0,0],
+    [0,0,1,1,0],
+    [0,0,0,1,0],
+    [0,0,0,1,3],
+  ]},
+  { level: 2, rows: 7, cols: 7, grid: [
+    [2,1,0,0,0,0,0],
+    [0,1,1,1,0,0,0],
+    [0,0,0,1,0,0,0],
+    [0,1,1,1,1,1,0],
+    [0,1,0,0,0,1,0],
+    [0,1,1,1,0,1,0],
+    [0,0,0,1,0,1,3],
+  ]},
+  { level: 2, rows: 7, cols: 7, grid: [
+    [2,1,1,1,1,0,0],
+    [0,0,0,0,1,0,0],
+    [0,1,1,0,1,1,0],
+    [0,1,0,0,0,1,0],
+    [0,1,0,1,1,1,0],
+    [0,1,0,1,0,0,0],
+    [0,1,1,1,0,0,3],
+  ]},
+  { level: 3, rows: 9, cols: 9, grid: [
+    [2,1,0,0,0,0,0,0,0],
+    [0,1,1,1,0,1,1,1,0],
+    [0,0,0,1,0,1,0,1,0],
+    [0,1,1,1,1,1,0,1,0],
+    [0,1,0,0,0,0,0,1,0],
+    [0,1,0,1,1,1,1,1,0],
+    [0,1,0,1,0,0,0,0,0],
+    [0,1,1,1,0,1,1,1,0],
+    [0,0,0,0,0,1,0,1,3],
+  ]},
+];
+
 // ─── Social Stories ─────────────────────────────────────────────────────────
 const socialStories = [
   {
@@ -1660,6 +1878,7 @@ function GamesScreen({ setScreen }) {
     { id: "memory", emoji: "🧠", title: "Memory Match", desc: "Find the matching pairs", color: T.pink, glow: T.pinkGlow },
     { id: "rhyming", emoji: "🎤", title: "Rhyme Time", desc: "Which word rhymes?", color: T.yellow, glow: T.yellowGlow },
     { id: "shapes", emoji: "🧩", title: "Odd One Out", desc: "Which doesn't belong?", color: T.primary, glow: T.primaryGlow },
+    { id: "spelling", emoji: "🐝", title: "Spelling Bee", desc: "Spell the word", color: T.yellow, glow: T.yellowGlow },
   ];
 
   return (
@@ -2091,6 +2310,119 @@ function ShapeSortScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 20, fontWeight: 800, color: T.green }}>🎉 {item.wrongLabel}!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>That one fits! Try again! 👀</div>}
+    </div>
+  );
+}
+
+// ─── SPELLING BEE ────────────────────────────────────────────────────────────
+function SpellingBeeScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = spellingWords.filter(w => w.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  function addLetter(l) {
+    if (feedback) return;
+    if (typed.length >= current.word.length) return;
+    setTyped(t => t + l);
+  }
+  function backspace() { if (!feedback) setTyped(t => t.slice(0, -1)); }
+  function clearAll() { if (!feedback) setTyped(""); }
+
+  function check() {
+    if (feedback || !typed) return;
+    if (typed.toLowerCase() === current.word.toLowerCase()) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.word}!`, settings);
+      addProgress({ stars: 1, wordsSpoken: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => {
+        setFeedback(""); setTyped(""); setRevealed(false);
+        setIdx(i => (i + 1) % filtered.length);
+      }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Try again!", settings);
+      setTimeout(() => { setFeedback(""); }, 900);
+    }
+  }
+
+  function sayWord() { speak(current.word, settings); }
+
+  const letters = "abcdefghijklmnopqrstuvwxyz".split("");
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🐝 Spelling Bee" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.yellow} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 16 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 10px" }}>Spell the word!</p>
+        <div style={{ fontSize: 32, marginBottom: 10 }}>{current.hint}</div>
+        <button onClick={sayWord} style={{
+          padding: "10px 18px", border: `2px solid ${T.primary}`, background: T.primaryGlow,
+          borderRadius: 14, fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.primary, cursor: "pointer",
+        }}>🔊 Hear it</button>
+        {revealed && <div style={{ marginTop: 12, fontFamily: T.font, fontSize: 18, color: T.blue, letterSpacing: 3 }}>{current.word}</div>}
+      </Card>
+      <div style={{
+        display: "flex", justifyContent: "center", gap: 8, marginBottom: 16, minHeight: 60, alignItems: "center",
+      }}>
+        {Array.from({ length: current.word.length }).map((_, i) => {
+          const ch = typed[i] || "";
+          const isCorrect = feedback === "correct";
+          const isWrong = feedback === "wrong";
+          return (
+            <div key={i} style={{
+              width: 40, height: 52, borderRadius: 12,
+              border: `2.5px solid ${isCorrect ? T.green : isWrong ? T.primary : T.border}`,
+              background: isCorrect ? T.greenGlow : isWrong ? T.primaryGlow : T.surface,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: T.font, fontSize: 24, fontWeight: 800,
+              color: isCorrect ? T.green : isWrong ? T.primary : T.text,
+              textTransform: "uppercase",
+            }}>{ch}</div>
+          );
+        })}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6, marginBottom: 12 }}>
+        {letters.map(l => (
+          <button key={l} onClick={() => addLetter(l)} style={{
+            padding: "12px 0", border: `1.5px solid ${T.border}`, background: T.surface,
+            borderRadius: 10, fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text,
+            cursor: "pointer", textTransform: "uppercase",
+          }}>{l}</button>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
+        <button onClick={backspace} style={{
+          padding: 12, border: `1.5px solid ${T.border}`, background: T.surface,
+          borderRadius: 12, fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.soft, cursor: "pointer",
+        }}>⌫ Back</button>
+        <button onClick={clearAll} style={{
+          padding: 12, border: `1.5px solid ${T.border}`, background: T.surface,
+          borderRadius: 12, fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.soft, cursor: "pointer",
+        }}>Clear</button>
+        <button onClick={check} disabled={!typed} style={{
+          padding: 12, border: "none", background: typed ? T.green : T.border,
+          borderRadius: 12, fontFamily: T.font, fontSize: 14, fontWeight: 800, color: "#fff",
+          cursor: typed ? "pointer" : "default",
+        }}>Check ✓</button>
+      </div>
+      {!revealed && !feedback && (
+        <button onClick={() => setRevealed(true)} style={{
+          width: "100%", padding: 10, background: "none", border: `1.5px dashed ${T.border}`,
+          borderRadius: 14, fontFamily: T.font, fontSize: 13, color: T.soft, cursor: "pointer",
+        }}>💡 Show Answer</button>
+      )}
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 14, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Perfect!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 14, fontFamily: T.font, fontSize: 16, color: T.primary }}>Not quite! 💪</div>}
     </div>
   );
 }
@@ -2964,6 +3296,7 @@ export default function App() {
     game_memory: <MemoryGameScreen setScreen={setScreen} />,
     game_rhyming: <RhymingGameScreen setScreen={setScreen} />,
     game_shapes: <ShapeSortScreen setScreen={setScreen} />,
+    game_spelling: <SpellingBeeScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
