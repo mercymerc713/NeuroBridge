@@ -1962,13 +1962,20 @@ function GamesScreen({ setScreen }) {
 function WordGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = wordGames.filter(g => g.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(wordGames.filter(g => g.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const game = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const game = items[idx];
+
+  function restart() {
+    setItems(shuffleArr(wordGames.filter(g => g.level <= maxLevel)));
+    setIdx(0); setFeedback(""); setScore(0); setShowHint(false); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(choice) {
     if (feedback) return;
@@ -1976,7 +1983,11 @@ function WordGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak("Great job!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setShowHint(false); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback(""); setShowHint(false);
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Try again!", settings);
       setTimeout(() => setFeedback(""), 1000);
