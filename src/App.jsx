@@ -1129,10 +1129,33 @@ const socialStories = [
 
 // ─── Reading Practice Data ──────────────────────────────────────────────────
 const sightWords = {
-  level1: ["the", "and", "is", "it", "to", "in", "I", "a", "my", "we", "go", "no", "so", "he", "me", "be", "do", "up", "at", "on"],
-  level2: ["said", "have", "with", "they", "this", "from", "that", "what", "were", "when", "your", "each", "make", "like", "just", "over", "such", "take", "than", "them"],
-  level3: ["about", "could", "would", "there", "their", "which", "other", "because", "through", "before", "should", "between", "people", "different", "important", "another", "together", "something", "sometimes", "everything"],
-  level4: ["although", "however", "therefore", "nevertheless", "consequently", "furthermore", "specifically", "generally", "particularly", "essentially", "significantly", "previously", "immediately", "approximately", "effectively", "independently", "additionally", "ultimately", "eventually", "occasionally"],
+  level1: [
+    "the", "and", "is", "it", "to", "in", "I", "a", "my", "we", "go", "no", "so", "he", "me", "be", "do", "up", "at", "on",
+    "if", "as", "an", "by", "or", "us", "am", "of", "for", "see",
+    "red", "big", "can", "run", "sit", "top", "bed", "dog", "cat", "sun",
+    "has", "had", "but", "not", "yes", "one", "two", "ten", "mom", "dad",
+  ],
+  level2: [
+    "said", "have", "with", "they", "this", "from", "that", "what", "were", "when",
+    "your", "each", "make", "like", "just", "over", "such", "take", "than", "them",
+    "been", "into", "more", "some", "time", "will", "many", "then", "most", "know",
+    "well", "find", "here", "good", "year", "work", "back", "also", "after", "came",
+    "want", "give", "play", "keep", "help", "show", "read", "name", "long", "made",
+  ],
+  level3: [
+    "about", "could", "would", "there", "their", "which", "other", "because", "through", "before",
+    "should", "between", "people", "different", "important", "another", "together", "something", "sometimes", "everything",
+    "around", "really", "should", "under", "every", "think", "still", "first", "water", "world",
+    "while", "until", "above", "below", "began", "almost", "country", "example", "several", "without",
+    "always", "never", "school", "family", "friend", "house", "happy", "story", "place", "thought",
+  ],
+  level4: [
+    "although", "however", "therefore", "nevertheless", "consequently", "furthermore", "specifically", "generally", "particularly", "essentially",
+    "significantly", "previously", "immediately", "approximately", "effectively", "independently", "additionally", "ultimately", "eventually", "occasionally",
+    "regardless", "meanwhile", "accordingly", "subsequently", "alternatively", "predominantly", "exclusively", "relatively", "undoubtedly", "frequently",
+    "acknowledge", "demonstrate", "establish", "investigate", "analyze", "determine", "influence", "recognize", "maintain", "achieve",
+    "experience", "opportunity", "environment", "technology", "community", "education", "government", "responsibility", "relationship", "development",
+  ],
 };
 
 const readingStories = [
@@ -4581,28 +4604,178 @@ function SocialStoriesScreen({ setScreen }) {
 }
 
 // ─── READING PRACTICE ───────────────────────────────────────────────────────
+// ─── MANAGE LESSONS (Parent) ─────────────────────────────────────────────────
+function ManageLessonsScreen({ lessons, onSave, onBack }) {
+  const [editingId, setEditingId] = useState(null);
+  const [name, setName] = useState("");
+  const [wordsText, setWordsText] = useState("");
+
+  function startNew() {
+    setEditingId("new");
+    setName("");
+    setWordsText("");
+  }
+
+  function startEdit(lesson) {
+    setEditingId(lesson.id);
+    setName(lesson.name);
+    setWordsText(lesson.words.join(", "));
+  }
+
+  function save() {
+    const trimmedName = name.trim();
+    const words = wordsText.split(/[,\n]/).map(w => w.trim()).filter(Boolean);
+    if (!trimmedName || words.length === 0) return;
+    let next;
+    if (editingId === "new") {
+      next = [...lessons, { id: `lesson_${Date.now()}`, name: trimmedName, words }];
+    } else {
+      next = lessons.map(l => l.id === editingId ? { ...l, name: trimmedName, words } : l);
+    }
+    onSave(next);
+    setEditingId(null);
+    setName("");
+    setWordsText("");
+  }
+
+  function remove(id) {
+    onSave(lessons.filter(l => l.id !== id));
+  }
+
+  if (editingId !== null) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title={editingId === "new" ? "📝 New Lesson" : "✏️ Edit Lesson"} onBack={() => setEditingId(null)} />
+        <Card style={{ padding: 20, marginTop: 8 }}>
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Lesson Name</div>
+          <input value={name} onChange={e => setName(e.target.value)}
+            placeholder="e.g. Spelling Week 1"
+            style={{
+              width: "100%", padding: 12, borderRadius: 12, border: `1.5px solid ${T.border}`,
+              fontFamily: T.fontAlt, fontSize: 15, marginBottom: 14, boxSizing: "border-box", background: T.surface, color: T.text,
+            }} />
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Words</div>
+          <p style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, margin: "0 0 6px" }}>
+            Separate with commas or new lines.
+          </p>
+          <textarea value={wordsText} onChange={e => setWordsText(e.target.value)}
+            placeholder="apple, banana, cherry&#10;orange, grape"
+            rows={8}
+            style={{
+              width: "100%", padding: 12, borderRadius: 12, border: `1.5px solid ${T.border}`,
+              fontFamily: T.fontAlt, fontSize: 15, boxSizing: "border-box", background: T.surface, color: T.text, resize: "vertical",
+            }} />
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <Btn color={T.soft} onClick={() => setEditingId(null)} style={{ flex: 1 }}>Cancel</Btn>
+            <Btn color={T.green} onClick={save} disabled={!name.trim() || !wordsText.trim()} style={{ flex: 1 }}>Save Lesson</Btn>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="🔒 Manage Lessons" onBack={onBack} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 16px", lineHeight: 1.5 }}>
+        Create custom word lists for practice. The learner will see them under "My Lessons".
+      </p>
+      <Btn color={T.primary} onClick={startNew} style={{ width: "100%", marginBottom: 16 }}>+ New Lesson</Btn>
+      {lessons.length === 0 ? (
+        <Card style={{ textAlign: "center", padding: 32 }}>
+          <div style={{ fontSize: 48, marginBottom: 10 }}>📋</div>
+          <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>No lessons yet. Tap "New Lesson" to create one.</div>
+        </Card>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {lessons.map(l => (
+            <Card key={l.id} style={{ padding: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text }}>{l.name}</div>
+                  <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {l.words.length} words: {l.words.slice(0, 6).join(", ")}{l.words.length > 6 ? "…" : ""}
+                  </div>
+                </div>
+                <button onClick={() => startEdit(l)} style={{
+                  padding: "6px 10px", borderRadius: 10, border: `1.5px solid ${T.blue}40`,
+                  background: T.blueGlow, fontFamily: T.font, fontSize: 12, fontWeight: 700, color: T.blue, cursor: "pointer",
+                }}>Edit</button>
+                <button onClick={() => remove(l.id)} style={{
+                  padding: "6px 10px", borderRadius: 10, border: `1.5px solid ${T.primary}40`,
+                  background: T.primaryGlow, fontFamily: T.font, fontSize: 12, fontWeight: 700, color: T.primary, cursor: "pointer",
+                }}>✕</button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ReadingScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const [mode, setMode] = useState(null); // "sight" | "stories"
+  const [mode, setMode] = useState(null); // "sight" | "stories" | "lessons" | "manage_lessons"
   const [wordIdx, setWordIdx] = useState(0);
   const [storyId, setStoryId] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState(0);
+  const [shuffledWords, setShuffledWords] = useState([]);
+  const [activeLessonId, setActiveLessonId] = useState(null);
+  const [parentLessons, setParentLessons] = useState(() => loadState("parentLessons", []));
+  const [pinOk, setPinOk] = useState(false);
+  const [showPin, setShowPin] = useState(false);
 
   const levelKey = maxLevel === 1 ? "level1" : maxLevel === 2 ? "level2" : maxLevel === 3 ? "level3" : "level4";
-  const words = sightWords[levelKey];
+
+  function startSightWords(lessonId = null) {
+    let source;
+    if (lessonId) {
+      const lesson = parentLessons.find(l => l.id === lessonId);
+      source = lesson ? lesson.words : sightWords[levelKey];
+    } else {
+      source = sightWords[levelKey];
+    }
+    setShuffledWords(shuffleArr(source));
+    setActiveLessonId(lessonId);
+    setWordIdx(0);
+    setMode("sight");
+  }
+
+  function reshuffle() {
+    setShuffledWords(prev => shuffleArr(prev));
+    setWordIdx(0);
+  }
+
+  function openManageLessons() {
+    if (settings.parentPin && settings.parentPin.length >= 4 && !pinOk) {
+      setShowPin(true);
+    } else {
+      setMode("manage_lessons");
+    }
+  }
+
+  function saveLessons(next) {
+    setParentLessons(next);
+    saveState("parentLessons", next);
+  }
+
+  if (showPin) {
+    return <PinEntry onSuccess={() => { setPinOk(true); setShowPin(false); setMode("manage_lessons"); }} onCancel={() => setShowPin(false)} />;
+  }
 
   if (!mode) {
     return (
       <div style={{ padding: "24px 20px 120px" }}>
         <Header title="📚 Reading Practice" onBack={() => setScreen("home")} />
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <Card onClick={() => setMode("sight")} style={{ display: "flex", alignItems: "center", gap: 16, padding: 22, background: T.blueGlow, border: `1.5px solid ${T.blue}20` }}>
+          <Card onClick={() => startSightWords(null)} style={{ display: "flex", alignItems: "center", gap: 16, padding: 22, background: T.blueGlow, border: `1.5px solid ${T.blue}20` }}>
             <div style={{ width: 60, height: 60, borderRadius: 20, background: `${T.blue}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>🔤</div>
             <div>
               <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>Sight Words</div>
-              <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Practice reading common words</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Practice reading common words ({sightWords[levelKey].length} available)</div>
             </div>
           </Card>
           <Card onClick={() => setMode("stories")} style={{ display: "flex", alignItems: "center", gap: 16, padding: 22, background: T.purpleGlow, border: `1.5px solid ${T.purple}20` }}>
@@ -4612,27 +4785,104 @@ function ReadingScreen({ setScreen }) {
               <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>Short stories with audio</div>
             </div>
           </Card>
+          <Card onClick={() => setMode("lessons")} style={{ display: "flex", alignItems: "center", gap: 16, padding: 22, background: T.greenGlow, border: `1.5px solid ${T.green}20` }}>
+            <div style={{ width: 60, height: 60, borderRadius: 20, background: `${T.green}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>⭐</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>My Lessons</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>
+                {parentLessons.length > 0 ? `${parentLessons.length} lesson${parentLessons.length === 1 ? "" : "s"} to practice` : "Words picked just for you"}
+              </div>
+            </div>
+          </Card>
+          <button onClick={openManageLessons} style={{
+            padding: "12px 16px", background: "none", border: `1.5px dashed ${T.border}`,
+            borderRadius: 14, fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.soft, cursor: "pointer",
+          }}>
+            🔒 Parent: Manage Lessons {settings.parentPin ? "(PIN)" : ""}
+          </button>
         </div>
       </div>
     );
   }
 
-  if (mode === "sight") {
-    const word = words[wordIdx % words.length];
+  if (mode === "lessons") {
+    if (parentLessons.length === 0) {
+      return (
+        <div style={{ padding: "24px 20px 120px" }}>
+          <Header title="⭐ My Lessons" onBack={() => setMode(null)} />
+          <Card style={{ textAlign: "center", padding: 40, marginTop: 20 }}>
+            <div style={{ fontSize: 64, marginBottom: 12 }}>📝</div>
+            <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 6 }}>No lessons yet</div>
+            <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 18px", lineHeight: 1.5 }}>
+              A parent or helper can create custom word lists for you to practice.
+            </p>
+            <Btn color={T.green} onClick={openManageLessons}>Create a Lesson</Btn>
+          </Card>
+        </div>
+      );
+    }
     return (
       <div style={{ padding: "24px 20px 120px" }}>
-        <Header title="🔤 Sight Words" onBack={() => setMode(null)}
-          right={<span style={{ fontFamily: T.font, fontSize: 14, color: T.soft }}>{wordIdx + 1}/{words.length}</span>} />
-        <ProgressBar value={wordIdx + 1} max={words.length} color={T.blue} h={6} />
+        <Header title="⭐ My Lessons" onBack={() => setMode(null)} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {parentLessons.map(l => (
+            <Card key={l.id} onClick={() => startSightWords(l.id)}
+              style={{ display: "flex", alignItems: "center", gap: 16, padding: 18, background: T.greenGlow, border: `1.5px solid ${T.green}30` }}>
+              <div style={{ fontSize: 36 }}>📖</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text }}>{l.name}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>{l.words.length} words</div>
+              </div>
+              <div style={{ fontSize: 22, color: T.green }}>▸</div>
+            </Card>
+          ))}
+        </div>
+        <button onClick={openManageLessons} style={{
+          width: "100%", marginTop: 16, padding: "12px 16px", background: "none", border: `1.5px dashed ${T.border}`,
+          borderRadius: 14, fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.soft, cursor: "pointer",
+        }}>
+          🔒 Parent: Manage Lessons {settings.parentPin ? "(PIN)" : ""}
+        </button>
+      </div>
+    );
+  }
+
+  if (mode === "manage_lessons") {
+    return <ManageLessonsScreen
+      lessons={parentLessons}
+      onSave={saveLessons}
+      onBack={() => setMode(null)}
+    />;
+  }
+
+  if (mode === "sight") {
+    const word = shuffledWords[wordIdx];
+    const activeLesson = activeLessonId ? parentLessons.find(l => l.id === activeLessonId) : null;
+    if (!word) return null;
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title={activeLesson ? `⭐ ${activeLesson.name}` : "🔤 Sight Words"} onBack={() => setMode(null)}
+          right={<span style={{ fontFamily: T.font, fontSize: 14, color: T.soft }}>{wordIdx + 1}/{shuffledWords.length}</span>} />
+        <ProgressBar value={wordIdx + 1} max={shuffledWords.length} color={T.blue} h={6} />
         <Card style={{ textAlign: "center", padding: 48, marginTop: 20, marginBottom: 20 }}>
           <div style={{ fontFamily: T.font, fontSize: 64, fontWeight: 800, color: T.text, letterSpacing: 4 }}>{word}</div>
         </Card>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 16 }}>
           <Btn color={T.blue} size="lg" onClick={() => speak(word, settings)}>🔊 Hear It</Btn>
         </div>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 10 }}>
           <Btn color={T.soft} onClick={() => setWordIdx(i => Math.max(0, i - 1))} disabled={wordIdx === 0}>← Back</Btn>
-          <Btn color={T.primary} onClick={() => setWordIdx(i => i + 1)}>Next →</Btn>
+          {wordIdx + 1 < shuffledWords.length ? (
+            <Btn color={T.primary} onClick={() => setWordIdx(i => i + 1)}>Next →</Btn>
+          ) : (
+            <Btn color={T.green} onClick={reshuffle}>Shuffle Again ↻</Btn>
+          )}
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <button onClick={reshuffle} style={{
+            padding: "8px 14px", background: "none", border: `1px dashed ${T.border}`,
+            borderRadius: 10, fontFamily: T.font, fontSize: 12, color: T.soft, cursor: "pointer",
+          }}>↻ Shuffle words</button>
         </div>
       </div>
     );
