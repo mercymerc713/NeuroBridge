@@ -5375,16 +5375,24 @@ export default function App() {
     @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     .page-enter { animation: fadeIn 0.25s ease-out; }
+    /* High contrast: stronger borders, heavier text, deeper shadows */
+    .high-contrast button, .high-contrast input, .high-contrast textarea { border-width: 3px !important; }
+    .high-contrast * { font-weight: 600; }
+    .high-contrast h1, .high-contrast h2, .high-contrast h3 { font-weight: 900 !important; }
   `;
+
+  const fontZoom = settings.fontSize === "small" ? 0.88 : settings.fontSize === "large" ? 1.18 : 1;
+  const rootClass = settings.highContrast ? "high-contrast" : "";
 
   return (
     <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
-      <div style={{
+      <div className={rootClass} style={{
         background: T.bg, minHeight: "100vh",
         maxWidth: screen === "soundboard" ? 1200 : 480,
         margin: "0 auto",
         fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
         transition: "max-width 0.25s ease",
+        zoom: fontZoom,
       }}>
         <style>{globalCSS}</style>
         <div key={screen} className="page-enter">
