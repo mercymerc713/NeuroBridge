@@ -1881,6 +1881,7 @@ function GamesScreen({ setScreen }) {
     { id: "spelling", emoji: "🐝", title: "Spelling Bee", desc: "Spell the word", color: T.yellow, glow: T.yellowGlow },
     { id: "opposites", emoji: "↔️", title: "Opposite Match", desc: "Find the opposite", color: T.purple, glow: T.purpleGlow },
     { id: "counting", emoji: "🔢", title: "Counting", desc: "Count the objects", color: T.blue, glow: T.blueGlow },
+    { id: "sizes", emoji: "📏", title: "Size Sort", desc: "Smallest to biggest", color: T.pink, glow: T.pinkGlow },
   ];
 
   return (
@@ -2542,6 +2543,96 @@ function CountingGameScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Right!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Count again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── SIZE SORTING ────────────────────────────────────────────────────────────
+function SizeSortScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = sizeSortData.filter(s => s.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [order, setOrder] = useState([]);
+  const [available, setAvailable] = useState([]);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) {
+      setOrder([]);
+      setAvailable([...current.items].sort(() => Math.random() - 0.5));
+      setFeedback("");
+    }
+  }, [idx, current]);
+
+  function pickItem(item) {
+    if (feedback) return;
+    setAvailable(a => a.filter(i => i.label !== item.label));
+    const next = [...order, item];
+    setOrder(next);
+    if (next.length === current.items.length) {
+      // check ascending (smallest to biggest)
+      const correct = next.every((it, i) => it.size === i + 1);
+      if (correct) {
+        setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+        speak("Perfect order!", settings);
+        addProgress({ stars: 1 });
+        setTimeout(() => setShowConfetti(false), 2000);
+        setTimeout(() => setIdx(i => (i + 1) % filtered.length), 1800);
+      } else {
+        setFeedback("wrong"); speak("Try again!", settings);
+        setTimeout(() => {
+          setOrder([]);
+          setAvailable([...current.items].sort(() => Math.random() - 0.5));
+          setFeedback("");
+        }, 1200);
+      }
+    }
+  }
+
+  if (!current) return null;
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="📏 Size Sort" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.pink} h={6} />
+      <Card style={{ textAlign: "center", padding: 20, marginTop: 16, marginBottom: 16 }}>
+        <p style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text, margin: 0 }}>Tap in order: smallest → biggest</p>
+      </Card>
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, margin: "0 0 8px" }}>Your order:</p>
+        <div style={{
+          display: "flex", gap: 8, minHeight: 80, padding: 12,
+          border: `2px dashed ${feedback === "correct" ? T.green : feedback === "wrong" ? T.primary : T.border}`,
+          borderRadius: 16, background: T.surface, alignItems: "center", justifyContent: "center",
+        }}>
+          {order.length === 0 ? (
+            <span style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>Tap items below</span>
+          ) : order.map((it, i) => (
+            <div key={i} style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 36 }}>{it.emoji}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 11, color: T.soft }}>{i + 1}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+        {available.map(it => (
+          <button key={it.label} onClick={() => pickItem(it)} style={{
+            padding: "12px 14px", borderRadius: 16, border: `2px solid ${T.border}`, background: T.surface,
+            cursor: "pointer", textAlign: "center",
+          }}>
+            <div style={{ fontSize: 40 }}>{it.emoji}</div>
+            <div style={{ fontFamily: T.font, fontSize: 12, color: T.text, fontWeight: 700 }}>{it.label}</div>
+          </button>
+        ))}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Perfect!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Try again! 💪</div>}
     </div>
   );
 }
@@ -3418,6 +3509,7 @@ export default function App() {
     game_spelling: <SpellingBeeScreen setScreen={setScreen} />,
     game_opposites: <OppositeMatchScreen setScreen={setScreen} />,
     game_counting: <CountingGameScreen setScreen={setScreen} />,
+    game_sizes: <SizeSortScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
