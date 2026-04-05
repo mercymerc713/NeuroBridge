@@ -2688,14 +2688,16 @@ function CountingGameScreen({ setScreen }) {
 function SizeSortScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = sizeSortData.filter(s => s.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(sizeSortData.filter(s => s.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [order, setOrder] = useState([]);
   const [available, setAvailable] = useState([]);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) {
@@ -2704,6 +2706,12 @@ function SizeSortScreen({ setScreen }) {
       setFeedback("");
     }
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(sizeSortData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setOrder([]); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pickItem(item) {
     if (feedback) return;
@@ -2718,7 +2726,10 @@ function SizeSortScreen({ setScreen }) {
         speak("Perfect order!", settings);
         addProgress({ stars: 1 });
         setTimeout(() => setShowConfetti(false), 2000);
-        setTimeout(() => setIdx(i => (i + 1) % filtered.length), 1800);
+        setTimeout(() => {
+          if (idx + 1 >= items.length) setDone(true);
+          else setIdx(i => i + 1);
+        }, 1800);
       } else {
         setFeedback("wrong"); speak("Try again!", settings);
         setTimeout(() => {
