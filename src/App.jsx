@@ -2004,7 +2004,7 @@ function WordGameScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🔤 Word Match" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <ProgressBar value={idx + 1} max={filtered.length} color={T.primary} h={6} />
+      <ProgressBar value={idx + 1} max={items.length} color={T.primary} h={6} />
       <Card style={{ textAlign: "center", padding: 32, marginBottom: 20, marginTop: 16 }}>
         <div style={{ fontSize: 80, marginBottom: 12 }}>{game.image}</div>
         <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, margin: 0 }}>What word matches this picture?</p>
@@ -2482,7 +2482,7 @@ function SpellingBeeScreen({ setScreen }) {
       <Confetti active={showConfetti} />
       <Header title="🐝 Spelling Bee" onBack={() => setScreen("games")}
         right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
-      <ProgressBar value={idx + 1} max={filtered.length} color={T.yellow} h={6} />
+      <ProgressBar value={idx + 1} max={items.length} color={T.yellow} h={6} />
       <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 16 }}>
         <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 10px" }}>Spell the word!</p>
         <div style={{ fontSize: 32, marginBottom: 10 }}>{current.hint}</div>
