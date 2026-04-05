@@ -964,8 +964,10 @@ function speak(text, settings = {}) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.rate = settings.voiceRate ?? 0.85;
-  u.pitch = settings.voicePitch ?? 1.0;
+  // Slightly slower and warmer pitch sounds less robotic on most engines
+  u.rate = settings.voiceRate ?? 0.92;
+  u.pitch = settings.voicePitch ?? 1.05;
+  u.volume = 1;
   const voices = getVoices();
   if (settings.voiceId && settings.voiceId !== "default") {
     const v = voices.find(v => v.voiceURI === settings.voiceId);
@@ -975,6 +977,55 @@ function speak(text, settings = {}) {
     if (best) u.voice = best;
   }
   window.speechSynthesis.speak(u);
+}
+
+// ─── Sound effects (non-speech feedback) ─────────────────────────────────────
+let _sfxCtx = null;
+function sfxCtx() {
+  if (typeof window === "undefined") return null;
+  if (!_sfxCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) _sfxCtx = new AC();
+  }
+  if (_sfxCtx && _sfxCtx.state === "suspended") { try { _sfxCtx.resume(); } catch (e) { /* ignore */ } }
+  return _sfxCtx;
+}
+
+function playTone(freq, start, dur, { type = "sine", gain = 0.18 } = {}) {
+  const ctx = sfxCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime + start;
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(gain, t0 + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.02);
+}
+
+// kind: "correct" | "wrong" | "tap" | "win"
+function playSfx(kind) {
+  const ctx = sfxCtx(); if (!ctx) return;
+  if (kind === "correct") {
+    // warm two-note chime: C5 → E5
+    playTone(523.25, 0,    0.22, { type: "sine",     gain: 0.2 });
+    playTone(659.25, 0.09, 0.28, { type: "triangle", gain: 0.18 });
+  } else if (kind === "wrong") {
+    // gentle low "nope" — two soft low tones, nothing harsh
+    playTone(196.0, 0,    0.16, { type: "sine", gain: 0.16 });
+    playTone(174.6, 0.1,  0.22, { type: "sine", gain: 0.14 });
+  } else if (kind === "tap") {
+    playTone(880, 0, 0.08, { type: "sine", gain: 0.12 });
+  } else if (kind === "win") {
+    // ascending arpeggio C-E-G-C
+    playTone(523.25, 0,    0.18, { type: "triangle", gain: 0.2 });
+    playTone(659.25, 0.12, 0.18, { type: "triangle", gain: 0.2 });
+    playTone(783.99, 0.24, 0.2,  { type: "triangle", gain: 0.2 });
+    playTone(1046.5, 0.36, 0.45, { type: "triangle", gain: 0.22 });
+  }
 }
 
 // ─── Shared UI ───────────────────────────────────────────────────────────────
@@ -1986,7 +2037,7 @@ function WordGameScreen({ setScreen }) {
     if (feedback) return;
     if (choice === game.word) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak("Great job!", settings);
+      playSfx("correct");
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback(""); setShowHint(false);
@@ -1994,7 +2045,7 @@ function WordGameScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Try again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 1000);
     }
   }
@@ -2055,10 +2106,10 @@ function ColorGameScreen({ setScreen }) {
     if (feedback) return;
     if (name === target.name) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! That's ${target.name.toLowerCase()}!`, settings);
+      playSfx("correct"); speak(target.name, settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(newRound, 1500);
-    } else { setFeedback("wrong"); speak("Not quite!", settings); setTimeout(() => setFeedback(""), 800); }
+    } else { setFeedback("wrong"); playSfx("wrong"); setTimeout(() => setFeedback(""), 800); }
   }
 
   if (!target) return null;
@@ -2110,14 +2161,14 @@ function PatternGameScreen({ setScreen }) {
     if (feedback) return;
     if (val === p.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak("You found the pattern!", settings);
+      playSfx("correct");
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback("");
         if (idx + 1 >= items.length) setDone(true);
         else setIdx(i => i + 1);
       }, 1500);
-    } else { setFeedback("wrong"); speak("Look again", settings); setTimeout(() => setFeedback(""), 800); }
+    } else { setFeedback("wrong"); playSfx("wrong"); setTimeout(() => setFeedback(""), 800); }
   }
 
   return (
@@ -2178,14 +2229,14 @@ function MathGameScreen({ setScreen }) {
     if (feedback) return;
     if (val === prob.a) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${prob.q} equals ${prob.a}`, settings);
+      playSfx("correct"); speak(`${prob.q} equals ${prob.a}`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback("");
         if (idx + 1 >= items.length) setDone(true);
         else setIdx(i => i + 1);
       }, 1500);
-    } else { setFeedback("wrong"); speak("Not quite", settings); setTimeout(() => setFeedback(""), 800); }
+    } else { setFeedback("wrong"); playSfx("wrong"); setTimeout(() => setFeedback(""), 800); }
   }
 
   return (
@@ -2245,10 +2296,10 @@ function MemoryGameScreen({ setScreen }) {
         setMatched(newMatched);
         setFlipped([]);
         lockRef.current = false;
-        speak("Match!", settings);
+        playSfx("correct");
         if (newMatched.length === cards.length) {
           setShowConfetti(true);
-          speak("Amazing! You found them all!", settings);
+          playSfx("win");
           setTimeout(() => setShowConfetti(false), 3000);
         }
       } else {
@@ -2317,7 +2368,7 @@ function RhymingGameScreen({ setScreen }) {
     if (feedback) return;
     if (choice === item.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${item.word} rhymes with ${item.answer}!`, settings);
+      playSfx("correct"); speak(`${item.word} rhymes with ${item.answer}`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback("");
@@ -2325,7 +2376,7 @@ function RhymingGameScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1500);
     } else {
-      setFeedback("wrong"); speak("Try another one!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 800);
     }
   }
@@ -2383,7 +2434,7 @@ function ShapeSortScreen({ setScreen }) {
     if (feedback) return;
     if (emoji === item.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Right! That one doesn't belong!`, settings);
+      playSfx("correct");
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback("");
@@ -2391,7 +2442,7 @@ function ShapeSortScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1500);
     } else {
-      setFeedback("wrong"); speak("That one fits! Look again.", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 800);
     }
   }
@@ -2459,7 +2510,7 @@ function SpellingBeeScreen({ setScreen }) {
     if (feedback || !typed) return;
     if (typed.toLowerCase() === current.word.toLowerCase()) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${current.word}!`, settings);
+      playSfx("correct"); speak(current.word, settings);
       addProgress({ stars: 1, wordsSpoken: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -2468,7 +2519,7 @@ function SpellingBeeScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Try again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => { setFeedback(""); }, 900);
     }
   }
@@ -2576,7 +2627,7 @@ function OppositeMatchScreen({ setScreen }) {
     if (feedback) return;
     if (choice === current.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${current.word} and ${current.answer} are opposites!`, settings);
+      playSfx("correct"); speak(`${current.word} and ${current.answer}`, settings);
       addProgress({ stars: 1, wordsSpoken: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -2585,7 +2636,7 @@ function OppositeMatchScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Try again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 900);
     }
   }
@@ -2643,7 +2694,7 @@ function CountingGameScreen({ setScreen }) {
     if (feedback) return;
     if (n === current.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${current.answer}!`, settings);
+      playSfx("correct"); speak(String(current.answer), settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -2652,7 +2703,7 @@ function CountingGameScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Count again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 900);
     }
   }
@@ -2728,7 +2779,7 @@ function SizeSortScreen({ setScreen }) {
       const correct = next.every((it, i) => it.size === i + 1);
       if (correct) {
         setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-        speak("Perfect order!", settings);
+        playSfx("correct");
         addProgress({ stars: 1 });
         setTimeout(() => setShowConfetti(false), 2000);
         setTimeout(() => {
@@ -2736,7 +2787,7 @@ function SizeSortScreen({ setScreen }) {
           else setIdx(i => i + 1);
         }, 1800);
       } else {
-        setFeedback("wrong"); speak("Try again!", settings);
+        setFeedback("wrong"); playSfx("wrong");
         setTimeout(() => {
           setOrder([]);
           setAvailable([...current.items].sort(() => Math.random() - 0.5));
@@ -2818,7 +2869,7 @@ function ClockReaderScreen({ setScreen }) {
     if (feedback) return;
     if (c === current.display) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${current.display}`, settings);
+      playSfx("correct"); speak(current.display, settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -2827,7 +2878,7 @@ function ClockReaderScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Look again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 900);
     }
   }
@@ -2912,7 +2963,7 @@ function MoneyMatchScreen({ setScreen }) {
     if (feedback) return;
     if (c === current.display) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! ${current.display}`, settings);
+      playSfx("correct"); speak(current.display, settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -2921,7 +2972,7 @@ function MoneyMatchScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Add them up again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 900);
     }
   }
@@ -3004,7 +3055,7 @@ function EmotionMatchScreen({ setScreen }) {
     if (feedback) return;
     if (c === current.answer) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak(`Yes! This face looks ${current.answer}.`, settings);
+      playSfx("correct"); speak(current.answer, settings);
       addProgress({ stars: 1, wordsSpoken: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -3013,7 +3064,7 @@ function EmotionMatchScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Look again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 900);
     }
   }
@@ -3079,7 +3130,7 @@ function WhatsMissingScreen({ setScreen }) {
     if (feedback) return;
     if (c === current.missing) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
-      speak("Yes! That was missing!", settings);
+      playSfx("correct");
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
@@ -3087,7 +3138,7 @@ function WhatsMissingScreen({ setScreen }) {
         else setIdx(i => i + 1);
       }, 1800);
     } else {
-      setFeedback("wrong"); speak("Think again!", settings);
+      setFeedback("wrong"); playSfx("wrong");
       setTimeout(() => setFeedback(""), 900);
     }
   }
@@ -3266,11 +3317,11 @@ function MazeRunnerScreen({ setScreen }) {
     const nr = pos.r + dr, nc = pos.c + dc;
     if (nr < 0 || nr >= current.rows || nc < 0 || nc >= current.cols) return;
     const cell = current.grid[nr][nc];
-    if (cell === 0) { speak("Wall!", settings); return; }
+    if (cell === 0) { playSfx("wrong"); return; }
     setPos({ r: nr, c: nc });
     if (cell === 3) {
       setWon(true); setShowConfetti(true); setScore(s => s + 1);
-      speak("You made it!", settings);
+      playSfx("win");
       addProgress({ stars: 2 });
       setTimeout(() => setShowConfetti(false), 2500);
     }
@@ -4043,7 +4094,7 @@ function HabitsScreen({ setScreen }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {habits.map(h => (
-          <button key={h.id} onClick={() => { setHabits(prev => prev.map(x => x.id === h.id ? { ...x, done: !x.done } : x)); if (!h.done) speak("Nice job!", settings); }}
+          <button key={h.id} onClick={() => { setHabits(prev => prev.map(x => x.id === h.id ? { ...x, done: !x.done } : x)); if (!h.done) playSfx("correct"); }}
             style={{
               display: "flex", alignItems: "center", gap: 14, padding: 16,
               borderRadius: 18, border: `1.5px solid ${h.done ? T.green + "40" : T.border}`,
@@ -4304,8 +4355,8 @@ function ReadingScreen({ setScreen }) {
           {q.choices.map(c => (
             <button key={c} onClick={() => {
               setShowAnswer(true);
-              if (c === q.a) { setScore(s => s + 1); speak("Correct!", settings); }
-              else speak("Try again!", settings);
+              if (c === q.a) { setScore(s => s + 1); playSfx("correct"); }
+              else playSfx("wrong");
             }} style={{
               padding: 14, borderRadius: 14, border: `2px solid ${showAnswer && c === q.a ? T.green : T.border}`,
               background: showAnswer && c === q.a ? T.greenGlow : T.surface,
@@ -4344,7 +4395,7 @@ function EmotionScreen({ setScreen }) {
         <div style={{ fontFamily: T.font, fontSize: 24, fontWeight: 800, color: current.color }}>{current.label}</div>
         <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 20 }}>
           {emotionScale.map(e => (
-            <button key={e.level} onClick={() => { setLevel(e.level); speak(`I feel ${e.label.toLowerCase()}`, settings); }}
+            <button key={e.level} onClick={() => { setLevel(e.level); playSfx("tap"); }}
               style={{
                 width: 52, height: 52, borderRadius: 16, border: `3px solid ${level === e.level ? e.color : T.border}`,
                 background: level === e.level ? `${e.color}20` : T.surface,
@@ -4361,7 +4412,7 @@ function EmotionScreen({ setScreen }) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
         {copingCards.slice(0, level <= 2 ? 8 : 6).map((card, i) => (
-          <button key={i} onClick={() => { setSelectedCoping(card); speak(card.desc, settings); }}
+          <button key={i} onClick={() => { setSelectedCoping(card); playSfx("tap"); }}
             style={{
               padding: 16, borderRadius: 18, border: `1.5px solid ${card.color}25`,
               background: selectedCoping === card ? `${card.color}15` : T.surface,
