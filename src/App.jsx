@@ -1880,6 +1880,7 @@ function GamesScreen({ setScreen }) {
     { id: "shapes", emoji: "🧩", title: "Odd One Out", desc: "Which doesn't belong?", color: T.primary, glow: T.primaryGlow },
     { id: "spelling", emoji: "🐝", title: "Spelling Bee", desc: "Spell the word", color: T.yellow, glow: T.yellowGlow },
     { id: "opposites", emoji: "↔️", title: "Opposite Match", desc: "Find the opposite", color: T.purple, glow: T.purpleGlow },
+    { id: "counting", emoji: "🔢", title: "Counting", desc: "Count the objects", color: T.blue, glow: T.blueGlow },
   ];
 
   return (
@@ -2484,6 +2485,63 @@ function OppositeMatchScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Opposites!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Hmm, not quite! 💪</div>}
+    </div>
+  );
+}
+
+// ─── COUNTING GAME ───────────────────────────────────────────────────────────
+function CountingGameScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = countingData.filter(c => c.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  function pick(n) {
+    if (feedback) return;
+    if (n === current.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.answer}!`, settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Count again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🔢 Counting" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.blue} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>How many do you see?</p>
+        <div style={{
+          display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, fontSize: 36, lineHeight: 1.2,
+        }}>
+          {current.items.map((it, i) => <span key={i}>{it}</span>)}
+        </div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        {current.choices.map(n => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && n === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={n} onClick={() => pick(n)} style={{
+              padding: "24px 0", borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 32, fontWeight: 800, color: col,
+            }}>{n}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Right!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Count again! 💪</div>}
     </div>
   );
 }
@@ -3359,6 +3417,7 @@ export default function App() {
     game_shapes: <ShapeSortScreen setScreen={setScreen} />,
     game_spelling: <SpellingBeeScreen setScreen={setScreen} />,
     game_opposites: <OppositeMatchScreen setScreen={setScreen} />,
+    game_counting: <CountingGameScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
