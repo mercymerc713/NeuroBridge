@@ -3045,14 +3045,16 @@ function EmotionMatchScreen({ setScreen }) {
 function WhatsMissingScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = missingData.filter(m => m.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(missingData.filter(m => m.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [phase, setPhase] = useState("show"); // show, hide, answer
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     setPhase("show");
@@ -3062,6 +3064,12 @@ function WhatsMissingScreen({ setScreen }) {
     return () => clearTimeout(t);
   }, [idx, current]);
 
+  function restart() {
+    setItems(shuffleArr(missingData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setPhase("show"); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
+
   function pick(c) {
     if (feedback) return;
     if (c === current.missing) {
@@ -3069,7 +3077,10 @@ function WhatsMissingScreen({ setScreen }) {
       speak("Yes! That was missing!", settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Think again!", settings);
       setTimeout(() => setFeedback(""), 900);
