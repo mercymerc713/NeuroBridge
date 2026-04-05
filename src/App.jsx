@@ -2359,12 +2359,20 @@ function RhymingGameScreen({ setScreen }) {
 function ShapeSortScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = shapeSortData.filter(s => s.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(shapeSortData.filter(s => s.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const item = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const item = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(shapeSortData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(emoji) {
     if (feedback) return;
@@ -2372,7 +2380,11 @@ function ShapeSortScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak(`Right! That one doesn't belong!`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else {
       setFeedback("wrong"); speak("That one fits! Look again.", settings);
       setTimeout(() => setFeedback(""), 800);
