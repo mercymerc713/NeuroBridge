@@ -550,6 +550,224 @@ const shapeSortData = [
   { shape: "School Items", emoji: "🏫", items: ["📚", "✏️", "🍕", "📐"], answer: "🍕", wrongLabel: "Not for school", level: 3 },
 ];
 
+// ─── Spelling Bee Data ──────────────────────────────────────────────────────
+const spellingWords = [
+  { word: "cat", hint: "🐱 A furry pet", level: 1 },
+  { word: "dog", hint: "🐕 It barks", level: 1 },
+  { word: "sun", hint: "☀️ In the sky", level: 1 },
+  { word: "hat", hint: "🎩 Goes on your head", level: 1 },
+  { word: "red", hint: "🔴 A color", level: 1 },
+  { word: "cup", hint: "🥤 You drink from it", level: 1 },
+  { word: "bed", hint: "🛏️ Where you sleep", level: 1 },
+  { word: "fish", hint: "🐟 Swims in water", level: 2 },
+  { word: "tree", hint: "🌳 Has leaves", level: 2 },
+  { word: "star", hint: "⭐ Twinkles at night", level: 2 },
+  { word: "jump", hint: "🤸 Leap in the air", level: 2 },
+  { word: "play", hint: "🎮 Have fun", level: 2 },
+  { word: "blue", hint: "🔵 Color of the sky", level: 2 },
+  { word: "happy", hint: "😊 Feeling good", level: 3 },
+  { word: "water", hint: "💧 You drink it", level: 3 },
+  { word: "house", hint: "🏠 Where you live", level: 3 },
+  { word: "friend", hint: "🤝 Someone you like", level: 3 },
+  { word: "school", hint: "🏫 Where you learn", level: 3 },
+  { word: "dragon", hint: "🐉 Breathes fire", level: 3 },
+];
+
+// ─── Opposite Match Data ────────────────────────────────────────────────────
+const oppositeData = [
+  { word: "Hot", emoji: "🔥", answer: "Cold", choices: ["Cold", "Warm", "Wet"], level: 1 },
+  { word: "Big", emoji: "🐘", answer: "Small", choices: ["Small", "Tall", "Wide"], level: 1 },
+  { word: "Happy", emoji: "😊", answer: "Sad", choices: ["Sad", "Mad", "Glad"], level: 1 },
+  { word: "Up", emoji: "⬆️", answer: "Down", choices: ["Down", "Left", "Right"], level: 1 },
+  { word: "Fast", emoji: "⚡", answer: "Slow", choices: ["Slow", "Quick", "Quiet"], level: 1 },
+  { word: "Day", emoji: "☀️", answer: "Night", choices: ["Night", "Dark", "Moon"], level: 1 },
+  { word: "Open", emoji: "📂", answer: "Close", choices: ["Close", "Shut", "Lock"], level: 2 },
+  { word: "Full", emoji: "🥛", answer: "Empty", choices: ["Empty", "Half", "Spill"], level: 2 },
+  { word: "Loud", emoji: "🔊", answer: "Quiet", choices: ["Quiet", "Silent", "Soft"], level: 2 },
+  { word: "Light", emoji: "💡", answer: "Dark", choices: ["Dark", "Dim", "Black"], level: 2 },
+  { word: "Hard", emoji: "🪨", answer: "Soft", choices: ["Soft", "Easy", "Light"], level: 2 },
+  { word: "Push", emoji: "👐", answer: "Pull", choices: ["Pull", "Drag", "Lift"], level: 2 },
+  { word: "Ancient", emoji: "🏛️", answer: "Modern", choices: ["Modern", "Recent", "Fresh"], level: 3 },
+  { word: "Brave", emoji: "🦁", answer: "Scared", choices: ["Scared", "Shy", "Weak"], level: 3 },
+  { word: "Generous", emoji: "🎁", answer: "Selfish", choices: ["Selfish", "Greedy", "Mean"], level: 3 },
+  { word: "Remember", emoji: "🧠", answer: "Forget", choices: ["Forget", "Lose", "Miss"], level: 3 },
+];
+
+// ─── Counting Data ──────────────────────────────────────────────────────────
+const countingData = [
+  { items: ["🍎", "🍎", "🍎"], answer: 3, choices: [2, 3, 4], level: 1 },
+  { items: ["⭐", "⭐", "⭐", "⭐", "⭐"], answer: 5, choices: [4, 5, 6], level: 1 },
+  { items: ["🐟", "🐟"], answer: 2, choices: [1, 2, 3], level: 1 },
+  { items: ["🎈", "🎈", "🎈", "🎈"], answer: 4, choices: [3, 4, 5], level: 1 },
+  { items: ["🌸"], answer: 1, choices: [1, 2, 3], level: 1 },
+  { items: ["🐱", "🐱", "🐱", "🐱", "🐱", "🐱"], answer: 6, choices: [5, 6, 7], level: 1 },
+  { items: ["🍪", "🍪", "🍪", "🍪", "🍪", "🍪", "🍪"], answer: 7, choices: [6, 7, 8], level: 2 },
+  { items: ["🦋", "🦋", "🦋", "🦋", "🦋", "🦋", "🦋", "🦋", "🦋"], answer: 9, choices: [8, 9, 10], level: 2 },
+  { items: ["🌙", "🌙", "🌙", "🌙", "🌙", "🌙", "🌙", "🌙"], answer: 8, choices: [7, 8, 9], level: 2 },
+  { items: ["🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵", "🔵"], answer: 10, choices: [9, 10, 11], level: 2 },
+  { items: ["🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎", "🍎"], answer: 12, choices: [11, 12, 13], level: 3 },
+  { items: ["⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐"], answer: 15, choices: [14, 15, 16], level: 3 },
+];
+
+// ─── Size Sorting Data ──────────────────────────────────────────────────────
+const sizeSortData = [
+  { items: [{ emoji: "🐘", label: "Elephant", size: 3 }, { emoji: "🐱", label: "Cat", size: 2 }, { emoji: "🐜", label: "Ant", size: 1 }], level: 1 },
+  { items: [{ emoji: "🌳", label: "Tree", size: 3 }, { emoji: "🌻", label: "Flower", size: 2 }, { emoji: "🌱", label: "Sprout", size: 1 }], level: 1 },
+  { items: [{ emoji: "🏠", label: "House", size: 3 }, { emoji: "🚗", label: "Car", size: 2 }, { emoji: "📱", label: "Phone", size: 1 }], level: 1 },
+  { items: [{ emoji: "🌊", label: "Ocean", size: 4 }, { emoji: "🏔️", label: "Mountain", size: 3 }, { emoji: "🏠", label: "House", size: 2 }, { emoji: "🧸", label: "Teddy", size: 1 }], level: 2 },
+  { items: [{ emoji: "🐋", label: "Whale", size: 4 }, { emoji: "🐕", label: "Dog", size: 3 }, { emoji: "🐸", label: "Frog", size: 2 }, { emoji: "🐛", label: "Bug", size: 1 }], level: 2 },
+  { items: [{ emoji: "🌍", label: "Earth", size: 5 }, { emoji: "🏔️", label: "Mountain", size: 4 }, { emoji: "🏢", label: "Building", size: 3 }, { emoji: "🧑", label: "Person", size: 2 }, { emoji: "🐜", label: "Ant", size: 1 }], level: 3 },
+];
+
+// ─── Clock Data ─────────────────────────────────────────────────────────────
+const clockData = [
+  { hour: 3, minute: 0, display: "3:00", choices: ["3:00", "6:00", "9:00"], level: 1 },
+  { hour: 6, minute: 0, display: "6:00", choices: ["6:00", "12:00", "3:00"], level: 1 },
+  { hour: 12, minute: 0, display: "12:00", choices: ["12:00", "6:00", "9:00"], level: 1 },
+  { hour: 9, minute: 0, display: "9:00", choices: ["9:00", "3:00", "6:00"], level: 1 },
+  { hour: 2, minute: 30, display: "2:30", choices: ["2:30", "3:00", "6:30"], level: 2 },
+  { hour: 7, minute: 30, display: "7:30", choices: ["7:30", "8:30", "7:00"], level: 2 },
+  { hour: 10, minute: 30, display: "10:30", choices: ["10:30", "11:30", "10:00"], level: 2 },
+  { hour: 4, minute: 15, display: "4:15", choices: ["4:15", "3:15", "4:45"], level: 3 },
+  { hour: 8, minute: 45, display: "8:45", choices: ["8:45", "9:45", "8:15"], level: 3 },
+  { hour: 11, minute: 20, display: "11:20", choices: ["11:20", "4:55", "11:40"], level: 3 },
+];
+
+// ─── Money Data ─────────────────────────────────────────────────────────────
+const moneyData = [
+  { coins: ["25¢"], total: 25, display: "$0.25", choices: ["$0.25", "$0.50", "$0.10"], level: 1 },
+  { coins: ["10¢", "10¢"], total: 20, display: "$0.20", choices: ["$0.20", "$0.10", "$0.30"], level: 1 },
+  { coins: ["25¢", "25¢"], total: 50, display: "$0.50", choices: ["$0.50", "$0.25", "$0.75"], level: 1 },
+  { coins: ["5¢", "5¢", "5¢"], total: 15, display: "$0.15", choices: ["$0.15", "$0.10", "$0.20"], level: 1 },
+  { coins: ["25¢", "10¢", "5¢"], total: 40, display: "$0.40", choices: ["$0.40", "$0.35", "$0.45"], level: 2 },
+  { coins: ["25¢", "25¢", "10¢"], total: 60, display: "$0.60", choices: ["$0.60", "$0.50", "$0.70"], level: 2 },
+  { coins: ["25¢", "10¢", "10¢", "5¢"], total: 50, display: "$0.50", choices: ["$0.50", "$0.45", "$0.55"], level: 2 },
+  { coins: ["$1", "25¢", "10¢"], total: 135, display: "$1.35", choices: ["$1.35", "$1.25", "$1.45"], level: 3 },
+  { coins: ["$1", "$1", "25¢", "10¢", "5¢"], total: 240, display: "$2.40", choices: ["$2.40", "$2.35", "$2.50"], level: 3 },
+  { coins: ["$5", "$1", "25¢", "25¢", "10¢"], total: 660, display: "$6.60", choices: ["$6.60", "$5.60", "$6.50"], level: 3 },
+];
+
+// ─── Emotion Match Data ─────────────────────────────────────────────────────
+const emotionMatchData = [
+  { face: "😊", answer: "Happy", choices: ["Happy", "Sad", "Angry"], level: 1 },
+  { face: "😢", answer: "Sad", choices: ["Happy", "Sad", "Scared"], level: 1 },
+  { face: "😠", answer: "Angry", choices: ["Angry", "Happy", "Tired"], level: 1 },
+  { face: "😨", answer: "Scared", choices: ["Scared", "Excited", "Bored"], level: 1 },
+  { face: "😴", answer: "Tired", choices: ["Tired", "Sad", "Calm"], level: 1 },
+  { face: "🤩", answer: "Excited", choices: ["Excited", "Happy", "Surprised"], level: 1 },
+  { face: "😕", answer: "Confused", choices: ["Confused", "Worried", "Bored"], level: 2 },
+  { face: "😤", answer: "Frustrated", choices: ["Frustrated", "Angry", "Annoyed"], level: 2 },
+  { face: "🥰", answer: "Loved", choices: ["Loved", "Happy", "Grateful"], level: 2 },
+  { face: "😬", answer: "Nervous", choices: ["Nervous", "Scared", "Worried"], level: 2 },
+  { face: "😞", answer: "Disappointed", choices: ["Disappointed", "Sad", "Bored"], level: 3 },
+  { face: "🤗", answer: "Affectionate", choices: ["Affectionate", "Happy", "Grateful"], level: 3 },
+  { face: "😏", answer: "Smug", choices: ["Smug", "Happy", "Confident"], level: 3 },
+  { face: "🫣", answer: "Embarrassed", choices: ["Embarrassed", "Shy", "Nervous"], level: 3 },
+];
+
+// ─── What's Missing Data ────────────────────────────────────────────────────
+const missingData = [
+  { items: ["🍎", "🍌", "🍇", "🍊"], missing: "🍌", choices: ["🍌", "🍕", "🥕"], level: 1 },
+  { items: ["🐱", "🐕", "🐟", "🐦"], missing: "🐟", choices: ["🐟", "🐸", "🐍"], level: 1 },
+  { items: ["⭐", "🌙", "☀️", "🌈"], missing: "☀️", choices: ["☀️", "💧", "⚡"], level: 1 },
+  { items: ["🚗", "🚌", "✈️", "🚢"], missing: "✈️", choices: ["✈️", "🚲", "🛹"], level: 1 },
+  { items: ["❤️", "💛", "💚", "💙", "💜"], missing: "💚", choices: ["💚", "🧡", "🤍"], level: 2 },
+  { items: ["🎸", "🥁", "🎹", "🎺", "🎻"], missing: "🎹", choices: ["🎹", "📻", "🔔"], level: 2 },
+  { items: ["1", "2", "3", "4", "5", "6"], missing: "4", choices: ["4", "7", "9"], level: 2 },
+  { items: ["A", "B", "C", "D", "E", "F"], missing: "D", choices: ["D", "G", "H"], level: 3 },
+  { items: ["🌑", "🌒", "🌓", "🌔", "🌕"], missing: "🌓", choices: ["🌓", "🌙", "⭐"], level: 3 },
+  { items: ["👶", "🧒", "🧑", "🧓"], missing: "🧑", choices: ["🧑", "👦", "👴"], level: 3 },
+];
+
+// ─── Story Builder (Mad Libs) Templates ─────────────────────────────────────
+const storyTemplates = [
+  {
+    id: "adventure", title: "The Adventure", emoji: "🗺️",
+    template: "One day, a {adjective} {animal} went to the {place}. It found a {adjective2} {thing} and felt very {feeling}!",
+    blanks: [
+      { key: "adjective", label: "Describe it", choices: ["silly", "brave", "tiny", "magical", "sneaky", "sparkly"] },
+      { key: "animal", label: "Pick an animal", choices: ["cat", "dragon", "penguin", "unicorn", "puppy", "bear"] },
+      { key: "place", label: "Pick a place", choices: ["moon", "castle", "jungle", "ocean", "candy shop", "cloud"] },
+      { key: "adjective2", label: "Describe it", choices: ["golden", "glowing", "giant", "invisible", "rainbow", "fluffy"] },
+      { key: "thing", label: "Pick a thing", choices: ["treasure", "sandwich", "spaceship", "crown", "magic wand", "pizza"] },
+      { key: "feeling", label: "Pick a feeling", choices: ["happy", "excited", "surprised", "proud", "giggly", "amazed"] },
+    ],
+  },
+  {
+    id: "school", title: "School Day", emoji: "🏫",
+    template: "At school, my {adjective} teacher said we would learn about {topic}. I used my {color} {supply} and made a {adjective2} {creation}. Everyone said {exclamation}!",
+    blanks: [
+      { key: "adjective", label: "Describe teacher", choices: ["funny", "kind", "tall", "smart", "silly", "cool"] },
+      { key: "topic", label: "What to learn", choices: ["dinosaurs", "space", "robots", "animals", "magic", "cooking"] },
+      { key: "color", label: "Pick a color", choices: ["red", "blue", "purple", "rainbow", "gold", "green"] },
+      { key: "supply", label: "School supply", choices: ["pencil", "crayon", "glitter", "paintbrush", "marker", "chalk"] },
+      { key: "adjective2", label: "Describe it", choices: ["amazing", "huge", "sparkly", "wiggly", "beautiful", "funny"] },
+      { key: "creation", label: "What you made", choices: ["robot", "picture", "volcano", "rocket", "monster", "cake"] },
+      { key: "exclamation", label: "They said", choices: ["Wow!", "Amazing!", "Cool!", "Awesome!", "Incredible!", "Yay!"] },
+    ],
+  },
+  {
+    id: "pet", title: "My Pet", emoji: "🐾",
+    template: "I have a pet {animal}. Its name is {name} and it loves to {action}. It eats {food} every day. My pet is very {adjective} and makes me feel {feeling}.",
+    blanks: [
+      { key: "animal", label: "Pick a pet", choices: ["dinosaur", "cloud", "robot", "dragon", "unicorn", "alien"] },
+      { key: "name", label: "Name your pet", choices: ["Sparkle", "Zoom", "Bubbles", "Captain", "Noodle", "Pickle"] },
+      { key: "action", label: "What it does", choices: ["dance", "fly", "sing", "surf", "paint", "skateboard"] },
+      { key: "food", label: "What it eats", choices: ["pizza", "rainbows", "stars", "cookies", "clouds", "tacos"] },
+      { key: "adjective", label: "Describe it", choices: ["fluffy", "sparkly", "bouncy", "giggly", "cuddly", "wild"] },
+      { key: "feeling", label: "How you feel", choices: ["happy", "lucky", "loved", "proud", "giggly", "warm"] },
+    ],
+  },
+];
+
+// ─── Maze Data ──────────────────────────────────────────────────────────────
+// Simple grid mazes: 0=wall, 1=path, 2=start, 3=end
+const mazeData = [
+  { level: 1, rows: 5, cols: 5, grid: [
+    [2,1,0,0,0],
+    [0,1,1,1,0],
+    [0,0,0,1,0],
+    [0,1,1,1,0],
+    [0,1,0,0,3],
+  ]},
+  { level: 1, rows: 5, cols: 5, grid: [
+    [2,1,1,0,0],
+    [0,0,1,0,0],
+    [0,0,1,1,0],
+    [0,0,0,1,0],
+    [0,0,0,1,3],
+  ]},
+  { level: 2, rows: 7, cols: 7, grid: [
+    [2,1,0,0,0,0,0],
+    [0,1,1,1,0,0,0],
+    [0,0,0,1,0,0,0],
+    [0,1,1,1,1,1,0],
+    [0,1,0,0,0,1,0],
+    [0,1,1,1,0,1,0],
+    [0,0,0,1,0,1,3],
+  ]},
+  { level: 2, rows: 7, cols: 7, grid: [
+    [2,1,1,1,1,0,0],
+    [0,0,0,0,1,0,0],
+    [0,1,1,0,1,1,0],
+    [0,1,0,0,0,1,0],
+    [0,1,0,1,1,1,0],
+    [0,1,0,1,0,0,0],
+    [0,1,1,1,0,0,3],
+  ]},
+  { level: 3, rows: 9, cols: 9, grid: [
+    [2,1,0,0,0,0,0,0,0],
+    [0,1,1,1,0,1,1,1,0],
+    [0,0,0,1,0,1,0,1,0],
+    [0,1,1,1,1,1,0,1,0],
+    [0,1,0,0,0,0,0,1,0],
+    [0,1,0,1,1,1,1,1,0],
+    [0,1,0,1,0,0,0,0,0],
+    [0,1,1,1,0,1,1,1,0],
+    [0,0,0,0,0,1,0,1,3],
+  ]},
+];
+
 // ─── Social Stories ─────────────────────────────────────────────────────────
 const socialStories = [
   {
@@ -1660,6 +1878,17 @@ function GamesScreen({ setScreen }) {
     { id: "memory", emoji: "🧠", title: "Memory Match", desc: "Find the matching pairs", color: T.pink, glow: T.pinkGlow },
     { id: "rhyming", emoji: "🎤", title: "Rhyme Time", desc: "Which word rhymes?", color: T.yellow, glow: T.yellowGlow },
     { id: "shapes", emoji: "🧩", title: "Odd One Out", desc: "Which doesn't belong?", color: T.primary, glow: T.primaryGlow },
+    { id: "spelling", emoji: "🐝", title: "Spelling Bee", desc: "Spell the word", color: T.yellow, glow: T.yellowGlow },
+    { id: "opposites", emoji: "↔️", title: "Opposite Match", desc: "Find the opposite", color: T.purple, glow: T.purpleGlow },
+    { id: "counting", emoji: "🔢", title: "Counting", desc: "Count the objects", color: T.blue, glow: T.blueGlow },
+    { id: "sizes", emoji: "📏", title: "Size Sort", desc: "Smallest to biggest", color: T.pink, glow: T.pinkGlow },
+    { id: "clock", emoji: "🕐", title: "Clock Reader", desc: "What time is it?", color: T.blue, glow: T.blueGlow },
+    { id: "money", emoji: "💰", title: "Money Match", desc: "Count the coins", color: T.green, glow: T.greenGlow },
+    { id: "emotions", emoji: "🙂", title: "Emotion Match", desc: "Name the feeling", color: T.pink, glow: T.pinkGlow },
+    { id: "missing", emoji: "🔍", title: "What's Missing?", desc: "Memory puzzle", color: T.purple, glow: T.purpleGlow },
+    { id: "story", emoji: "📖", title: "Story Builder", desc: "Make a silly story", color: T.yellow, glow: T.yellowGlow },
+    { id: "maze", emoji: "🏁", title: "Maze Runner", desc: "Find the way out", color: T.green, glow: T.greenGlow },
+    { id: "music", emoji: "🎹", title: "Music Maker", desc: "Tap notes & make songs", color: T.pink, glow: T.pinkGlow },
   ];
 
   return (
@@ -2091,6 +2320,941 @@ function ShapeSortScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 20, fontWeight: 800, color: T.green }}>🎉 {item.wrongLabel}!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>That one fits! Try again! 👀</div>}
+    </div>
+  );
+}
+
+// ─── SPELLING BEE ────────────────────────────────────────────────────────────
+function SpellingBeeScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = spellingWords.filter(w => w.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  function addLetter(l) {
+    if (feedback) return;
+    if (typed.length >= current.word.length) return;
+    setTyped(t => t + l);
+  }
+  function backspace() { if (!feedback) setTyped(t => t.slice(0, -1)); }
+  function clearAll() { if (!feedback) setTyped(""); }
+
+  function check() {
+    if (feedback || !typed) return;
+    if (typed.toLowerCase() === current.word.toLowerCase()) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.word}!`, settings);
+      addProgress({ stars: 1, wordsSpoken: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => {
+        setFeedback(""); setTyped(""); setRevealed(false);
+        setIdx(i => (i + 1) % filtered.length);
+      }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Try again!", settings);
+      setTimeout(() => { setFeedback(""); }, 900);
+    }
+  }
+
+  function sayWord() { speak(current.word, settings); }
+
+  const letters = "abcdefghijklmnopqrstuvwxyz".split("");
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🐝 Spelling Bee" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.yellow} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 16 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 10px" }}>Spell the word!</p>
+        <div style={{ fontSize: 32, marginBottom: 10 }}>{current.hint}</div>
+        <button onClick={sayWord} style={{
+          padding: "10px 18px", border: `2px solid ${T.primary}`, background: T.primaryGlow,
+          borderRadius: 14, fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.primary, cursor: "pointer",
+        }}>🔊 Hear it</button>
+        {revealed && <div style={{ marginTop: 12, fontFamily: T.font, fontSize: 18, color: T.blue, letterSpacing: 3 }}>{current.word}</div>}
+      </Card>
+      <div style={{
+        display: "flex", justifyContent: "center", gap: 8, marginBottom: 16, minHeight: 60, alignItems: "center",
+      }}>
+        {Array.from({ length: current.word.length }).map((_, i) => {
+          const ch = typed[i] || "";
+          const isCorrect = feedback === "correct";
+          const isWrong = feedback === "wrong";
+          return (
+            <div key={i} style={{
+              width: 40, height: 52, borderRadius: 12,
+              border: `2.5px solid ${isCorrect ? T.green : isWrong ? T.primary : T.border}`,
+              background: isCorrect ? T.greenGlow : isWrong ? T.primaryGlow : T.surface,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: T.font, fontSize: 24, fontWeight: 800,
+              color: isCorrect ? T.green : isWrong ? T.primary : T.text,
+              textTransform: "uppercase",
+            }}>{ch}</div>
+          );
+        })}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6, marginBottom: 12 }}>
+        {letters.map(l => (
+          <button key={l} onClick={() => addLetter(l)} style={{
+            padding: "12px 0", border: `1.5px solid ${T.border}`, background: T.surface,
+            borderRadius: 10, fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text,
+            cursor: "pointer", textTransform: "uppercase",
+          }}>{l}</button>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
+        <button onClick={backspace} style={{
+          padding: 12, border: `1.5px solid ${T.border}`, background: T.surface,
+          borderRadius: 12, fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.soft, cursor: "pointer",
+        }}>⌫ Back</button>
+        <button onClick={clearAll} style={{
+          padding: 12, border: `1.5px solid ${T.border}`, background: T.surface,
+          borderRadius: 12, fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.soft, cursor: "pointer",
+        }}>Clear</button>
+        <button onClick={check} disabled={!typed} style={{
+          padding: 12, border: "none", background: typed ? T.green : T.border,
+          borderRadius: 12, fontFamily: T.font, fontSize: 14, fontWeight: 800, color: "#fff",
+          cursor: typed ? "pointer" : "default",
+        }}>Check ✓</button>
+      </div>
+      {!revealed && !feedback && (
+        <button onClick={() => setRevealed(true)} style={{
+          width: "100%", padding: 10, background: "none", border: `1.5px dashed ${T.border}`,
+          borderRadius: 14, fontFamily: T.font, fontSize: 13, color: T.soft, cursor: "pointer",
+        }}>💡 Show Answer</button>
+      )}
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 14, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Perfect!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 14, fontFamily: T.font, fontSize: 16, color: T.primary }}>Not quite! 💪</div>}
+    </div>
+  );
+}
+
+// ─── OPPOSITE MATCH ──────────────────────────────────────────────────────────
+function OppositeMatchScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = oppositeData.filter(o => o.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(choice) {
+    if (feedback) return;
+    if (choice === current.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.word} and ${current.answer} are opposites!`, settings);
+      addProgress({ stars: 1, wordsSpoken: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Try again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="↔️ Opposite Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.purple} h={6} />
+      <Card style={{ textAlign: "center", padding: 32, marginTop: 16, marginBottom: 20 }}>
+        <div style={{ fontSize: 70, marginBottom: 8 }}>{current.emoji}</div>
+        <div style={{ fontFamily: T.font, fontSize: 32, fontWeight: 800, color: T.text, marginBottom: 8 }}>{current.word}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: 0 }}>What's the opposite?</p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          if (feedback === "wrong" && c === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: 20, borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 22, fontWeight: 800, color: col, transition: "all 0.15s ease",
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Opposites!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Hmm, not quite! 💪</div>}
+    </div>
+  );
+}
+
+// ─── COUNTING GAME ───────────────────────────────────────────────────────────
+function CountingGameScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = countingData.filter(c => c.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  function pick(n) {
+    if (feedback) return;
+    if (n === current.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.answer}!`, settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Count again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🔢 Counting" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.blue} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>How many do you see?</p>
+        <div style={{
+          display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, fontSize: 36, lineHeight: 1.2,
+        }}>
+          {current.items.map((it, i) => <span key={i}>{it}</span>)}
+        </div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        {current.choices.map(n => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && n === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={n} onClick={() => pick(n)} style={{
+              padding: "24px 0", borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 32, fontWeight: 800, color: col,
+            }}>{n}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Right!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Count again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── SIZE SORTING ────────────────────────────────────────────────────────────
+function SizeSortScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = sizeSortData.filter(s => s.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [order, setOrder] = useState([]);
+  const [available, setAvailable] = useState([]);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) {
+      setOrder([]);
+      setAvailable([...current.items].sort(() => Math.random() - 0.5));
+      setFeedback("");
+    }
+  }, [idx, current]);
+
+  function pickItem(item) {
+    if (feedback) return;
+    setAvailable(a => a.filter(i => i.label !== item.label));
+    const next = [...order, item];
+    setOrder(next);
+    if (next.length === current.items.length) {
+      // check ascending (smallest to biggest)
+      const correct = next.every((it, i) => it.size === i + 1);
+      if (correct) {
+        setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+        speak("Perfect order!", settings);
+        addProgress({ stars: 1 });
+        setTimeout(() => setShowConfetti(false), 2000);
+        setTimeout(() => setIdx(i => (i + 1) % filtered.length), 1800);
+      } else {
+        setFeedback("wrong"); speak("Try again!", settings);
+        setTimeout(() => {
+          setOrder([]);
+          setAvailable([...current.items].sort(() => Math.random() - 0.5));
+          setFeedback("");
+        }, 1200);
+      }
+    }
+  }
+
+  if (!current) return null;
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="📏 Size Sort" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.pink} h={6} />
+      <Card style={{ textAlign: "center", padding: 20, marginTop: 16, marginBottom: 16 }}>
+        <p style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text, margin: 0 }}>Tap in order: smallest → biggest</p>
+      </Card>
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, margin: "0 0 8px" }}>Your order:</p>
+        <div style={{
+          display: "flex", gap: 8, minHeight: 80, padding: 12,
+          border: `2px dashed ${feedback === "correct" ? T.green : feedback === "wrong" ? T.primary : T.border}`,
+          borderRadius: 16, background: T.surface, alignItems: "center", justifyContent: "center",
+        }}>
+          {order.length === 0 ? (
+            <span style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>Tap items below</span>
+          ) : order.map((it, i) => (
+            <div key={i} style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 36 }}>{it.emoji}</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 11, color: T.soft }}>{i + 1}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+        {available.map(it => (
+          <button key={it.label} onClick={() => pickItem(it)} style={{
+            padding: "12px 14px", borderRadius: 16, border: `2px solid ${T.border}`, background: T.surface,
+            cursor: "pointer", textAlign: "center",
+          }}>
+            <div style={{ fontSize: 40 }}>{it.emoji}</div>
+            <div style={{ fontFamily: T.font, fontSize: 12, color: T.text, fontWeight: 700 }}>{it.label}</div>
+          </button>
+        ))}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Perfect!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Try again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── CLOCK READER ────────────────────────────────────────────────────────────
+function ClockReaderScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = clockData.filter(c => c.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.display) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.display}`, settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Look again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  // hand angles
+  const hourDeg = ((current.hour % 12) * 30) + (current.minute * 0.5) - 90;
+  const minDeg = (current.minute * 6) - 90;
+  const R = 110;
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🕐 Clock Reader" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.blue} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>What time is it?</p>
+        <svg width={R * 2 + 20} height={R * 2 + 20} style={{ display: "block", margin: "0 auto" }}>
+          <circle cx={R + 10} cy={R + 10} r={R} fill={T.surface} stroke={T.primary} strokeWidth={4} />
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i * 30 - 90) * Math.PI / 180;
+            const x = R + 10 + Math.cos(a) * (R - 18);
+            const y = R + 10 + Math.sin(a) * (R - 18) + 5;
+            return <text key={i} x={x} y={y} textAnchor="middle" fontFamily={T.font} fontSize={16} fontWeight={800} fill={T.text}>{i === 0 ? 12 : i}</text>;
+          })}
+          {/* hour hand */}
+          <line x1={R + 10} y1={R + 10}
+            x2={R + 10 + Math.cos(hourDeg * Math.PI / 180) * (R - 45)}
+            y2={R + 10 + Math.sin(hourDeg * Math.PI / 180) * (R - 45)}
+            stroke={T.text} strokeWidth={6} strokeLinecap="round" />
+          {/* minute hand */}
+          <line x1={R + 10} y1={R + 10}
+            x2={R + 10 + Math.cos(minDeg * Math.PI / 180) * (R - 25)}
+            y2={R + 10 + Math.sin(minDeg * Math.PI / 180) * (R - 25)}
+            stroke={T.primary} strokeWidth={4} strokeLinecap="round" />
+          <circle cx={R + 10} cy={R + 10} r={6} fill={T.primary} />
+        </svg>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.display) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: "18px 0", borderRadius: 16, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 20, fontWeight: 800, color: col,
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Right!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Look again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── MONEY MATCH ─────────────────────────────────────────────────────────────
+function MoneyMatchScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = moneyData.filter(m => m.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.display) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.display}`, settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Add them up again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  function coinColor(c) {
+    if (c.startsWith("$")) return T.green;
+    if (c === "25¢") return T.soft;
+    if (c === "10¢") return T.blue;
+    if (c === "5¢") return T.purple;
+    return T.primary;
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="💰 Money Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.green} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>How much money?</p>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+          {current.coins.map((c, i) => {
+            const isBill = c.startsWith("$");
+            return (
+              <div key={i} style={{
+                width: isBill ? 74 : 56, height: isBill ? 42 : 56,
+                borderRadius: isBill ? 8 : "50%",
+                background: coinColor(c),
+                color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: T.font, fontSize: 14, fontWeight: 800,
+                boxShadow: `0 4px 12px ${coinColor(c)}40`,
+              }}>{c}</div>
+            );
+          })}
+        </div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.display) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: "18px 0", borderRadius: 16, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 18, fontWeight: 800, color: col,
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Correct!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Count again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── EMOTION MATCH ───────────────────────────────────────────────────────────
+function EmotionMatchScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = emotionMatchData.filter(e => e.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! This face looks ${current.answer}.`, settings);
+      addProgress({ stars: 1, wordsSpoken: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Look again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🙂 Emotion Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.pink} h={6} />
+      <Card style={{ textAlign: "center", padding: 32, marginTop: 16, marginBottom: 20 }}>
+        <div style={{ fontSize: 110, lineHeight: 1, marginBottom: 10 }}>{current.face}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: 0 }}>How is this person feeling?</p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: 20, borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 22, fontWeight: 800, color: col,
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Yes!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Look again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── WHAT'S MISSING ──────────────────────────────────────────────────────────
+function WhatsMissingScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = missingData.filter(m => m.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [phase, setPhase] = useState("show"); // show, hide, answer
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    setPhase("show");
+    setFeedback("");
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+    const t = setTimeout(() => setPhase("answer"), 2500);
+    return () => clearTimeout(t);
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.missing) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak("Yes! That was missing!", settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Think again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🔍 What's Missing" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.purple} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>
+          {phase === "show" ? "Remember these items..." : "Which one is missing?"}
+        </p>
+        <div style={{
+          display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, fontSize: 42, minHeight: 60,
+        }}>
+          {phase === "show"
+            ? current.items.map((it, i) => <span key={i}>{it}</span>)
+            : current.items.filter(it => it !== current.missing).map((it, i) => <span key={i}>{it}</span>)}
+          {phase === "answer" && <span style={{ opacity: 0.3 }}>❓</span>}
+        </div>
+      </Card>
+      {phase === "answer" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          {shuffled.map((c, i) => {
+            let bg = T.surface, border = T.border;
+            if (feedback === "correct" && c === current.missing) { bg = T.greenGlow; border = T.green; }
+            return (
+              <button key={i} onClick={() => pick(c)} style={{
+                padding: "24px 0", borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+                fontSize: 42,
+              }}>{c}</button>
+            );
+          })}
+        </div>
+      )}
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Found it!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Think again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── STORY BUILDER ───────────────────────────────────────────────────────────
+function StoryBuilderScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const [templateIdx, setTemplateIdx] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [blankIdx, setBlankIdx] = useState(0);
+  const [done, setDone] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  if (templateIdx === null) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="📖 Story Builder" onBack={() => setScreen("games")} />
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 16px" }}>Pick a story to build!</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {storyTemplates.map((t, i) => (
+            <Card key={t.id} onClick={() => { setTemplateIdx(i); setAnswers({}); setBlankIdx(0); setDone(false); }}
+              style={{ display: "flex", alignItems: "center", gap: 16, padding: 20 }}>
+              <div style={{ fontSize: 44 }}>{t.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>{t.title}</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const template = storyTemplates[templateIdx];
+  const currentBlank = template.blanks[blankIdx];
+
+  function pick(choice) {
+    const next = { ...answers, [currentBlank.key]: choice };
+    setAnswers(next);
+    if (blankIdx + 1 < template.blanks.length) {
+      setBlankIdx(blankIdx + 1);
+    } else {
+      setDone(true);
+      setShowConfetti(true);
+      addProgress({ stars: 2, wordsSpoken: template.blanks.length });
+      // build and speak the story
+      let story = template.template;
+      Object.entries(next).forEach(([k, v]) => {
+        story = story.replace(new RegExp(`\\{${k}\\}`, "g"), v);
+      });
+      speak(story, settings);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }
+
+  function reset() { setTemplateIdx(null); setAnswers({}); setBlankIdx(0); setDone(false); }
+
+  if (done) {
+    let story = template.template;
+    Object.entries(answers).forEach(([k, v]) => {
+      story = story.replace(new RegExp(`\\{${k}\\}`, "g"), `__${v}__`);
+    });
+    const parts = story.split(/(__[^_]+__)/g);
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Confetti active={showConfetti} />
+        <Header title="📖 Your Story" onBack={() => setScreen("games")} />
+        <Card style={{ padding: 24, marginTop: 16, marginBottom: 20 }}>
+          <div style={{ fontSize: 56, textAlign: "center", marginBottom: 10 }}>{template.emoji}</div>
+          <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text, textAlign: "center", marginBottom: 14 }}>{template.title}</div>
+          <p style={{ fontFamily: T.fontAlt, fontSize: 17, color: T.text, lineHeight: 1.7, margin: 0 }}>
+            {parts.map((p, i) => {
+              if (p.startsWith("__") && p.endsWith("__")) {
+                return <span key={i} style={{ fontWeight: 800, color: T.primary, background: T.primaryGlow, padding: "2px 6px", borderRadius: 6 }}>{p.slice(2, -2)}</span>;
+              }
+              return <span key={i}>{p}</span>;
+            })}
+          </p>
+        </Card>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <button onClick={() => { let st = template.template; Object.entries(answers).forEach(([k, v]) => { st = st.replace(new RegExp(`\\{${k}\\}`, "g"), v); }); speak(st, settings); }} style={{
+            padding: 14, borderRadius: 14, border: `2px solid ${T.primary}`, background: T.primaryGlow,
+            fontFamily: T.font, fontSize: 15, fontWeight: 800, color: T.primary, cursor: "pointer",
+          }}>🔊 Read it</button>
+          <button onClick={reset} style={{
+            padding: 14, borderRadius: 14, border: "none", background: T.green,
+            fontFamily: T.font, fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer",
+          }}>+ New Story</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title={`📖 ${template.title}`} onBack={reset} />
+      <ProgressBar value={blankIdx + 1} max={template.blanks.length} color={T.yellow} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <div style={{ fontSize: 56, marginBottom: 10 }}>{template.emoji}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 6px" }}>Step {blankIdx + 1} of {template.blanks.length}</p>
+        <p style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text, margin: 0 }}>{currentBlank.label}</p>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        {currentBlank.choices.map(c => (
+          <button key={c} onClick={() => pick(c)} style={{
+            padding: 18, borderRadius: 16, border: `2px solid ${T.border}`, background: T.surface,
+            fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text, cursor: "pointer",
+          }}>{c}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── MAZE RUNNER ─────────────────────────────────────────────────────────────
+function MazeRunnerScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = mazeData.filter(m => m.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [pos, setPos] = useState({ r: 0, c: 0 });
+  const [score, setScore] = useState(0);
+  const [won, setWon] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (!current) return;
+    // find start
+    for (let r = 0; r < current.rows; r++) {
+      for (let c = 0; c < current.cols; c++) {
+        if (current.grid[r][c] === 2) { setPos({ r, c }); return; }
+      }
+    }
+  }, [idx, current]);
+
+  function move(dr, dc) {
+    if (won || !current) return;
+    const nr = pos.r + dr, nc = pos.c + dc;
+    if (nr < 0 || nr >= current.rows || nc < 0 || nc >= current.cols) return;
+    const cell = current.grid[nr][nc];
+    if (cell === 0) { speak("Wall!", settings); return; }
+    setPos({ r: nr, c: nc });
+    if (cell === 3) {
+      setWon(true); setShowConfetti(true); setScore(s => s + 1);
+      speak("You made it!", settings);
+      addProgress({ stars: 2 });
+      setTimeout(() => setShowConfetti(false), 2500);
+    }
+  }
+
+  function next() {
+    setWon(false);
+    setIdx(i => (i + 1) % filtered.length);
+  }
+
+  if (!current) return null;
+  const cellSize = Math.min(44, Math.floor(320 / current.cols));
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🏁 Maze Runner" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.green} h={6} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "16px 0 10px", textAlign: "center" }}>Guide 🐵 to the 🍌!</p>
+      <div style={{
+        display: "flex", justifyContent: "center", marginBottom: 20, padding: 10,
+        background: T.surface, borderRadius: 18, border: `2px solid ${T.border}`,
+      }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${current.cols}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${current.rows}, ${cellSize}px)`,
+          gap: 2,
+        }}>
+          {current.grid.map((row, r) =>
+            row.map((cell, c) => {
+              const isPlayer = pos.r === r && pos.c === c;
+              let bg = T.border, content = "";
+              if (cell === 0) bg = T.text + "30";
+              else if (cell === 1 || cell === 2) bg = T.greenGlow;
+              else if (cell === 3) { bg = T.yellowGlow; content = "🍌"; }
+              if (isPlayer) content = "🐵";
+              return (
+                <div key={`${r}-${c}`} style={{
+                  width: cellSize, height: cellSize, background: bg, borderRadius: 4,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: cellSize * 0.7,
+                }}>{content}</div>
+              );
+            })
+          )}
+        </div>
+      </div>
+      {won ? (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: T.font, fontSize: 24, fontWeight: 800, color: T.green, marginBottom: 14 }}>🎉 You made it!</div>
+          <Btn onClick={next} color={T.green}>Next Maze →</Btn>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, maxWidth: 260, margin: "0 auto" }}>
+          <div />
+          <button onClick={() => move(-1, 0)} style={btnStyle(T)}>⬆️</button>
+          <div />
+          <button onClick={() => move(0, -1)} style={btnStyle(T)}>⬅️</button>
+          <div />
+          <button onClick={() => move(0, 1)} style={btnStyle(T)}>➡️</button>
+          <div />
+          <button onClick={() => move(1, 0)} style={btnStyle(T)}>⬇️</button>
+          <div />
+        </div>
+      )}
+    </div>
+  );
+}
+function btnStyle(T) {
+  return {
+    padding: "16px 0", borderRadius: 16, border: `2px solid ${T.primary}`,
+    background: T.primaryGlow, fontSize: 28, cursor: "pointer",
+  };
+}
+
+// ─── MUSIC MAKER ─────────────────────────────────────────────────────────────
+function MusicMakerScreen({ setScreen }) {
+  const { addProgress } = useApp();
+  const audioRef = useRef(null);
+  const [recorded, setRecorded] = useState([]);
+  const [playing, setPlaying] = useState(false);
+
+  const notes = [
+    { name: "C", freq: 261.63, color: "#EF5BA1", emoji: "🎵" },
+    { name: "D", freq: 293.66, color: "#F59E0B", emoji: "🎶" },
+    { name: "E", freq: 329.63, color: "#EAB308", emoji: "🎵" },
+    { name: "F", freq: 349.23, color: "#3EBB6E", emoji: "🎶" },
+    { name: "G", freq: 392.00, color: "#4E8AE6", emoji: "🎵" },
+    { name: "A", freq: 440.00, color: "#8B6CF6", emoji: "🎶" },
+    { name: "B", freq: 493.88, color: "#EC4899", emoji: "🎵" },
+    { name: "C²", freq: 523.25, color: "#EF5BA1", emoji: "🎶" },
+  ];
+
+  function getCtx() {
+    if (!audioRef.current) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioRef.current = new AC();
+    }
+    return audioRef.current;
+  }
+
+  function playNote(freq, duration = 0.4) {
+    const ctx = getCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + duration);
+  }
+
+  function tap(note) {
+    playNote(note.freq);
+    setRecorded(r => [...r, note].slice(-16));
+  }
+
+  async function playback() {
+    if (playing || recorded.length === 0) return;
+    setPlaying(true);
+    for (let i = 0; i < recorded.length; i++) {
+      playNote(recorded[i].freq, 0.35);
+      await new Promise(r => setTimeout(r, 380));
+    }
+    setPlaying(false);
+    addProgress({ stars: 1 });
+  }
+
+  function clearSeq() { setRecorded([]); }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="🎹 Music Maker" onBack={() => setScreen("games")} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 16px", textAlign: "center" }}>Tap keys to make music!</p>
+      <Card style={{ padding: 14, marginBottom: 16, minHeight: 56, background: T.surface }}>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, marginBottom: 6 }}>Your song:</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, minHeight: 28 }}>
+          {recorded.length === 0 ? (
+            <span style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, fontStyle: "italic" }}>Tap the keys below...</span>
+          ) : recorded.map((n, i) => (
+            <span key={i} style={{
+              padding: "2px 8px", borderRadius: 8, background: n.color + "25",
+              color: n.color, fontFamily: T.font, fontSize: 13, fontWeight: 800,
+            }}>{n.name}</span>
+          ))}
+        </div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 16 }}>
+        {notes.map(n => (
+          <button key={n.name} onClick={() => tap(n)} style={{
+            padding: "28px 0", borderRadius: 16, border: "none",
+            background: `linear-gradient(135deg, ${n.color}, ${n.color}cc)`,
+            color: "#fff", fontFamily: T.font, fontSize: 22, fontWeight: 800,
+            cursor: "pointer", boxShadow: `0 6px 16px ${n.color}40`,
+          }}>
+            <div>{n.emoji}</div>
+            <div style={{ marginTop: 4 }}>{n.name}</div>
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <button onClick={playback} disabled={playing || recorded.length === 0} style={{
+          padding: 14, borderRadius: 14, border: "none",
+          background: recorded.length ? T.primary : T.border,
+          fontFamily: T.font, fontSize: 15, fontWeight: 800, color: "#fff",
+          cursor: recorded.length ? "pointer" : "default",
+        }}>{playing ? "▶ Playing..." : "▶ Play back"}</button>
+        <button onClick={clearSeq} style={{
+          padding: 14, borderRadius: 14, border: `2px solid ${T.border}`,
+          background: T.surface, fontFamily: T.font, fontSize: 15, fontWeight: 800, color: T.soft, cursor: "pointer",
+        }}>Clear</button>
+      </div>
     </div>
   );
 }
@@ -2964,6 +4128,17 @@ export default function App() {
     game_memory: <MemoryGameScreen setScreen={setScreen} />,
     game_rhyming: <RhymingGameScreen setScreen={setScreen} />,
     game_shapes: <ShapeSortScreen setScreen={setScreen} />,
+    game_spelling: <SpellingBeeScreen setScreen={setScreen} />,
+    game_opposites: <OppositeMatchScreen setScreen={setScreen} />,
+    game_counting: <CountingGameScreen setScreen={setScreen} />,
+    game_sizes: <SizeSortScreen setScreen={setScreen} />,
+    game_clock: <ClockReaderScreen setScreen={setScreen} />,
+    game_money: <MoneyMatchScreen setScreen={setScreen} />,
+    game_emotions: <EmotionMatchScreen setScreen={setScreen} />,
+    game_missing: <WhatsMissingScreen setScreen={setScreen} />,
+    game_story: <StoryBuilderScreen setScreen={setScreen} />,
+    game_maze: <MazeRunnerScreen setScreen={setScreen} />,
+    game_music: <MusicMakerScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
