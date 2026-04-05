@@ -1887,6 +1887,7 @@ function GamesScreen({ setScreen }) {
     { id: "emotions", emoji: "🙂", title: "Emotion Match", desc: "Name the feeling", color: T.pink, glow: T.pinkGlow },
     { id: "missing", emoji: "🔍", title: "What's Missing?", desc: "Memory puzzle", color: T.purple, glow: T.purpleGlow },
     { id: "story", emoji: "📖", title: "Story Builder", desc: "Make a silly story", color: T.yellow, glow: T.yellowGlow },
+    { id: "maze", emoji: "🏁", title: "Maze Runner", desc: "Find the way out", color: T.green, glow: T.greenGlow },
   ];
 
   return (
@@ -3044,6 +3045,115 @@ function StoryBuilderScreen({ setScreen }) {
   );
 }
 
+// ─── MAZE RUNNER ─────────────────────────────────────────────────────────────
+function MazeRunnerScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = mazeData.filter(m => m.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [pos, setPos] = useState({ r: 0, c: 0 });
+  const [score, setScore] = useState(0);
+  const [won, setWon] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (!current) return;
+    // find start
+    for (let r = 0; r < current.rows; r++) {
+      for (let c = 0; c < current.cols; c++) {
+        if (current.grid[r][c] === 2) { setPos({ r, c }); return; }
+      }
+    }
+  }, [idx, current]);
+
+  function move(dr, dc) {
+    if (won || !current) return;
+    const nr = pos.r + dr, nc = pos.c + dc;
+    if (nr < 0 || nr >= current.rows || nc < 0 || nc >= current.cols) return;
+    const cell = current.grid[nr][nc];
+    if (cell === 0) { speak("Wall!", settings); return; }
+    setPos({ r: nr, c: nc });
+    if (cell === 3) {
+      setWon(true); setShowConfetti(true); setScore(s => s + 1);
+      speak("You made it!", settings);
+      addProgress({ stars: 2 });
+      setTimeout(() => setShowConfetti(false), 2500);
+    }
+  }
+
+  function next() {
+    setWon(false);
+    setIdx(i => (i + 1) % filtered.length);
+  }
+
+  if (!current) return null;
+  const cellSize = Math.min(44, Math.floor(320 / current.cols));
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🏁 Maze Runner" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.green} h={6} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "16px 0 10px", textAlign: "center" }}>Guide 🐵 to the 🍌!</p>
+      <div style={{
+        display: "flex", justifyContent: "center", marginBottom: 20, padding: 10,
+        background: T.surface, borderRadius: 18, border: `2px solid ${T.border}`,
+      }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${current.cols}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${current.rows}, ${cellSize}px)`,
+          gap: 2,
+        }}>
+          {current.grid.map((row, r) =>
+            row.map((cell, c) => {
+              const isPlayer = pos.r === r && pos.c === c;
+              let bg = T.border, content = "";
+              if (cell === 0) bg = T.text + "30";
+              else if (cell === 1 || cell === 2) bg = T.greenGlow;
+              else if (cell === 3) { bg = T.yellowGlow; content = "🍌"; }
+              if (isPlayer) content = "🐵";
+              return (
+                <div key={`${r}-${c}`} style={{
+                  width: cellSize, height: cellSize, background: bg, borderRadius: 4,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: cellSize * 0.7,
+                }}>{content}</div>
+              );
+            })
+          )}
+        </div>
+      </div>
+      {won ? (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: T.font, fontSize: 24, fontWeight: 800, color: T.green, marginBottom: 14 }}>🎉 You made it!</div>
+          <Btn onClick={next} color={T.green}>Next Maze →</Btn>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, maxWidth: 260, margin: "0 auto" }}>
+          <div />
+          <button onClick={() => move(-1, 0)} style={btnStyle(T)}>⬆️</button>
+          <div />
+          <button onClick={() => move(0, -1)} style={btnStyle(T)}>⬅️</button>
+          <div />
+          <button onClick={() => move(0, 1)} style={btnStyle(T)}>➡️</button>
+          <div />
+          <button onClick={() => move(1, 0)} style={btnStyle(T)}>⬇️</button>
+          <div />
+        </div>
+      )}
+    </div>
+  );
+}
+function btnStyle(T) {
+  return {
+    padding: "16px 0", borderRadius: 16, border: `2px solid ${T.primary}`,
+    background: T.primaryGlow, fontSize: 28, cursor: "pointer",
+  };
+}
+
 // ─── FOCUS TIMER ─────────────────────────────────────────────────────────────
 function FocusScreen({ setScreen }) {
   const { settings } = useApp();
@@ -3922,6 +4032,7 @@ export default function App() {
     game_emotions: <EmotionMatchScreen setScreen={setScreen} />,
     game_missing: <WhatsMissingScreen setScreen={setScreen} />,
     game_story: <StoryBuilderScreen setScreen={setScreen} />,
+    game_maze: <MazeRunnerScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
