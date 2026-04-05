@@ -3529,69 +3529,466 @@ function FocusScreen({ setScreen }) {
 }
 
 // ─── CALM CORNER ─────────────────────────────────────────────────────────────
+const affirmations = [
+  "I am safe and calm.",
+  "This feeling will pass.",
+  "I am doing my best, and that is enough.",
+  "I can take things one breath at a time.",
+  "My feelings are valid.",
+  "I am stronger than I think.",
+  "It's okay to rest.",
+  "I am loved.",
+  "I can handle what comes my way.",
+  "I am proud of myself for trying.",
+  "Little by little, I am getting there.",
+  "I am allowed to take up space.",
+];
+
 function CalmScreen({ setScreen }) {
-  const { settings } = useApp();
   const [breathing, setBreathing] = useState(false);
+  const [breathPattern, setBreathPattern] = useState("box"); // box = 4-4-4-4, 478 = 4-7-8, simple = 4-4-4
   const [breathPhase, setBreathPhase] = useState("in");
   const [breathCount, setBreathCount] = useState(4);
   const breathRef = useRef(null);
 
-  useEffect(() => {
-    if (breathing) {
-      let phase = "in", count = 4;
-      breathRef.current = setInterval(() => {
-        count--;
-        if (count <= 0) {
-          if (phase === "in") { phase = "hold"; } else if (phase === "hold") { phase = "out"; } else { phase = "in"; }
-          count = 4;
-        }
-        setBreathPhase(phase); setBreathCount(count);
-      }, 1000);
-    }
-    return () => clearInterval(breathRef.current);
-  }, [breathing]);
+  const patterns = {
+    box: { in: 4, hold: 4, out: 4, hold2: 4, label: "Box Breathing (4-4-4-4)" },
+    "478": { in: 4, hold: 7, out: 8, hold2: 0, label: "Relax (4-7-8)" },
+    simple: { in: 4, hold: 0, out: 4, hold2: 0, label: "Simple (4-4)" },
+  };
 
-  const breathInfo = { in: { label: "Breathe In...", color: T.blue, scale: 1.3 }, hold: { label: "Hold...", color: T.purple, scale: 1.3 }, out: { label: "Breathe Out...", color: T.green, scale: 0.9 } };
+  useEffect(() => {
+    if (!breathing) return;
+    const p = patterns[breathPattern];
+    let phase = "in", count = p.in;
+    setBreathPhase(phase); setBreathCount(count);
+    breathRef.current = setInterval(() => {
+      count--;
+      if (count <= 0) {
+        if (phase === "in") {
+          phase = p.hold > 0 ? "hold" : "out";
+          count = p.hold > 0 ? p.hold : p.out;
+        } else if (phase === "hold") {
+          phase = "out"; count = p.out;
+        } else if (phase === "out") {
+          phase = p.hold2 > 0 ? "hold2" : "in";
+          count = p.hold2 > 0 ? p.hold2 : p.in;
+        } else {
+          phase = "in"; count = p.in;
+        }
+      }
+      setBreathPhase(phase); setBreathCount(count);
+    }, 1000);
+    return () => clearInterval(breathRef.current);
+  }, [breathing, breathPattern]);
+
+  const breathInfo = {
+    in: { label: "Breathe In...", color: T.blue, scale: 1.35 },
+    hold: { label: "Hold...", color: T.purple, scale: 1.35 },
+    out: { label: "Breathe Out...", color: T.green, scale: 0.85 },
+    hold2: { label: "Hold...", color: T.purple, scale: 0.85 },
+  };
   const bi = breathInfo[breathPhase];
 
+  // ─── Real ambient sounds via Web Audio API ───────────────────────────────
+  const audioCtxRef = useRef(null);
+  const activeSoundRef = useRef(null);
+  const [activeSoundId, setActiveSoundId] = useState(null);
+  const [volume, setVolume] = useState(0.5);
+  const volumeRef = useRef(0.5);
+  const masterGainRef = useRef(null);
+
+  function getCtx() {
+    if (!audioCtxRef.current) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtxRef.current = new AC();
+    }
+    return audioCtxRef.current;
+  }
+
+  function stopSound() {
+    if (activeSoundRef.current) {
+      try { activeSoundRef.current.stop(); } catch (e) { /* ignore */ }
+      activeSoundRef.current = null;
+    }
+    masterGainRef.current = null;
+    setActiveSoundId(null);
+  }
+
+  useEffect(() => {
+    volumeRef.current = volume;
+    if (masterGainRef.current) {
+      masterGainRef.current.gain.value = volume;
+    }
+  }, [volume]);
+
+  useEffect(() => () => {
+    stopSound();
+    if (audioCtxRef.current) {
+      try { audioCtxRef.current.close(); } catch (e) { /* ignore */ }
+    }
+  }, []);
+
+  function makeNoiseBuffer(ctx, type = "white") {
+    const len = ctx.sampleRate * 2;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    if (type === "white") {
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    } else if (type === "brown") {
+      let last = 0;
+      for (let i = 0; i < len; i++) {
+        const white = Math.random() * 2 - 1;
+        last = (last + 0.02 * white) / 1.02;
+        data[i] = last * 3.5;
+      }
+    } else { // pink
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < len; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+    }
+    return buf;
+  }
+
+  function startMaster(ctx, level) {
+    const g = ctx.createGain();
+    g.gain.value = volumeRef.current * level;
+    g.connect(ctx.destination);
+    masterGainRef.current = g;
+    // keep level baseline so slider scales correctly
+    g._baseLevel = level;
+    return g;
+  }
+
+  function playOcean() {
+    const ctx = getCtx(); if (!ctx) return null;
+    if (ctx.state === "suspended") ctx.resume();
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoiseBuffer(ctx, "brown");
+    src.loop = true;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 600; lp.Q.value = 1;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.13;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 350;
+    lfo.connect(lfoGain); lfoGain.connect(lp.frequency);
+    const master = startMaster(ctx, 0.9);
+    src.connect(lp).connect(master);
+    src.start(); lfo.start();
+    return { stop: () => { src.stop(); lfo.stop(); } };
+  }
+
+  function playRain() {
+    const ctx = getCtx(); if (!ctx) return null;
+    if (ctx.state === "suspended") ctx.resume();
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoiseBuffer(ctx, "white");
+    src.loop = true;
+    const hp = ctx.createBiquadFilter();
+    hp.type = "highpass"; hp.frequency.value = 500;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 5500;
+    const master = startMaster(ctx, 0.35);
+    src.connect(hp).connect(lp).connect(master);
+    src.start();
+    return { stop: () => src.stop() };
+  }
+
+  function playWind() {
+    const ctx = getCtx(); if (!ctx) return null;
+    if (ctx.state === "suspended") ctx.resume();
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoiseBuffer(ctx, "brown");
+    src.loop = true;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass"; bp.frequency.value = 500; bp.Q.value = 1.8;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.08;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 280;
+    lfo.connect(lfoGain); lfoGain.connect(bp.frequency);
+    const master = startMaster(ctx, 0.7);
+    src.connect(bp).connect(master);
+    src.start(); lfo.start();
+    return { stop: () => { src.stop(); lfo.stop(); } };
+  }
+
+  function playBirds() {
+    const ctx = getCtx(); if (!ctx) return null;
+    if (ctx.state === "suspended") ctx.resume();
+    // soft leafy background + chirps
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoiseBuffer(ctx, "pink");
+    src.loop = true;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 1200;
+    const master = startMaster(ctx, 0.25);
+    src.connect(lp).connect(master);
+    src.start();
+    let stopped = false;
+    function chirp() {
+      if (stopped) return;
+      const now = ctx.currentTime;
+      const burst = 2 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < burst; i++) {
+        const t = now + i * 0.12;
+        const osc = ctx.createOscillator();
+        osc.type = "sine";
+        const base = 1600 + Math.random() * 1600;
+        osc.frequency.setValueAtTime(base, t);
+        osc.frequency.exponentialRampToValueAtTime(base * 1.4, t + 0.06);
+        osc.frequency.exponentialRampToValueAtTime(base * 0.85, t + 0.14);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.12, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.connect(g).connect(master);
+        osc.start(t); osc.stop(t + 0.2);
+      }
+      setTimeout(chirp, 1200 + Math.random() * 2800);
+    }
+    setTimeout(chirp, 400);
+    return { stop: () => { stopped = true; src.stop(); } };
+  }
+
+  function playNight() {
+    const ctx = getCtx(); if (!ctx) return null;
+    if (ctx.state === "suspended") ctx.resume();
+    // low hum + crickets
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoiseBuffer(ctx, "brown");
+    src.loop = true;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 220;
+    const master = startMaster(ctx, 0.5);
+    src.connect(lp).connect(master);
+    src.start();
+    let stopped = false;
+    function cricket() {
+      if (stopped) return;
+      const now = ctx.currentTime;
+      for (let i = 0; i < 5; i++) {
+        const t = now + i * 0.085;
+        const osc = ctx.createOscillator();
+        osc.type = "triangle";
+        osc.frequency.value = 4200 + Math.random() * 400;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.18, t + 0.004);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+        osc.connect(g).connect(master);
+        osc.start(t); osc.stop(t + 0.05);
+      }
+      setTimeout(cricket, 700 + Math.random() * 900);
+    }
+    setTimeout(cricket, 300);
+    return { stop: () => { stopped = true; src.stop(); } };
+  }
+
+  function playMusic() {
+    const ctx = getCtx(); if (!ctx) return null;
+    if (ctx.state === "suspended") ctx.resume();
+    // ambient pad: C minor-ish chord with slow LFO
+    const freqs = [130.81, 155.56, 196.00, 261.63, 311.13]; // C3, Eb3, G3, C4, Eb4
+    const master = startMaster(ctx, 0.25);
+    const oscs = [], lfos = [];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = i < 2 ? "sine" : "triangle";
+      osc.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.value = 0.22;
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = 0.08 + i * 0.025;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 0.1;
+      lfo.connect(lfoGain); lfoGain.connect(g.gain);
+      osc.connect(g).connect(master);
+      osc.start(); lfo.start();
+      oscs.push(osc); lfos.push(lfo);
+    });
+    return { stop: () => { oscs.forEach(o => { try { o.stop(); } catch (e) {} }); lfos.forEach(l => { try { l.stop(); } catch (e) {} }); } };
+  }
+
   const sounds = [
-    { emoji: "🌊", label: "Ocean" }, { emoji: "🌧️", label: "Rain" }, { emoji: "🐦", label: "Birds" },
-    { emoji: "🎵", label: "Music" }, { emoji: "🦗", label: "Night" }, { emoji: "💨", label: "Wind" },
+    { id: "ocean", emoji: "🌊", label: "Ocean", play: playOcean, color: T.blue },
+    { id: "rain", emoji: "🌧️", label: "Rain", play: playRain, color: T.purple },
+    { id: "birds", emoji: "🐦", label: "Birds", play: playBirds, color: T.green },
+    { id: "music", emoji: "🎵", label: "Pad", play: playMusic, color: T.pink },
+    { id: "night", emoji: "🦗", label: "Night", play: playNight, color: T.purple },
+    { id: "wind", emoji: "💨", label: "Wind", play: playWind, color: T.blue },
   ];
+
+  function toggleSound(s) {
+    if (activeSoundId === s.id) { stopSound(); return; }
+    stopSound();
+    const handle = s.play();
+    if (handle) {
+      activeSoundRef.current = handle;
+      setActiveSoundId(s.id);
+    }
+  }
+
+  // Affirmations
+  const [affIdx, setAffIdx] = useState(() => Math.floor(Math.random() * affirmations.length));
+  function nextAff() { setAffIdx(i => (i + 1 + Math.floor(Math.random() * (affirmations.length - 1))) % affirmations.length); }
+
+  // Muscle relaxation (progressive) — timer-based guide
+  const [muscleActive, setMuscleActive] = useState(false);
+  const [muscleStep, setMuscleStep] = useState(0);
+  const muscleRef = useRef(null);
+  const muscleSteps = [
+    { emoji: "✊", label: "Squeeze your hands tight...", phase: "tense" },
+    { emoji: "🖐️", label: "And release. Let them go soft.", phase: "release" },
+    { emoji: "💪", label: "Tighten your arms...", phase: "tense" },
+    { emoji: "🫳", label: "And let them relax.", phase: "release" },
+    { emoji: "🤷", label: "Pull your shoulders up to your ears...", phase: "tense" },
+    { emoji: "😌", label: "And drop them down. Ahh.", phase: "release" },
+    { emoji: "😬", label: "Scrunch up your face...", phase: "tense" },
+    { emoji: "😊", label: "And let it go soft.", phase: "release" },
+    { emoji: "🦵", label: "Squeeze your legs tight...", phase: "tense" },
+    { emoji: "🧘", label: "And release. You did it!", phase: "release" },
+  ];
+  useEffect(() => {
+    if (!muscleActive) return;
+    muscleRef.current = setInterval(() => {
+      setMuscleStep(s => {
+        if (s + 1 >= muscleSteps.length) { setMuscleActive(false); return 0; }
+        return s + 1;
+      });
+    }, 4000);
+    return () => clearInterval(muscleRef.current);
+  }, [muscleActive]);
+
+  const circleSize = 150;
 
   return (
     <div style={{ padding: "24px 20px 120px" }}>
-      <Header title="🫧 Calm Corner" onBack={() => { setBreathing(false); setScreen("home"); }} />
-      <Card style={{ textAlign: "center", padding: 32, marginBottom: 20, background: breathing ? `${bi.color}08` : T.surface }}>
-        <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 20 }}>Breathing Exercise</div>
+      <Header title="🫧 Calm Corner" onBack={() => { setBreathing(false); stopSound(); setScreen("home"); }} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 18px" }}>
+        A quiet place to slow down. Take what you need.
+      </p>
+
+      {/* Breathing exercise */}
+      <Card style={{ textAlign: "center", padding: 28, marginBottom: 16, background: breathing ? `${bi.color}08` : T.surface }}>
+        <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 14 }}>Breathing Exercise</div>
+        {!breathing && (
+          <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
+            {Object.entries(patterns).map(([key, p]) => (
+              <button key={key} onClick={() => setBreathPattern(key)} style={{
+                padding: "8px 12px", borderRadius: 10,
+                border: `1.5px solid ${breathPattern === key ? T.blue : T.border}`,
+                background: breathPattern === key ? T.blueGlow : T.surface,
+                color: breathPattern === key ? T.blue : T.soft,
+                fontFamily: T.font, fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}>{p.label}</button>
+            ))}
+          </div>
+        )}
         <div style={{
-          width: 140, height: 140, borderRadius: "50%", margin: "0 auto 20px",
-          background: breathing ? `${bi.color}20` : `${T.blue}10`,
+          width: circleSize, height: circleSize, borderRadius: "50%", margin: "0 auto 16px",
+          background: breathing ? `${bi.color}25` : `${T.blue}10`,
           border: `3px solid ${breathing ? bi.color : T.blue}40`,
           display: "flex", alignItems: "center", justifyContent: "center",
-          transition: "all 1s ease", transform: breathing ? `scale(${bi.scale})` : "scale(1)",
+          transition: "all 1s ease-in-out", transform: breathing ? `scale(${bi.scale})` : "scale(1)",
         }}>
-          <span style={{ fontSize: breathing ? 40 : 48 }}>{breathing ? breathCount : "🫁"}</span>
+          <span style={{ fontSize: breathing ? 44 : 48, fontWeight: 800, color: breathing ? bi.color : T.blue, fontFamily: T.font }}>
+            {breathing ? breathCount : "🫁"}
+          </span>
         </div>
         {breathing && <p style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: bi.color, margin: "0 0 16px" }}>{bi.label}</p>}
         <Btn color={breathing ? T.primary : T.blue} onClick={() => setBreathing(!breathing)}>
           {breathing ? "Stop" : "Start Breathing"}
         </Btn>
       </Card>
-      <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 14 }}>Ambient Sounds</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 24 }}>
-        {sounds.map(s => (
-          <button key={s.label} onClick={() => speak(s.label, settings)} style={{
-            padding: "18px 8px", borderRadius: 18, border: `1.5px solid ${T.border}`,
-            background: T.surface, cursor: "pointer", textAlign: "center",
-          }}>
-            <div style={{ fontSize: 32, marginBottom: 4 }}>{s.emoji}</div>
-            <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.text }}>{s.label}</div>
-          </button>
-        ))}
+
+      {/* Ambient sounds */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text }}>Ambient Sounds</div>
+        {activeSoundId && (
+          <button onClick={stopSound} style={{
+            padding: "6px 12px", borderRadius: 10, border: `1.5px solid ${T.primary}`,
+            background: T.primaryGlow, color: T.primary, fontFamily: T.font, fontSize: 12, fontWeight: 700, cursor: "pointer",
+          }}>⏹ Stop</button>
+        )}
       </div>
-      <Card style={{ background: T.purpleGlow, border: `1.5px solid ${T.purple}20` }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
+        {sounds.map(s => {
+          const isActive = activeSoundId === s.id;
+          return (
+            <button key={s.id} onClick={() => toggleSound(s)} style={{
+              padding: "18px 8px", borderRadius: 18,
+              border: `2px solid ${isActive ? s.color : T.border}`,
+              background: isActive ? `${s.color}18` : T.surface,
+              cursor: "pointer", textAlign: "center",
+              boxShadow: isActive ? `0 0 0 4px ${s.color}15` : "none",
+              transition: "all 0.2s ease",
+            }}>
+              <div style={{ fontSize: 32, marginBottom: 4, animation: isActive ? "pulse 2s ease-in-out infinite" : "none" }}>{s.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: isActive ? s.color : T.text }}>{s.label}</div>
+              {isActive && <div style={{ fontFamily: T.fontAlt, fontSize: 10, color: s.color, marginTop: 2 }}>▶ playing</div>}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24, padding: "10px 14px", background: T.surface, borderRadius: 12, border: `1.5px solid ${T.border}` }}>
+        <span style={{ fontSize: 16 }}>🔈</span>
+        <input type="range" min="0" max="1" step="0.01" value={volume} onChange={e => setVolume(parseFloat(e.target.value))}
+          style={{ flex: 1, accentColor: T.blue }} />
+        <span style={{ fontSize: 16 }}>🔊</span>
+      </div>
+
+      {/* Positive affirmation */}
+      <Card onClick={nextAff} style={{
+        background: `linear-gradient(135deg, ${T.pinkGlow}, ${T.purpleGlow})`,
+        border: `1.5px solid ${T.pink}30`, padding: 22, marginBottom: 16, cursor: "pointer", textAlign: "center",
+      }}>
+        <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.pink, marginBottom: 8, letterSpacing: 1 }}>💖 POSITIVE THOUGHT</div>
+        <div style={{ fontFamily: T.font, fontSize: 19, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>
+          "{affirmations[affIdx]}"
+        </div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 11, color: T.soft, marginTop: 10 }}>Tap for another</div>
+      </Card>
+
+      {/* Muscle relaxation */}
+      <Card style={{ padding: 22, marginBottom: 16, background: muscleActive ? T.greenGlow : T.surface, border: `1.5px solid ${muscleActive ? T.green + "40" : T.border}` }}>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.green, marginBottom: 12 }}>💆 Muscle Relaxation</div>
+        {muscleActive ? (
+          <div style={{ textAlign: "center", padding: "10px 0" }}>
+            <div style={{ fontSize: 64, marginBottom: 10 }}>{muscleSteps[muscleStep].emoji}</div>
+            <div style={{ fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text, marginBottom: 14 }}>
+              {muscleSteps[muscleStep].label}
+            </div>
+            <ProgressBar value={muscleStep + 1} max={muscleSteps.length} color={T.green} h={6} />
+            <button onClick={() => { setMuscleActive(false); setMuscleStep(0); }} style={{
+              marginTop: 14, padding: "8px 16px", border: `1.5px solid ${T.border}`, background: T.surface,
+              borderRadius: 10, fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.soft, cursor: "pointer",
+            }}>Stop</button>
+          </div>
+        ) : (
+          <>
+            <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 14px", lineHeight: 1.6 }}>
+              Tense and release each muscle group to let go of stress. I'll guide you.
+            </p>
+            <Btn color={T.green} onClick={() => { setMuscleStep(0); setMuscleActive(true); }}>Start Guide</Btn>
+          </>
+        )}
+      </Card>
+
+      {/* 5-4-3-2-1 grounding */}
+      <Card style={{ background: T.purpleGlow, border: `1.5px solid ${T.purple}20`, padding: 22 }}>
         <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.purple, marginBottom: 10 }}>🧘 5-4-3-2-1 Grounding</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft, margin: "0 0 10px" }}>Use your senses to feel right here, right now.</p>
         <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.text, lineHeight: 2.2 }}>
           <strong>5</strong> things you can <strong>see</strong> 👀<br />
           <strong>4</strong> things you can <strong>touch</strong> ✋<br />
