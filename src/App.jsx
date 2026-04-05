@@ -1888,6 +1888,7 @@ function GamesScreen({ setScreen }) {
     { id: "missing", emoji: "🔍", title: "What's Missing?", desc: "Memory puzzle", color: T.purple, glow: T.purpleGlow },
     { id: "story", emoji: "📖", title: "Story Builder", desc: "Make a silly story", color: T.yellow, glow: T.yellowGlow },
     { id: "maze", emoji: "🏁", title: "Maze Runner", desc: "Find the way out", color: T.green, glow: T.greenGlow },
+    { id: "music", emoji: "🎹", title: "Music Maker", desc: "Tap notes & make songs", color: T.pink, glow: T.pinkGlow },
   ];
 
   return (
@@ -3154,6 +3155,110 @@ function btnStyle(T) {
   };
 }
 
+// ─── MUSIC MAKER ─────────────────────────────────────────────────────────────
+function MusicMakerScreen({ setScreen }) {
+  const { addProgress } = useApp();
+  const audioRef = useRef(null);
+  const [recorded, setRecorded] = useState([]);
+  const [playing, setPlaying] = useState(false);
+
+  const notes = [
+    { name: "C", freq: 261.63, color: "#EF5BA1", emoji: "🎵" },
+    { name: "D", freq: 293.66, color: "#F59E0B", emoji: "🎶" },
+    { name: "E", freq: 329.63, color: "#EAB308", emoji: "🎵" },
+    { name: "F", freq: 349.23, color: "#3EBB6E", emoji: "🎶" },
+    { name: "G", freq: 392.00, color: "#4E8AE6", emoji: "🎵" },
+    { name: "A", freq: 440.00, color: "#8B6CF6", emoji: "🎶" },
+    { name: "B", freq: 493.88, color: "#EC4899", emoji: "🎵" },
+    { name: "C²", freq: 523.25, color: "#EF5BA1", emoji: "🎶" },
+  ];
+
+  function getCtx() {
+    if (!audioRef.current) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioRef.current = new AC();
+    }
+    return audioRef.current;
+  }
+
+  function playNote(freq, duration = 0.4) {
+    const ctx = getCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + duration);
+  }
+
+  function tap(note) {
+    playNote(note.freq);
+    setRecorded(r => [...r, note].slice(-16));
+  }
+
+  async function playback() {
+    if (playing || recorded.length === 0) return;
+    setPlaying(true);
+    for (let i = 0; i < recorded.length; i++) {
+      playNote(recorded[i].freq, 0.35);
+      await new Promise(r => setTimeout(r, 380));
+    }
+    setPlaying(false);
+    addProgress({ stars: 1 });
+  }
+
+  function clearSeq() { setRecorded([]); }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="🎹 Music Maker" onBack={() => setScreen("games")} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 16px", textAlign: "center" }}>Tap keys to make music!</p>
+      <Card style={{ padding: 14, marginBottom: 16, minHeight: 56, background: T.surface }}>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, marginBottom: 6 }}>Your song:</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, minHeight: 28 }}>
+          {recorded.length === 0 ? (
+            <span style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, fontStyle: "italic" }}>Tap the keys below...</span>
+          ) : recorded.map((n, i) => (
+            <span key={i} style={{
+              padding: "2px 8px", borderRadius: 8, background: n.color + "25",
+              color: n.color, fontFamily: T.font, fontSize: 13, fontWeight: 800,
+            }}>{n.name}</span>
+          ))}
+        </div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 16 }}>
+        {notes.map(n => (
+          <button key={n.name} onClick={() => tap(n)} style={{
+            padding: "28px 0", borderRadius: 16, border: "none",
+            background: `linear-gradient(135deg, ${n.color}, ${n.color}cc)`,
+            color: "#fff", fontFamily: T.font, fontSize: 22, fontWeight: 800,
+            cursor: "pointer", boxShadow: `0 6px 16px ${n.color}40`,
+          }}>
+            <div>{n.emoji}</div>
+            <div style={{ marginTop: 4 }}>{n.name}</div>
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <button onClick={playback} disabled={playing || recorded.length === 0} style={{
+          padding: 14, borderRadius: 14, border: "none",
+          background: recorded.length ? T.primary : T.border,
+          fontFamily: T.font, fontSize: 15, fontWeight: 800, color: "#fff",
+          cursor: recorded.length ? "pointer" : "default",
+        }}>{playing ? "▶ Playing..." : "▶ Play back"}</button>
+        <button onClick={clearSeq} style={{
+          padding: 14, borderRadius: 14, border: `2px solid ${T.border}`,
+          background: T.surface, fontFamily: T.font, fontSize: 15, fontWeight: 800, color: T.soft, cursor: "pointer",
+        }}>Clear</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── FOCUS TIMER ─────────────────────────────────────────────────────────────
 function FocusScreen({ setScreen }) {
   const { settings } = useApp();
@@ -4033,6 +4138,7 @@ export default function App() {
     game_missing: <WhatsMissingScreen setScreen={setScreen} />,
     game_story: <StoryBuilderScreen setScreen={setScreen} />,
     game_maze: <MazeRunnerScreen setScreen={setScreen} />,
+    game_music: <MusicMakerScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
