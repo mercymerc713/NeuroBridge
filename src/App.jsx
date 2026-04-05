@@ -85,6 +85,14 @@ function getMaxLevel(ageRange) {
   if (ageRange === "teen") return 2;
   return 3; // young_adult, adult
 }
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 function getFontScale(settings) {
   const base = settings.fontSize === "small" ? 0.85 : settings.fontSize === "large" ? 1.18 : 1;
   return base;
@@ -1037,6 +1045,36 @@ function Confetti({ active }) {
   );
 }
 
+function GameComplete({ score, total, onPlayAgain, onExit, title = "You Did It!" }) {
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+  const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : 1;
+  return (
+    <div style={{ padding: "24px 20px 120px", textAlign: "center" }}>
+      <Confetti active={true} />
+      <div style={{ fontSize: 90, marginTop: 20, marginBottom: 8 }}>🏆</div>
+      <h2 style={{ fontFamily: T.font, fontSize: 30, fontWeight: 800, color: T.text, margin: "0 0 6px" }}>{title}</h2>
+      <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, margin: "0 0 18px" }}>Great job finishing the round!</p>
+      <div style={{ fontSize: 44, marginBottom: 12, letterSpacing: 4 }}>
+        {"⭐".repeat(stars)}{"☆".repeat(3 - stars)}
+      </div>
+      <Card style={{ padding: 20, marginBottom: 20 }}>
+        <div style={{ fontFamily: T.font, fontSize: 36, fontWeight: 800, color: T.primary }}>{score} / {total}</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginTop: 4 }}>{pct}% correct</div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <button onClick={onExit} style={{
+          padding: 16, borderRadius: 16, border: `2px solid ${T.border}`, background: T.surface,
+          fontFamily: T.font, fontSize: 15, fontWeight: 800, color: T.soft, cursor: "pointer",
+        }}>← Back to Games</button>
+        <button onClick={onPlayAgain} style={{
+          padding: 16, borderRadius: 16, border: "none", background: T.primary,
+          fontFamily: T.font, fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer",
+        }}>Play Again ↻</button>
+      </div>
+    </div>
+  );
+}
+
 function PinEntry({ onSuccess, onCancel }) {
   const { settings } = useApp();
   const [pin, setPin] = useState("");
@@ -1924,13 +1962,20 @@ function GamesScreen({ setScreen }) {
 function WordGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = wordGames.filter(g => g.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(wordGames.filter(g => g.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const game = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const game = items[idx];
+
+  function restart() {
+    setItems(shuffleArr(wordGames.filter(g => g.level <= maxLevel)));
+    setIdx(0); setFeedback(""); setScore(0); setShowHint(false); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(choice) {
     if (feedback) return;
@@ -1938,7 +1983,11 @@ function WordGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak("Great job!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setShowHint(false); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback(""); setShowHint(false);
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Try again!", settings);
       setTimeout(() => setFeedback(""), 1000);
@@ -2037,12 +2086,20 @@ function ColorGameScreen({ setScreen }) {
 function PatternGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = patternData.filter(p => p.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(patternData.filter(p => p.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const p = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const p = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(patternData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setFeedback(""); setScore(0); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(val) {
     if (feedback) return;
@@ -2050,7 +2107,11 @@ function PatternGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak("You found the pattern!", settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else { setFeedback("wrong"); speak("Look again", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
@@ -2093,12 +2154,20 @@ function PatternGameScreen({ setScreen }) {
 function MathGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = mathProblems.filter(p => p.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(mathProblems.filter(p => p.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const prob = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const prob = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(mathProblems.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(val) {
     if (feedback) return;
@@ -2106,7 +2175,11 @@ function MathGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak(`Yes! ${prob.q} equals ${prob.a}`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else { setFeedback("wrong"); speak("Not quite", settings); setTimeout(() => setFeedback(""), 800); }
   }
 
@@ -2220,12 +2293,20 @@ function MemoryGameScreen({ setScreen }) {
 function RhymingGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = rhymingData.filter(r => r.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(rhymingData.filter(r => r.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const item = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const item = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(rhymingData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(choice) {
     if (feedback) return;
@@ -2233,7 +2314,11 @@ function RhymingGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak(`Yes! ${item.word} rhymes with ${item.answer}!`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else {
       setFeedback("wrong"); speak("Try another one!", settings);
       setTimeout(() => setFeedback(""), 800);
@@ -2274,12 +2359,20 @@ function RhymingGameScreen({ setScreen }) {
 function ShapeSortScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = shapeSortData.filter(s => s.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(shapeSortData.filter(s => s.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const item = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const item = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(shapeSortData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(emoji) {
     if (feedback) return;
@@ -2287,7 +2380,11 @@ function ShapeSortScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak(`Right! That one doesn't belong!`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else {
       setFeedback("wrong"); speak("That one fits! Look again.", settings);
       setTimeout(() => setFeedback(""), 800);
@@ -2328,14 +2425,22 @@ function ShapeSortScreen({ setScreen }) {
 function SpellingBeeScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = spellingWords.filter(w => w.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(spellingWords.filter(w => w.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [typed, setTyped] = useState("");
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [revealed, setRevealed] = useState(false);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+
+  function restart() {
+    setItems(shuffleArr(spellingWords.filter(w => w.level <= maxLevel)));
+    setIdx(0); setTyped(""); setFeedback(""); setScore(0); setRevealed(false); setDone(false);
+  }
+
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function addLetter(l) {
     if (feedback) return;
@@ -2354,7 +2459,8 @@ function SpellingBeeScreen({ setScreen }) {
       setTimeout(() => setShowConfetti(false), 2000);
       setTimeout(() => {
         setFeedback(""); setTyped(""); setRevealed(false);
-        setIdx(i => (i + 1) % filtered.length);
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
       }, 1800);
     } else {
       setFeedback("wrong"); speak("Try again!", settings);
@@ -2441,17 +2547,25 @@ function SpellingBeeScreen({ setScreen }) {
 function OppositeMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = oppositeData.filter(o => o.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(oppositeData.filter(o => o.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(oppositeData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(choice) {
     if (feedback) return;
@@ -2460,7 +2574,11 @@ function OppositeMatchScreen({ setScreen }) {
       speak(`Yes! ${current.word} and ${current.answer} are opposites!`, settings);
       addProgress({ stars: 1, wordsSpoken: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Try again!", settings);
       setTimeout(() => setFeedback(""), 900);
@@ -2501,12 +2619,20 @@ function OppositeMatchScreen({ setScreen }) {
 function CountingGameScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = countingData.filter(c => c.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(countingData.filter(c => c.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(countingData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(n) {
     if (feedback) return;
@@ -2515,7 +2641,11 @@ function CountingGameScreen({ setScreen }) {
       speak(`Yes! ${current.answer}!`, settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Count again!", settings);
       setTimeout(() => setFeedback(""), 900);
@@ -2558,14 +2688,16 @@ function CountingGameScreen({ setScreen }) {
 function SizeSortScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = sizeSortData.filter(s => s.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(sizeSortData.filter(s => s.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [order, setOrder] = useState([]);
   const [available, setAvailable] = useState([]);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) {
@@ -2574,6 +2706,12 @@ function SizeSortScreen({ setScreen }) {
       setFeedback("");
     }
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(sizeSortData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setOrder([]); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pickItem(item) {
     if (feedback) return;
@@ -2588,7 +2726,10 @@ function SizeSortScreen({ setScreen }) {
         speak("Perfect order!", settings);
         addProgress({ stars: 1 });
         setTimeout(() => setShowConfetti(false), 2000);
-        setTimeout(() => setIdx(i => (i + 1) % filtered.length), 1800);
+        setTimeout(() => {
+          if (idx + 1 >= items.length) setDone(true);
+          else setIdx(i => i + 1);
+        }, 1800);
       } else {
         setFeedback("wrong"); speak("Try again!", settings);
         setTimeout(() => {
@@ -2648,17 +2789,25 @@ function SizeSortScreen({ setScreen }) {
 function ClockReaderScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = clockData.filter(c => c.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(clockData.filter(c => c.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(clockData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(c) {
     if (feedback) return;
@@ -2667,7 +2816,11 @@ function ClockReaderScreen({ setScreen }) {
       speak(`Yes! ${current.display}`, settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Look again!", settings);
       setTimeout(() => setFeedback(""), 900);
@@ -2730,17 +2883,25 @@ function ClockReaderScreen({ setScreen }) {
 function MoneyMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = moneyData.filter(m => m.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(moneyData.filter(m => m.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(moneyData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(c) {
     if (feedback) return;
@@ -2749,7 +2910,11 @@ function MoneyMatchScreen({ setScreen }) {
       speak(`Yes! ${current.display}`, settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Add them up again!", settings);
       setTimeout(() => setFeedback(""), 900);
@@ -2810,17 +2975,25 @@ function MoneyMatchScreen({ setScreen }) {
 function EmotionMatchScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = emotionMatchData.filter(e => e.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(emotionMatchData.filter(e => e.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
   }, [idx, current]);
+
+  function restart() {
+    setItems(shuffleArr(emotionMatchData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(c) {
     if (feedback) return;
@@ -2829,7 +3002,11 @@ function EmotionMatchScreen({ setScreen }) {
       speak(`Yes! This face looks ${current.answer}.`, settings);
       addProgress({ stars: 1, wordsSpoken: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Look again!", settings);
       setTimeout(() => setFeedback(""), 900);
@@ -2868,14 +3045,16 @@ function EmotionMatchScreen({ setScreen }) {
 function WhatsMissingScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = missingData.filter(m => m.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(missingData.filter(m => m.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [phase, setPhase] = useState("show"); // show, hide, answer
   const [shuffled, setShuffled] = useState([]);
-  const current = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const current = items[idx];
+  const filtered = items;
 
   useEffect(() => {
     setPhase("show");
@@ -2885,6 +3064,12 @@ function WhatsMissingScreen({ setScreen }) {
     return () => clearTimeout(t);
   }, [idx, current]);
 
+  function restart() {
+    setItems(shuffleArr(missingData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setPhase("show"); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
+
   function pick(c) {
     if (feedback) return;
     if (c === current.missing) {
@@ -2892,7 +3077,10 @@ function WhatsMissingScreen({ setScreen }) {
       speak("Yes! That was missing!", settings);
       addProgress({ stars: 1 });
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setIdx(i => (i + 1) % filtered.length); }, 1800);
+      setTimeout(() => {
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1800);
     } else {
       setFeedback("wrong"); speak("Think again!", settings);
       setTimeout(() => setFeedback(""), 900);
