@@ -1884,6 +1884,7 @@ function GamesScreen({ setScreen }) {
     { id: "sizes", emoji: "📏", title: "Size Sort", desc: "Smallest to biggest", color: T.pink, glow: T.pinkGlow },
     { id: "clock", emoji: "🕐", title: "Clock Reader", desc: "What time is it?", color: T.blue, glow: T.blueGlow },
     { id: "money", emoji: "💰", title: "Money Match", desc: "Count the coins", color: T.green, glow: T.greenGlow },
+    { id: "emotions", emoji: "🙂", title: "Emotion Match", desc: "Name the feeling", color: T.pink, glow: T.pinkGlow },
   ];
 
   return (
@@ -2801,6 +2802,64 @@ function MoneyMatchScreen({ setScreen }) {
   );
 }
 
+// ─── EMOTION MATCH ───────────────────────────────────────────────────────────
+function EmotionMatchScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = emotionMatchData.filter(e => e.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! This face looks ${current.answer}.`, settings);
+      addProgress({ stars: 1, wordsSpoken: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Look again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🙂 Emotion Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.pink} h={6} />
+      <Card style={{ textAlign: "center", padding: 32, marginTop: 16, marginBottom: 20 }}>
+        <div style={{ fontSize: 110, lineHeight: 1, marginBottom: 10 }}>{current.face}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: 0 }}>How is this person feeling?</p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: 20, borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 22, fontWeight: 800, color: col,
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Yes!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Look again! 💪</div>}
+    </div>
+  );
+}
+
 // ─── FOCUS TIMER ─────────────────────────────────────────────────────────────
 function FocusScreen({ setScreen }) {
   const { settings } = useApp();
@@ -3676,6 +3735,7 @@ export default function App() {
     game_sizes: <SizeSortScreen setScreen={setScreen} />,
     game_clock: <ClockReaderScreen setScreen={setScreen} />,
     game_money: <MoneyMatchScreen setScreen={setScreen} />,
+    game_emotions: <EmotionMatchScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
