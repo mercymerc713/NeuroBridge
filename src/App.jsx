@@ -2293,12 +2293,20 @@ function MemoryGameScreen({ setScreen }) {
 function RhymingGameScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
-  const filtered = rhymingData.filter(r => r.level <= maxLevel);
+  const [items, setItems] = useState(() => shuffleArr(rhymingData.filter(r => r.level <= maxLevel)));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const item = filtered[idx % filtered.length];
+  const [done, setDone] = useState(false);
+  const item = items[idx];
+  const filtered = items;
+
+  function restart() {
+    setItems(shuffleArr(rhymingData.filter(x => x.level <= maxLevel)));
+    setIdx(0); setScore(0); setFeedback(""); setDone(false);
+  }
+  if (done) return <GameComplete score={score} total={items.length} onPlayAgain={restart} onExit={() => setScreen("games")} />;
 
   function pick(choice) {
     if (feedback) return;
@@ -2306,7 +2314,11 @@ function RhymingGameScreen({ setScreen }) {
       setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
       speak(`Yes! ${item.word} rhymes with ${item.answer}!`, settings);
       setTimeout(() => setShowConfetti(false), 2000);
-      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1500);
+      setTimeout(() => {
+        setFeedback("");
+        if (idx + 1 >= items.length) setDone(true);
+        else setIdx(i => i + 1);
+      }, 1500);
     } else {
       setFeedback("wrong"); speak("Try another one!", settings);
       setTimeout(() => setFeedback(""), 800);
