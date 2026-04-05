@@ -1879,6 +1879,7 @@ function GamesScreen({ setScreen }) {
     { id: "rhyming", emoji: "🎤", title: "Rhyme Time", desc: "Which word rhymes?", color: T.yellow, glow: T.yellowGlow },
     { id: "shapes", emoji: "🧩", title: "Odd One Out", desc: "Which doesn't belong?", color: T.primary, glow: T.primaryGlow },
     { id: "spelling", emoji: "🐝", title: "Spelling Bee", desc: "Spell the word", color: T.yellow, glow: T.yellowGlow },
+    { id: "opposites", emoji: "↔️", title: "Opposite Match", desc: "Find the opposite", color: T.purple, glow: T.purpleGlow },
   ];
 
   return (
@@ -2423,6 +2424,66 @@ function SpellingBeeScreen({ setScreen }) {
       )}
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 14, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Perfect!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 14, fontFamily: T.font, fontSize: 16, color: T.primary }}>Not quite! 💪</div>}
+    </div>
+  );
+}
+
+// ─── OPPOSITE MATCH ──────────────────────────────────────────────────────────
+function OppositeMatchScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = oppositeData.filter(o => o.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(choice) {
+    if (feedback) return;
+    if (choice === current.answer) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.word} and ${current.answer} are opposites!`, settings);
+      addProgress({ stars: 1, wordsSpoken: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Try again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="↔️ Opposite Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.purple} h={6} />
+      <Card style={{ textAlign: "center", padding: 32, marginTop: 16, marginBottom: 20 }}>
+        <div style={{ fontSize: 70, marginBottom: 8 }}>{current.emoji}</div>
+        <div style={{ fontFamily: T.font, fontSize: 32, fontWeight: 800, color: T.text, marginBottom: 8 }}>{current.word}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: 0 }}>What's the opposite?</p>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          if (feedback === "wrong" && c === current.answer) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: 20, borderRadius: 18, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 22, fontWeight: 800, color: col, transition: "all 0.15s ease",
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Opposites!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Hmm, not quite! 💪</div>}
     </div>
   );
 }
@@ -3297,6 +3358,7 @@ export default function App() {
     game_rhyming: <RhymingGameScreen setScreen={setScreen} />,
     game_shapes: <ShapeSortScreen setScreen={setScreen} />,
     game_spelling: <SpellingBeeScreen setScreen={setScreen} />,
+    game_opposites: <OppositeMatchScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
