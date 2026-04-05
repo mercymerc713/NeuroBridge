@@ -1886,6 +1886,7 @@ function GamesScreen({ setScreen }) {
     { id: "money", emoji: "💰", title: "Money Match", desc: "Count the coins", color: T.green, glow: T.greenGlow },
     { id: "emotions", emoji: "🙂", title: "Emotion Match", desc: "Name the feeling", color: T.pink, glow: T.pinkGlow },
     { id: "missing", emoji: "🔍", title: "What's Missing?", desc: "Memory puzzle", color: T.purple, glow: T.purpleGlow },
+    { id: "story", emoji: "📖", title: "Story Builder", desc: "Make a silly story", color: T.yellow, glow: T.yellowGlow },
   ];
 
   return (
@@ -2935,6 +2936,114 @@ function WhatsMissingScreen({ setScreen }) {
   );
 }
 
+// ─── STORY BUILDER ───────────────────────────────────────────────────────────
+function StoryBuilderScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const [templateIdx, setTemplateIdx] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [blankIdx, setBlankIdx] = useState(0);
+  const [done, setDone] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  if (templateIdx === null) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="📖 Story Builder" onBack={() => setScreen("games")} />
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 16px" }}>Pick a story to build!</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {storyTemplates.map((t, i) => (
+            <Card key={t.id} onClick={() => { setTemplateIdx(i); setAnswers({}); setBlankIdx(0); setDone(false); }}
+              style={{ display: "flex", alignItems: "center", gap: 16, padding: 20 }}>
+              <div style={{ fontSize: 44 }}>{t.emoji}</div>
+              <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text }}>{t.title}</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const template = storyTemplates[templateIdx];
+  const currentBlank = template.blanks[blankIdx];
+
+  function pick(choice) {
+    const next = { ...answers, [currentBlank.key]: choice };
+    setAnswers(next);
+    if (blankIdx + 1 < template.blanks.length) {
+      setBlankIdx(blankIdx + 1);
+    } else {
+      setDone(true);
+      setShowConfetti(true);
+      addProgress({ stars: 2, wordsSpoken: template.blanks.length });
+      // build and speak the story
+      let story = template.template;
+      Object.entries(next).forEach(([k, v]) => {
+        story = story.replace(new RegExp(`\\{${k}\\}`, "g"), v);
+      });
+      speak(story, settings);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }
+
+  function reset() { setTemplateIdx(null); setAnswers({}); setBlankIdx(0); setDone(false); }
+
+  if (done) {
+    let story = template.template;
+    Object.entries(answers).forEach(([k, v]) => {
+      story = story.replace(new RegExp(`\\{${k}\\}`, "g"), `__${v}__`);
+    });
+    const parts = story.split(/(__[^_]+__)/g);
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Confetti active={showConfetti} />
+        <Header title="📖 Your Story" onBack={() => setScreen("games")} />
+        <Card style={{ padding: 24, marginTop: 16, marginBottom: 20 }}>
+          <div style={{ fontSize: 56, textAlign: "center", marginBottom: 10 }}>{template.emoji}</div>
+          <div style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text, textAlign: "center", marginBottom: 14 }}>{template.title}</div>
+          <p style={{ fontFamily: T.fontAlt, fontSize: 17, color: T.text, lineHeight: 1.7, margin: 0 }}>
+            {parts.map((p, i) => {
+              if (p.startsWith("__") && p.endsWith("__")) {
+                return <span key={i} style={{ fontWeight: 800, color: T.primary, background: T.primaryGlow, padding: "2px 6px", borderRadius: 6 }}>{p.slice(2, -2)}</span>;
+              }
+              return <span key={i}>{p}</span>;
+            })}
+          </p>
+        </Card>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <button onClick={() => { let st = template.template; Object.entries(answers).forEach(([k, v]) => { st = st.replace(new RegExp(`\\{${k}\\}`, "g"), v); }); speak(st, settings); }} style={{
+            padding: 14, borderRadius: 14, border: `2px solid ${T.primary}`, background: T.primaryGlow,
+            fontFamily: T.font, fontSize: 15, fontWeight: 800, color: T.primary, cursor: "pointer",
+          }}>🔊 Read it</button>
+          <button onClick={reset} style={{
+            padding: 14, borderRadius: 14, border: "none", background: T.green,
+            fontFamily: T.font, fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer",
+          }}>+ New Story</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title={`📖 ${template.title}`} onBack={reset} />
+      <ProgressBar value={blankIdx + 1} max={template.blanks.length} color={T.yellow} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <div style={{ fontSize: 56, marginBottom: 10 }}>{template.emoji}</div>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 6px" }}>Step {blankIdx + 1} of {template.blanks.length}</p>
+        <p style={{ fontFamily: T.font, fontSize: 20, fontWeight: 700, color: T.text, margin: 0 }}>{currentBlank.label}</p>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        {currentBlank.choices.map(c => (
+          <button key={c} onClick={() => pick(c)} style={{
+            padding: 18, borderRadius: 16, border: `2px solid ${T.border}`, background: T.surface,
+            fontFamily: T.font, fontSize: 17, fontWeight: 700, color: T.text, cursor: "pointer",
+          }}>{c}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── FOCUS TIMER ─────────────────────────────────────────────────────────────
 function FocusScreen({ setScreen }) {
   const { settings } = useApp();
@@ -3812,6 +3921,7 @@ export default function App() {
     game_money: <MoneyMatchScreen setScreen={setScreen} />,
     game_emotions: <EmotionMatchScreen setScreen={setScreen} />,
     game_missing: <WhatsMissingScreen setScreen={setScreen} />,
+    game_story: <StoryBuilderScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
