@@ -1883,6 +1883,7 @@ function GamesScreen({ setScreen }) {
     { id: "counting", emoji: "🔢", title: "Counting", desc: "Count the objects", color: T.blue, glow: T.blueGlow },
     { id: "sizes", emoji: "📏", title: "Size Sort", desc: "Smallest to biggest", color: T.pink, glow: T.pinkGlow },
     { id: "clock", emoji: "🕐", title: "Clock Reader", desc: "What time is it?", color: T.blue, glow: T.blueGlow },
+    { id: "money", emoji: "💰", title: "Money Match", desc: "Count the coins", color: T.green, glow: T.greenGlow },
   ];
 
   return (
@@ -2716,6 +2717,86 @@ function ClockReaderScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Right!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Look again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── MONEY MATCH ─────────────────────────────────────────────────────────────
+function MoneyMatchScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = moneyData.filter(m => m.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.display) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.display}`, settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Add them up again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  function coinColor(c) {
+    if (c.startsWith("$")) return T.green;
+    if (c === "25¢") return T.soft;
+    if (c === "10¢") return T.blue;
+    if (c === "5¢") return T.purple;
+    return T.primary;
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="💰 Money Match" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.green} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>How much money?</p>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+          {current.coins.map((c, i) => {
+            const isBill = c.startsWith("$");
+            return (
+              <div key={i} style={{
+                width: isBill ? 74 : 56, height: isBill ? 42 : 56,
+                borderRadius: isBill ? 8 : "50%",
+                background: coinColor(c),
+                color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: T.font, fontSize: 14, fontWeight: 800,
+                boxShadow: `0 4px 12px ${coinColor(c)}40`,
+              }}>{c}</div>
+            );
+          })}
+        </div>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.display) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: "18px 0", borderRadius: 16, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 18, fontWeight: 800, color: col,
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Correct!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Count again! 💪</div>}
     </div>
   );
 }
@@ -3594,6 +3675,7 @@ export default function App() {
     game_counting: <CountingGameScreen setScreen={setScreen} />,
     game_sizes: <SizeSortScreen setScreen={setScreen} />,
     game_clock: <ClockReaderScreen setScreen={setScreen} />,
+    game_money: <MoneyMatchScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
