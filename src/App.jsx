@@ -1882,6 +1882,7 @@ function GamesScreen({ setScreen }) {
     { id: "opposites", emoji: "↔️", title: "Opposite Match", desc: "Find the opposite", color: T.purple, glow: T.purpleGlow },
     { id: "counting", emoji: "🔢", title: "Counting", desc: "Count the objects", color: T.blue, glow: T.blueGlow },
     { id: "sizes", emoji: "📏", title: "Size Sort", desc: "Smallest to biggest", color: T.pink, glow: T.pinkGlow },
+    { id: "clock", emoji: "🕐", title: "Clock Reader", desc: "What time is it?", color: T.blue, glow: T.blueGlow },
   ];
 
   return (
@@ -2633,6 +2634,88 @@ function SizeSortScreen({ setScreen }) {
       </div>
       {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Perfect!</div>}
       {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Try again! 💪</div>}
+    </div>
+  );
+}
+
+// ─── CLOCK READER ────────────────────────────────────────────────────────────
+function ClockReaderScreen({ setScreen }) {
+  const { settings, addProgress } = useApp();
+  const maxLevel = getMaxLevel(settings.ageRange);
+  const filtered = clockData.filter(c => c.level <= maxLevel);
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [shuffled, setShuffled] = useState([]);
+  const current = filtered[idx % filtered.length];
+
+  useEffect(() => {
+    if (current) setShuffled([...current.choices].sort(() => Math.random() - 0.5));
+  }, [idx, current]);
+
+  function pick(c) {
+    if (feedback) return;
+    if (c === current.display) {
+      setFeedback("correct"); setScore(s => s + 1); setShowConfetti(true);
+      speak(`Yes! ${current.display}`, settings);
+      addProgress({ stars: 1 });
+      setTimeout(() => setShowConfetti(false), 2000);
+      setTimeout(() => { setFeedback(""); setIdx(i => (i + 1) % filtered.length); }, 1800);
+    } else {
+      setFeedback("wrong"); speak("Look again!", settings);
+      setTimeout(() => setFeedback(""), 900);
+    }
+  }
+
+  // hand angles
+  const hourDeg = ((current.hour % 12) * 30) + (current.minute * 0.5) - 90;
+  const minDeg = (current.minute * 6) - 90;
+  const R = 110;
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Confetti active={showConfetti} />
+      <Header title="🕐 Clock Reader" onBack={() => setScreen("games")}
+        right={<span style={{ fontFamily: T.font, fontSize: 16, color: T.green, fontWeight: 700 }}>⭐ {score}</span>} />
+      <ProgressBar value={idx + 1} max={filtered.length} color={T.blue} h={6} />
+      <Card style={{ textAlign: "center", padding: 24, marginTop: 16, marginBottom: 20 }}>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 14px" }}>What time is it?</p>
+        <svg width={R * 2 + 20} height={R * 2 + 20} style={{ display: "block", margin: "0 auto" }}>
+          <circle cx={R + 10} cy={R + 10} r={R} fill={T.surface} stroke={T.primary} strokeWidth={4} />
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i * 30 - 90) * Math.PI / 180;
+            const x = R + 10 + Math.cos(a) * (R - 18);
+            const y = R + 10 + Math.sin(a) * (R - 18) + 5;
+            return <text key={i} x={x} y={y} textAnchor="middle" fontFamily={T.font} fontSize={16} fontWeight={800} fill={T.text}>{i === 0 ? 12 : i}</text>;
+          })}
+          {/* hour hand */}
+          <line x1={R + 10} y1={R + 10}
+            x2={R + 10 + Math.cos(hourDeg * Math.PI / 180) * (R - 45)}
+            y2={R + 10 + Math.sin(hourDeg * Math.PI / 180) * (R - 45)}
+            stroke={T.text} strokeWidth={6} strokeLinecap="round" />
+          {/* minute hand */}
+          <line x1={R + 10} y1={R + 10}
+            x2={R + 10 + Math.cos(minDeg * Math.PI / 180) * (R - 25)}
+            y2={R + 10 + Math.sin(minDeg * Math.PI / 180) * (R - 25)}
+            stroke={T.primary} strokeWidth={4} strokeLinecap="round" />
+          <circle cx={R + 10} cy={R + 10} r={6} fill={T.primary} />
+        </svg>
+      </Card>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        {shuffled.map(c => {
+          let bg = T.surface, border = T.border, col = T.text;
+          if (feedback === "correct" && c === current.display) { bg = T.greenGlow; border = T.green; col = T.green; }
+          return (
+            <button key={c} onClick={() => pick(c)} style={{
+              padding: "18px 0", borderRadius: 16, border: `2.5px solid ${border}`, background: bg, cursor: "pointer",
+              fontFamily: T.font, fontSize: 20, fontWeight: 800, color: col,
+            }}>{c}</button>
+          );
+        })}
+      </div>
+      {feedback === "correct" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 22, fontWeight: 800, color: T.green }}>🎉 Right!</div>}
+      {feedback === "wrong" && <div style={{ textAlign: "center", padding: 16, fontFamily: T.font, fontSize: 18, color: T.primary }}>Look again! 💪</div>}
     </div>
   );
 }
@@ -3510,6 +3593,7 @@ export default function App() {
     game_opposites: <OppositeMatchScreen setScreen={setScreen} />,
     game_counting: <CountingGameScreen setScreen={setScreen} />,
     game_sizes: <SizeSortScreen setScreen={setScreen} />,
+    game_clock: <ClockReaderScreen setScreen={setScreen} />,
     focus: <FocusScreen setScreen={setScreen} />,
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
