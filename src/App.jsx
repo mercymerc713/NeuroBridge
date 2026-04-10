@@ -1518,7 +1518,43 @@ function Confetti({ active }) {
   );
 }
 
+// Lookup from screen key to { key, label } so GameComplete can auto-record
+// session history without every game having to pass its own identifier.
+const GAME_META = {
+  game_words:    { key: "words",     label: "🔤 Word Match" },
+  game_colors:   { key: "colors",    label: "🎨 Color Match" },
+  game_patterns: { key: "patterns",  label: "🔷 Pattern Finder" },
+  game_math:     { key: "math",      label: "🔢 Number Fun" },
+  game_memory:   { key: "memory",    label: "🧠 Memory Match" },
+  game_rhyming:  { key: "rhyming",   label: "🎤 Rhyme Time" },
+  game_shapes:   { key: "shapes",    label: "🧩 Odd One Out" },
+  game_spelling: { key: "spelling",  label: "🐝 Spelling Bee" },
+  game_opposites:{ key: "opposites", label: "↔️ Opposite Match" },
+  game_counting: { key: "counting",  label: "🔢 Counting" },
+  game_sizes:    { key: "sizes",     label: "📏 Size Sort" },
+  game_clock:    { key: "clock",     label: "🕐 Clock Reader" },
+  game_money:    { key: "money",     label: "💰 Money Match" },
+  game_emotions: { key: "emotions",  label: "🙂 Emotion Match" },
+  game_missing:  { key: "missing",   label: "🔍 What's Missing" },
+  game_story:    { key: "story",     label: "📖 Story Builder" },
+  game_maze:     { key: "maze",      label: "🏁 Maze Runner" },
+  game_music:    { key: "music",     label: "🎹 Music Maker" },
+};
+
 function GameComplete({ score, total, onPlayAgain, onExit, title = "You Did It!" }) {
+  const { currentScreen, addProgress } = useApp();
+  const recordedRef = useRef(false);
+  useEffect(() => {
+    if (recordedRef.current) return;
+    recordedRef.current = true;
+    const meta = GAME_META[currentScreen];
+    if (meta) {
+      addProgress({
+        gamesPlayed: 1,
+        session: { key: meta.key, label: meta.label, score, total, ts: Date.now() },
+      });
+    }
+  }, []);
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
   const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : 1;
   return (
@@ -5578,8 +5614,45 @@ function ParentDashboard({ setScreen }) {
     return <PinEntry onSuccess={() => setShowPin(false)} onCancel={() => setScreen("settings")} />;
   }
 
-  const today = new Date().toISOString().split("T")[0];
-  const todayLog = progress.dailyLog[today] || {};
+  // Build last-7-days series from dailyLog
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000);
+    const iso = d.toISOString().split("T")[0];
+    const log = progress.dailyLog?.[iso] || {};
+    days.push({
+      iso,
+      label: d.toLocaleDateString(undefined, { weekday: "short" }),
+      stars: log.stars || 0,
+      gamesPlayed: log.gamesPlayed || 0,
+    });
+  }
+  const maxStars = Math.max(1, ...days.map(d => d.stars));
+  const weekStars = days.reduce((sum, d) => sum + d.stars, 0);
+  const weekGames = days.reduce((sum, d) => sum + d.gamesPlayed, 0);
+
+  // Per-game breakdown from sessions (last 50)
+  const recentSessions = (progress.sessions || []).slice(0, 50);
+  const gameStats = {};
+  for (const s of recentSessions) {
+    if (!gameStats[s.key]) gameStats[s.key] = { key: s.key, label: s.label, plays: 0, correct: 0, total: 0 };
+    gameStats[s.key].plays += 1;
+    gameStats[s.key].correct += s.score || 0;
+    gameStats[s.key].total += s.total || 0;
+  }
+  const topGames = Object.values(gameStats).sort((a, b) => b.plays - a.plays).slice(0, 5);
+
+  function fmtTime(ts) {
+    const d = new Date(ts);
+    const today = new Date();
+    const yesterday = new Date(Date.now() - 86400000);
+    const isToday = d.toDateString() === today.toDateString();
+    const isYesterday = d.toDateString() === yesterday.toDateString();
+    const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    if (isToday) return `Today ${time}`;
+    if (isYesterday) return `Yesterday ${time}`;
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + time;
+  }
 
   return (
     <div style={{ padding: "24px 20px 120px" }}>
@@ -5589,6 +5662,46 @@ function ParentDashboard({ setScreen }) {
         <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Overview</div>
         <div style={{ fontFamily: T.fontAlt, fontSize: 13, opacity: 0.85 }}>
           {settings.ageRange ? `${ageRanges.find(a => a.id === settings.ageRange)?.label} Mode` : "No age set"} · {progress.streak} day streak
+        </div>
+      </Card>
+
+      {/* Last 7 days chart */}
+      <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>📈 This Week</div>
+      <Card style={{ padding: 18, marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 26, fontWeight: 800, color: T.text }}>{weekStars}</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>stars this week</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.soft }}>{weekGames} games</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>played</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100, marginBottom: 6 }}>
+          {days.map((d, i) => {
+            const h = Math.round((d.stars / maxStars) * 88);
+            const isToday = i === days.length - 1;
+            return (
+              <div key={d.iso} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: "100%" }}>
+                <div style={{ fontFamily: T.font, fontSize: 10, fontWeight: 700, color: T.soft, marginBottom: 4, minHeight: 12 }}>
+                  {d.stars > 0 ? d.stars : ""}
+                </div>
+                <div style={{
+                  width: "100%", height: Math.max(4, h), borderRadius: "6px 6px 0 0",
+                  background: isToday ? T.primary : `${T.primary}60`,
+                }} />
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", gap: 6 }}>
+          {days.map((d, i) => (
+            <div key={d.iso} style={{
+              flex: 1, textAlign: "center", fontFamily: T.font, fontSize: 10,
+              fontWeight: i === days.length - 1 ? 700 : 500, color: i === days.length - 1 ? T.primary : T.soft,
+            }}>{d.label}</div>
+          ))}
         </div>
       </Card>
 
@@ -5609,6 +5722,64 @@ function ParentDashboard({ setScreen }) {
           </Card>
         ))}
       </div>
+
+      {/* Top games */}
+      {topGames.length > 0 && (
+        <>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>🏆 Top Games</div>
+          <Card style={{ padding: 14, marginBottom: 20 }}>
+            {topGames.map((g, i) => {
+              const acc = g.total > 0 ? Math.round((g.correct / g.total) * 100) : 0;
+              return (
+                <div key={g.key} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "10px 0",
+                  borderBottom: i < topGames.length - 1 ? `1px solid ${T.border}` : "none",
+                }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.label}</div>
+                    <div style={{ fontFamily: T.fontAlt, fontSize: 11, color: T.soft, marginTop: 2 }}>
+                      {g.plays} play{g.plays === 1 ? "" : "s"} · {acc}% accuracy
+                    </div>
+                  </div>
+                  <div style={{
+                    fontFamily: T.font, fontSize: 13, fontWeight: 800, color: acc >= 80 ? T.green : acc >= 50 ? T.yellow : T.primary,
+                    padding: "4px 10px", borderRadius: 10,
+                    background: acc >= 80 ? T.greenGlow : acc >= 50 ? T.yellowGlow : T.primaryGlow,
+                  }}>{acc}%</div>
+                </div>
+              );
+            })}
+          </Card>
+        </>
+      )}
+
+      {/* Recent sessions */}
+      {recentSessions.length > 0 && (
+        <>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>📋 Recent Sessions</div>
+          <Card style={{ padding: 4, marginBottom: 20 }}>
+            {recentSessions.slice(0, 15).map((s, i) => {
+              const acc = s.total > 0 ? Math.round((s.score / s.total) * 100) : 0;
+              return (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "12px 14px",
+                  borderBottom: i < Math.min(recentSessions.length, 15) - 1 ? `1px solid ${T.border}` : "none",
+                }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</div>
+                    <div style={{ fontFamily: T.fontAlt, fontSize: 11, color: T.soft, marginTop: 2 }}>{fmtTime(s.ts)}</div>
+                  </div>
+                  <div style={{ fontFamily: T.font, fontSize: 12, color: T.soft, textAlign: "right" }}>
+                    <div style={{ fontWeight: 800, color: T.text }}>{s.score}/{s.total}</div>
+                    <div style={{ fontSize: 10 }}>{acc}%</div>
+                  </div>
+                </div>
+              );
+            })}
+          </Card>
+        </>
+      )}
 
       <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>🏅 Badges Earned</div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
@@ -5699,6 +5870,23 @@ export default function App() {
       const isNewDay = prev.lastActiveDate !== today;
       const streak = isNewDay ? (wasActiveYesterday ? prev.streak + 1 : 1) : prev.streak;
 
+      // Merge daily counters (excluding session which is an object, not a number)
+      const dailyDelta = { ...patch };
+      delete dailyDelta.session;
+      const prevDay = prev.dailyLog?.[today] || {};
+      const mergedDay = { ...prevDay };
+      for (const k of Object.keys(dailyDelta)) {
+        if (typeof dailyDelta[k] === "number") {
+          mergedDay[k] = (prevDay[k] || 0) + dailyDelta[k];
+        }
+      }
+
+      // Append session (capped at 200 most recent)
+      let sessions = prev.sessions || [];
+      if (patch.session) {
+        sessions = [patch.session, ...sessions].slice(0, 200);
+      }
+
       const next = {
         ...prev,
         totalStars: (prev.totalStars || 0) + (patch.stars || 0),
@@ -5710,7 +5898,8 @@ export default function App() {
         streak,
         lastActiveDate: today,
         badges: prev.badges || [],
-        dailyLog: { ...prev.dailyLog, [today]: { ...(prev.dailyLog?.[today] || {}), ...patch } },
+        dailyLog: { ...prev.dailyLog, [today]: mergedDay },
+        sessions,
       };
 
       // Check for new badges
@@ -5734,7 +5923,7 @@ export default function App() {
   // Show onboarding if no age range selected
   if (!settings.ageRange) {
     return (
-      <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
+      <AppContext.Provider value={{ settings, updateSettings, progress, addProgress, currentScreen: screen }}>
         <div style={{
           background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
           fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
