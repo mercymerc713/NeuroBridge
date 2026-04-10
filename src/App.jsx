@@ -31,12 +31,57 @@ const darkTheme = {
 let T = lightTheme;
 
 // ─── Persistent Storage ──────────────────────────────────────────────────────
+// Profile-scoped keys live under `nb_${profileId}_${key}` so multi-child
+// profiles can share a device without stepping on each other. The active
+// profile prefix is set once at module load by ensureProfileState().
+let _profilePrefix = "";
 function loadState(key, fallback) {
-  try { const v = localStorage.getItem(`nb_${key}`); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+  try { const v = localStorage.getItem(`nb_${_profilePrefix}${key}`); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
 }
 function saveState(key, value) {
-  try { localStorage.setItem(`nb_${key}`, JSON.stringify(value)); } catch {}
+  try { localStorage.setItem(`nb_${_profilePrefix}${key}`, JSON.stringify(value)); } catch {}
 }
+// Global (device-wide) keys bypass the profile prefix: profile list itself,
+// active profile pointer, anything meant to be shared across profiles.
+function loadGlobalState(key, fallback) {
+  try { const v = localStorage.getItem(`nbg_${key}`); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+}
+function saveGlobalState(key, value) {
+  try { localStorage.setItem(`nbg_${key}`, JSON.stringify(value)); } catch {}
+}
+function genId() { return `p_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`; }
+
+// Establish a profile prefix before any useState initializer runs.
+// Migrates pre-multi-profile data (unprefixed nb_foo) into the first profile.
+function ensureProfileState() {
+  let state = loadGlobalState("profileState", null);
+  if (state && state.profiles?.length && state.activeId) {
+    _profilePrefix = `${state.activeId}_`;
+    return state;
+  }
+  // First-run — either fresh install or existing data from before profiles shipped.
+  const legacyKeys = ["settings", "progress", "habits", "boardView", "customWords", "parentLessons"];
+  const firstId = genId();
+  const hasLegacy = legacyKeys.some(k => localStorage.getItem(`nb_${k}`) != null);
+  if (hasLegacy) {
+    // Rename legacy keys into the first profile namespace.
+    legacyKeys.forEach(k => {
+      const raw = localStorage.getItem(`nb_${k}`);
+      if (raw != null) {
+        localStorage.setItem(`nb_${firstId}_${k}`, raw);
+        localStorage.removeItem(`nb_${k}`);
+      }
+    });
+  }
+  state = {
+    profiles: [{ id: firstId, name: "Me", emoji: "😊", color: "#6BA3F5" }],
+    activeId: firstId,
+  };
+  saveGlobalState("profileState", state);
+  _profilePrefix = `${firstId}_`;
+  return state;
+}
+if (typeof window !== "undefined") { ensureProfileState(); }
 
 // ─── App Context ─────────────────────────────────────────────────────────────
 const defaultSettings = {
@@ -1784,14 +1829,35 @@ function SettingsScreen({ setScreen }) {
   }, []);
 
   const ageInfo = ageRanges.find(a => a.id === settings.ageRange);
+  const profileState = loadGlobalState("profileState", { profiles: [], activeId: null });
+  const activeProfile = profileState.profiles.find(p => p.id === profileState.activeId);
 
   return (
     <div style={{ padding: "24px 20px 120px" }}>
       <Header title="⚙️ Settings" onBack={() => setScreen("home")} />
 
+      {/* Active profile + switcher */}
+      <Card onClick={() => setScreen("manage_profiles")} style={{
+        marginBottom: 16, padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+        border: `2px solid ${activeProfile?.color || T.border}`,
+        background: activeProfile ? `${activeProfile.color}10` : T.surface,
+      }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: 16, background: `${activeProfile?.color || T.soft}20`,
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26,
+        }}>{activeProfile?.emoji || "👤"}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text }}>{activeProfile?.name || "Profile"}</div>
+          <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>
+            {profileState.profiles.length} profile{profileState.profiles.length === 1 ? "" : "s"} · Tap to manage
+          </div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.soft} strokeWidth="2.5" strokeLinecap="round"><path d="M9 5l7 7-7 7"/></svg>
+      </Card>
+
       {/* Profile */}
       <Card style={{ marginBottom: 16, background: ageInfo ? `${ageInfo.color}08` : T.surface }}>
-        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 }}>👤 Profile</div>
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 14 }}>👤 Age & Content Level</div>
         <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 10 }}>Age Range</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           {ageRanges.map(ar => (
@@ -4811,6 +4877,255 @@ function ManageLessonsScreen({ lessons, onSave, onBack }) {
   );
 }
 
+// ─── Profile Manager ─────────────────────────────────────────────────────────
+const PROFILE_EMOJI_CHOICES = ["😊", "🦊", "🐻", "🦁", "🐸", "🐼", "🦉", "🐙", "🦕", "🐢", "🌟", "🚀", "🎨", "⚽", "🎵"];
+const PROFILE_COLOR_CHOICES = ["#6BA3F5", "#FF6B9D", "#9B59B6", "#3EBB6E", "#F7B731", "#FF8B5E", "#26C6DA", "#EC407A"];
+
+function exportAllData() {
+  const bundle = { version: 1, exportedAt: new Date().toISOString(), data: {} };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && (k.startsWith("nb_") || k.startsWith("nbg_"))) {
+      bundle.data[k] = localStorage.getItem(k);
+    }
+  }
+  const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const stamp = new Date().toISOString().split("T")[0];
+  a.download = `neurobridge-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importAllData(file, onDone) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const bundle = JSON.parse(reader.result);
+      if (!bundle?.data || typeof bundle.data !== "object") throw new Error("Invalid backup file");
+      // Wipe existing nb_ / nbg_ keys so import fully replaces
+      const toRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith("nb_") || k.startsWith("nbg_"))) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      // Restore from bundle
+      Object.entries(bundle.data).forEach(([k, v]) => {
+        if (typeof v === "string") localStorage.setItem(k, v);
+      });
+      onDone(null);
+    } catch (err) {
+      onDone(err);
+    }
+  };
+  reader.onerror = () => onDone(reader.error || new Error("Read failed"));
+  reader.readAsText(file);
+}
+
+function ManageProfilesScreen({ onBack }) {
+  const [profileState, setProfileState] = useState(() => loadGlobalState("profileState", { profiles: [], activeId: null }));
+  const [editingId, setEditingId] = useState(null);
+  const [name, setName] = useState("");
+  const [emoji, setEmoji] = useState(PROFILE_EMOJI_CHOICES[0]);
+  const [color, setColor] = useState(PROFILE_COLOR_CHOICES[0]);
+  const [importMsg, setImportMsg] = useState("");
+  const fileRef = useRef(null);
+
+  function persist(next) {
+    saveGlobalState("profileState", next);
+    setProfileState(next);
+  }
+
+  function startNew() {
+    setEditingId("new");
+    setName("");
+    setEmoji(PROFILE_EMOJI_CHOICES[Math.floor(Math.random() * PROFILE_EMOJI_CHOICES.length)]);
+    setColor(PROFILE_COLOR_CHOICES[Math.floor(Math.random() * PROFILE_COLOR_CHOICES.length)]);
+  }
+
+  function startEdit(p) {
+    setEditingId(p.id);
+    setName(p.name);
+    setEmoji(p.emoji);
+    setColor(p.color);
+  }
+
+  function saveEdit() {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    if (editingId === "new") {
+      const id = genId();
+      persist({ ...profileState, profiles: [...profileState.profiles, { id, name: trimmed, emoji, color }] });
+    } else {
+      persist({
+        ...profileState,
+        profiles: profileState.profiles.map(p => p.id === editingId ? { ...p, name: trimmed, emoji, color } : p),
+      });
+    }
+    setEditingId(null);
+  }
+
+  function switchTo(id) {
+    if (id === profileState.activeId) return;
+    persist({ ...profileState, activeId: id });
+    // Full reload so all useState initializers re-read the new profile's data.
+    window.location.reload();
+  }
+
+  function deleteProfile(id) {
+    if (profileState.profiles.length <= 1) return; // keep at least one
+    if (!window.confirm("Delete this profile and all their data? This cannot be undone.")) return;
+    // Wipe that profile's keys
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(`nb_${id}_`)) keysToRemove.push(k);
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    const nextProfiles = profileState.profiles.filter(p => p.id !== id);
+    const nextActive = profileState.activeId === id ? nextProfiles[0].id : profileState.activeId;
+    const nextState = { profiles: nextProfiles, activeId: nextActive };
+    saveGlobalState("profileState", nextState);
+    if (profileState.activeId === id) {
+      window.location.reload();
+    } else {
+      setProfileState(nextState);
+    }
+  }
+
+  function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!window.confirm("Import will REPLACE all current profiles and progress on this device. Continue?")) {
+      e.target.value = "";
+      return;
+    }
+    importAllData(file, err => {
+      if (err) {
+        setImportMsg("❌ Import failed: " + err.message);
+      } else {
+        setImportMsg("✅ Import complete. Reloading…");
+        setTimeout(() => window.location.reload(), 600);
+      }
+    });
+  }
+
+  if (editingId !== null) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title={editingId === "new" ? "➕ New Profile" : "✏️ Edit Profile"} onBack={() => setEditingId(null)} />
+        <Card style={{ padding: 20 }}>
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Name</div>
+          <input value={name} onChange={e => setName(e.target.value)}
+            placeholder="e.g. Mia"
+            style={{
+              width: "100%", padding: 12, borderRadius: 12, border: `1.5px solid ${T.border}`,
+              fontFamily: T.fontAlt, fontSize: 15, marginBottom: 16, boxSizing: "border-box", background: T.surface, color: T.text,
+            }} />
+
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Icon</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 16 }}>
+            {PROFILE_EMOJI_CHOICES.map(em => (
+              <button key={em} onClick={() => setEmoji(em)} style={{
+                padding: 12, borderRadius: 12,
+                border: `2px solid ${emoji === em ? color : T.border}`,
+                background: emoji === em ? `${color}15` : T.surface,
+                fontSize: 22, cursor: "pointer",
+              }}>{em}</button>
+            ))}
+          </div>
+
+          <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Color</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 20 }}>
+            {PROFILE_COLOR_CHOICES.map(c => (
+              <button key={c} onClick={() => setColor(c)} style={{
+                height: 40, borderRadius: 12,
+                border: `3px solid ${color === c ? T.text : "transparent"}`,
+                background: c, cursor: "pointer",
+              }} />
+            ))}
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <Btn color={T.soft} onClick={() => setEditingId(null)} style={{ flex: 1 }}>Cancel</Btn>
+            <Btn color={T.green} onClick={saveEdit} disabled={!name.trim()} style={{ flex: 1 }}>Save</Btn>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "24px 20px 120px" }}>
+      <Header title="👥 Profiles" onBack={onBack} />
+      <p style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, margin: "0 0 16px", lineHeight: 1.5 }}>
+        Each profile has its own age, progress, settings, and lessons. Tap to switch.
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
+        {profileState.profiles.map(p => {
+          const isActive = p.id === profileState.activeId;
+          return (
+            <Card key={p.id} style={{
+              padding: 14, display: "flex", alignItems: "center", gap: 12,
+              border: `2px solid ${isActive ? p.color : T.border}`,
+              background: isActive ? `${p.color}10` : T.surface,
+            }}>
+              <button onClick={() => switchTo(p.id)} style={{
+                flex: 1, display: "flex", alignItems: "center", gap: 12, padding: 0,
+                background: "none", border: "none", cursor: "pointer", textAlign: "left",
+              }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 16, background: `${p.color}20`,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26,
+                }}>{p.emoji}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text }}>{p.name}</div>
+                  <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: isActive ? p.color : T.soft, fontWeight: 600 }}>
+                    {isActive ? "● Active" : "Tap to switch"}
+                  </div>
+                </div>
+              </button>
+              <button onClick={() => startEdit(p)} style={{
+                padding: "6px 10px", borderRadius: 10, border: `1.5px solid ${T.blue}40`,
+                background: T.blueGlow, fontFamily: T.font, fontSize: 12, fontWeight: 700, color: T.blue, cursor: "pointer",
+              }}>Edit</button>
+              {profileState.profiles.length > 1 && (
+                <button onClick={() => deleteProfile(p.id)} style={{
+                  padding: "6px 10px", borderRadius: 10, border: `1.5px solid ${T.primary}40`,
+                  background: T.primaryGlow, fontFamily: T.font, fontSize: 12, fontWeight: 700, color: T.primary, cursor: "pointer",
+                }}>✕</button>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+
+      <Btn color={T.primary} onClick={startNew} style={{ width: "100%", marginBottom: 20 }}>+ Add Profile</Btn>
+
+      <Card style={{ padding: 16 }}>
+        <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 4 }}>📦 Backup & Restore</div>
+        <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft, marginBottom: 14, lineHeight: 1.5 }}>
+          Export everything (all profiles, progress, custom lessons, settings) to a JSON file. Import replaces all current data.
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <Btn color={T.blue} onClick={exportAllData} style={{ flex: 1 }}>⬇ Export</Btn>
+          <Btn color={T.green} onClick={() => fileRef.current?.click()} style={{ flex: 1 }}>⬆ Import</Btn>
+        </div>
+        <input ref={fileRef} type="file" accept="application/json,.json" onChange={handleFile} style={{ display: "none" }} />
+        {importMsg && (
+          <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.text, marginTop: 10, textAlign: "center" }}>{importMsg}</div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 function ReadingScreen({ setScreen }) {
   const { settings } = useApp();
   const maxLevel = getMaxLevel(settings.ageRange);
@@ -5457,6 +5772,7 @@ export default function App() {
     calm: <CalmScreen setScreen={setScreen} />,
     habits: <HabitsScreen setScreen={setScreen} />,
     settings: <SettingsScreen setScreen={setScreen} />,
+    manage_profiles: <ManageProfilesScreen onBack={() => setScreen("settings")} />,
     stories: <SocialStoriesScreen setScreen={setScreen} />,
     reading: <ReadingScreen setScreen={setScreen} />,
     emotions: <EmotionScreen setScreen={setScreen} />,
