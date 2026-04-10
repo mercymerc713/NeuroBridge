@@ -50,8 +50,31 @@ const defaultSettings = {
   fontSize: "medium",
   highContrast: false,
   hapticFeedback: true,
+  soundEffects: true,
+  voiceGuidance: true,
+  reduceMotion: false,
   darkMode: false,
 };
+
+// ─── Runtime A11y flags (synced from settings in App.jsx) ────────────────────
+// These module-level flags let helpers like speak()/playSfx()/hapticTap()
+// respect user preferences without every call site having to know the context.
+const a11y = {
+  soundEffects: true,
+  voiceGuidance: true,
+  reduceMotion: false,
+  hapticFeedback: true,
+};
+function syncA11y(s) {
+  a11y.soundEffects = s.soundEffects !== false;
+  a11y.voiceGuidance = s.voiceGuidance !== false;
+  a11y.reduceMotion = !!s.reduceMotion;
+  a11y.hapticFeedback = s.hapticFeedback !== false;
+}
+function hapticTap(ms = 10) {
+  if (!a11y.hapticFeedback) return;
+  try { navigator.vibrate && navigator.vibrate(ms); } catch {}
+}
 
 const defaultProgress = {
   totalStars: 0,
@@ -1300,6 +1323,7 @@ function findBestVoice(voices) {
 }
 
 function speak(text, settings = {}) {
+  if (!a11y.voiceGuidance) return;
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
@@ -1347,6 +1371,12 @@ function playTone(freq, start, dur, { type = "sine", gain = 0.18 } = {}) {
 
 // kind: "correct" | "wrong" | "tap" | "win"
 function playSfx(kind) {
+  if (!a11y.soundEffects) return;
+  // Light haptic cue piggybacks on SFX so every game gets it for free
+  if (kind === "correct") hapticTap(18);
+  else if (kind === "wrong") hapticTap(40);
+  else if (kind === "tap") hapticTap(8);
+  else if (kind === "win") hapticTap(60);
   const ctx = sfxCtx(); if (!ctx) return;
   if (kind === "correct") {
     // warm two-note chime: C5 → E5
@@ -1382,15 +1412,17 @@ function Btn({ children, color = T.primary, style, onClick, size = "md", disable
 }
 
 function Card({ children, style, onClick }) {
+  const rm = a11y.reduceMotion;
   return (
     <div onClick={onClick} style={{
       background: T.surface, borderRadius: T.radius, padding: 20,
       boxShadow: T.shadow, border: `1.5px solid ${T.border}`,
-      cursor: onClick ? "pointer" : "default", transition: "transform 0.12s ease", ...style,
+      cursor: onClick ? "pointer" : "default",
+      transition: rm ? "none" : "transform 0.12s ease", ...style,
     }}
-      onPointerDown={e => onClick && (e.currentTarget.style.transform = "scale(0.97)")}
-      onPointerUp={e => onClick && (e.currentTarget.style.transform = "scale(1)")}
-      onPointerLeave={e => onClick && (e.currentTarget.style.transform = "scale(1)")}
+      onPointerDown={e => { if (!onClick || rm) return; e.currentTarget.style.transform = "scale(0.97)"; }}
+      onPointerUp={e => { if (!onClick || rm) return; e.currentTarget.style.transform = "scale(1)"; }}
+      onPointerLeave={e => { if (!onClick || rm) return; e.currentTarget.style.transform = "scale(1)"; }}
     >{children}</div>
   );
 }
@@ -1422,6 +1454,7 @@ function ProgressBar({ value, max, color = T.primary, h = 10 }) {
 
 function Confetti({ active }) {
   if (!active) return null;
+  if (a11y.reduceMotion) return null;
   const colors = [T.primary, T.blue, T.purple, T.green, T.yellow, T.pink];
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 999, overflow: "hidden" }}>
@@ -1897,7 +1930,7 @@ function SettingsScreen({ setScreen }) {
           </button>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <div>
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🌙 Dark Mode</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Easier on sensitive eyes</div>
@@ -1909,6 +1942,70 @@ function SettingsScreen({ setScreen }) {
             <div style={{
               width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
               left: settings.darkMode ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🌀 Reduce Motion</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Skip confetti & animations</div>
+          </div>
+          <button onClick={() => updateSettings({ reduceMotion: !settings.reduceMotion })} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.reduceMotion ? T.blue : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.reduceMotion ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🔊 Sound Effects</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Chimes for taps & correct/wrong</div>
+          </div>
+          <button onClick={() => updateSettings({ soundEffects: !(settings.soundEffects !== false) })} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.soundEffects !== false ? T.green : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.soundEffects !== false ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🗣️ Voice Guidance</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Spoken words & instructions</div>
+          </div>
+          <button onClick={() => updateSettings({ voiceGuidance: !(settings.voiceGuidance !== false) })} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.voiceGuidance !== false ? T.primary : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.voiceGuidance !== false ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            }} />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>📳 Haptic Feedback</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Vibrate on taps (phones/tablets)</div>
+          </div>
+          <button onClick={() => { updateSettings({ hapticFeedback: !settings.hapticFeedback }); try { navigator.vibrate && navigator.vibrate(20); } catch {} }} style={{
+            width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
+            background: settings.hapticFeedback ? T.pink : T.border, position: "relative", transition: "all 0.2s ease",
+          }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 12, background: "#fff", position: "absolute", top: 3,
+              left: settings.hapticFeedback ? 25 : 3, transition: "left 0.2s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
             }} />
           </button>
         </div>
@@ -5269,6 +5366,9 @@ export default function App() {
   // Apply dark mode theme
   T = settings.darkMode ? darkTheme : lightTheme;
 
+  // Keep module-level a11y flags in sync so speak/playSfx/haptics respect prefs
+  syncA11y(settings);
+
   function updateSettings(patch) {
     setSettings(prev => {
       const next = { ...prev, ...patch };
@@ -5379,10 +5479,21 @@ export default function App() {
     .high-contrast button, .high-contrast input, .high-contrast textarea { border-width: 3px !important; }
     .high-contrast * { font-weight: 600; }
     .high-contrast h1, .high-contrast h2, .high-contrast h3 { font-weight: 900 !important; }
+    /* Reduce motion: disable all animations/transitions app-wide */
+    .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+      animation-duration: 0.001s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001s !important;
+      scroll-behavior: auto !important;
+    }
+    .reduce-motion .page-enter { animation: none !important; }
   `;
 
   const fontZoom = settings.fontSize === "small" ? 0.88 : settings.fontSize === "large" ? 1.18 : 1;
-  const rootClass = settings.highContrast ? "high-contrast" : "";
+  const rootClass = [
+    settings.highContrast ? "high-contrast" : "",
+    settings.reduceMotion ? "reduce-motion" : "",
+  ].filter(Boolean).join(" ");
 
   return (
     <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
@@ -5391,7 +5502,7 @@ export default function App() {
         maxWidth: screen === "soundboard" ? 1200 : 480,
         margin: "0 auto",
         fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
-        transition: "max-width 0.25s ease",
+        transition: settings.reduceMotion ? "none" : "max-width 0.25s ease",
         zoom: fontZoom,
       }}>
         <style>{globalCSS}</style>
