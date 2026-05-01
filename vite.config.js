@@ -34,6 +34,14 @@ export default defineConfig({
               expiration: { maxEntries: 30, maxAgeSeconds: 365 * 24 * 60 * 60 },
             },
           },
+          {
+            urlPattern: /^https:\/\/fonts\.cdnfonts\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'cdn-fonts',
+              expiration: { maxEntries: 10, maxAgeSeconds: 365 * 24 * 60 * 60 },
+            },
+          },
         ],
       },
     }),
