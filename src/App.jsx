@@ -2565,52 +2565,46 @@ function SoundboardScreen({ setScreen }) {
   );
 }
 
+// ─── GAME TIMER (rendered by App, persists across game screens) ──────────────
+function GameTimerOverlay({ onGoHome }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: T.bg, display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      <div style={{ textAlign: "center", padding: "60px 20px" }}>
+        <div style={{ fontSize: 80, marginBottom: 20 }}>⏰</div>
+        <h1 style={{ fontFamily: T.font, fontSize: 28, fontWeight: 800, color: T.text, margin: "0 0 12px" }}>Game Time is Up!</h1>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, lineHeight: 1.6, marginBottom: 24 }}>
+          Great job playing! Time to take a break and do something else.
+        </p>
+        <Btn color={T.primary} onClick={onGoHome}>Go Home</Btn>
+      </div>
+    </div>
+  );
+}
+
+function GameTimerBadge({ timeLeft }) {
+  if (timeLeft <= 0) return null;
+  const warn = timeLeft < 60;
+  return (
+    <div style={{
+      position: "fixed", top: 10, right: 10, zIndex: 999,
+      padding: "6px 12px", borderRadius: 20,
+      background: warn ? T.primaryGlow : T.surface,
+      border: `2px solid ${warn ? T.primary : T.border}`,
+      fontFamily: T.font, fontSize: 13, fontWeight: 700,
+      color: warn ? T.primary : T.soft,
+      boxShadow: T.shadow,
+    }}>
+      ⏱️ {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+    </div>
+  );
+}
+
 // ─── GAMES HUB ───────────────────────────────────────────────────────────────
 function GamesScreen({ setScreen }) {
   const { settings } = useApp();
-  const [gameTimerActive, setGameTimerActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(settings.gameTimerMinutes * 60);
-  const [timerDone, setTimerDone] = useState(false);
-  const timerRef = useRef(null);
-
-  useEffect(() => {
-    if (settings.kidsMode && settings.gameTimerMinutes > 0 && !gameTimerActive) {
-      setGameTimerActive(true);
-      setTimeLeft(settings.gameTimerMinutes * 60);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (gameTimerActive && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(t => {
-          if (t <= 1) {
-            clearInterval(timerRef.current);
-            setTimerDone(true);
-            speak("Game time is over! Time to take a break.", settings);
-            return 0;
-          }
-          return t - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [gameTimerActive]);
-
-  if (timerDone) {
-    return (
-      <div style={{ padding: "24px 20px 120px" }}>
-        <div style={{ textAlign: "center", padding: "60px 20px" }}>
-          <div style={{ fontSize: 80, marginBottom: 20 }}>⏰</div>
-          <h1 style={{ fontFamily: T.font, fontSize: 28, fontWeight: 800, color: T.text, margin: "0 0 12px" }}>Game Time is Up!</h1>
-          <p style={{ fontFamily: T.fontAlt, fontSize: 16, color: T.soft, lineHeight: 1.6, marginBottom: 24 }}>
-            Great job playing! Time to take a break and do something else.
-          </p>
-          <Btn color={T.primary} onClick={() => setScreen("home")}>Go Home</Btn>
-        </div>
-      </div>
-    );
-  }
 
   const games = [
     { id: "words", emoji: "🔤", title: "Word Match", desc: "Match pictures to words", color: T.primary, glow: T.primaryGlow },
@@ -2635,13 +2629,7 @@ function GamesScreen({ setScreen }) {
 
   return (
     <div style={{ padding: "24px 20px 120px" }}>
-      <Header title="🎮 Learning Games" onBack={() => setScreen("home")}
-        right={gameTimerActive && timeLeft > 0 ? (
-          <span style={{ fontFamily: T.font, fontSize: 14, color: timeLeft < 60 ? T.primary : T.soft, fontWeight: 700 }}>
-            ⏱️ {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
-          </span>
-        ) : null}
-      />
+      <Header title="🎮 Learning Games" onBack={() => setScreen("home")} />
       <p style={{ fontFamily: T.fontAlt, fontSize: 15, color: T.soft, margin: "0 0 20px", lineHeight: 1.6 }}>Pick a game! Take your time — no rush.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {games.map(g => (
@@ -6009,6 +5997,45 @@ export default function App() {
     }
   }, []);
 
+  // ─── Game session timer (persists across all game_* screens) ────────────
+  const isGameScreen = screen === "games" || screen.startsWith("game_");
+  const [gameTimeLeft, setGameTimeLeft] = useState(0);
+  const [gameTimerDone, setGameTimerDone] = useState(false);
+  const gameTimerRef = useRef(null);
+
+  // Start timer when entering games area; reset when leaving
+  useEffect(() => {
+    clearInterval(gameTimerRef.current);
+    if (isGameScreen && settings.gameTimerMinutes > 0 && !gameTimerDone) {
+      if (gameTimeLeft <= 0) {
+        setGameTimeLeft(settings.gameTimerMinutes * 60);
+      }
+    }
+    if (!isGameScreen) {
+      setGameTimeLeft(0);
+      setGameTimerDone(false);
+    }
+  }, [isGameScreen]);
+
+  // Tick down every second while in games area
+  useEffect(() => {
+    clearInterval(gameTimerRef.current);
+    if (isGameScreen && gameTimeLeft > 0 && !gameTimerDone) {
+      gameTimerRef.current = setInterval(() => {
+        setGameTimeLeft(t => {
+          if (t <= 1) {
+            clearInterval(gameTimerRef.current);
+            setGameTimerDone(true);
+            speak("Game time is over! Time to take a break.", settings);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(gameTimerRef.current);
+  }, [isGameScreen, gameTimeLeft > 0, gameTimerDone]);
+
   // Show onboarding if no age range selected
   if (!settings.ageRange) {
     return (
@@ -6090,7 +6117,7 @@ export default function App() {
   ].filter(Boolean).join(" ");
 
   return (
-    <AppContext.Provider value={{ settings, updateSettings, progress, addProgress }}>
+    <AppContext.Provider value={{ settings, updateSettings, progress, addProgress, currentScreen: screen }}>
       <div className={rootClass} style={{
         background: T.bg, minHeight: "100vh",
         maxWidth: screen === "soundboard" ? 1200 : 480,
@@ -6100,6 +6127,12 @@ export default function App() {
         zoom: fontZoom,
       }}>
         <style>{globalCSS}</style>
+        {isGameScreen && settings.gameTimerMinutes > 0 && !gameTimerDone && (
+          <GameTimerBadge timeLeft={gameTimeLeft} />
+        )}
+        {gameTimerDone && isGameScreen && (
+          <GameTimerOverlay onGoHome={() => { setGameTimerDone(false); setGameTimeLeft(0); setScreen("home"); }} />
+        )}
         <div key={screen} className="page-enter">
           {screens[screen] || <HomeScreen setScreen={setScreen} />}
         </div>
