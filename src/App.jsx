@@ -93,6 +93,7 @@ const defaultSettings = {
   voiceRate: 0.85,
   voicePitch: 1.0,
   fontSize: "medium",
+  fontFamily: "default",
   highContrast: false,
   hapticFeedback: true,
   soundEffects: true,
@@ -1476,7 +1477,7 @@ function Header({ title, onBack, right }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, minHeight: 40 }}>
       {onBack && (
-        <button onClick={onBack} style={{
+        <button aria-label="Go back" onClick={onBack} style={{
           width: 40, height: 40, borderRadius: 14, border: `1.5px solid ${T.border}`,
           background: T.surface, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
         }}>
@@ -1696,6 +1697,65 @@ function OnboardingScreen() {
   );
 }
 
+// ─── ONBOARDING TOUR (shown once after age selection) ────────────────────────
+const tourSlides = [
+  { emoji: "💬", title: "Talk", desc: "Use the Soundboard to build sentences and communicate. Tap words to speak, build favorites, and customize with your own vocabulary.", bg: "linear-gradient(135deg, #2563EB 0%, #60A5FA 100%)" },
+  { emoji: "🎮", title: "Learn", desc: "18 learning games — spelling, math, patterns, memory and more. Content adjusts to your age level and tracks progress over time.", bg: "linear-gradient(135deg, #7C3AED 0%, #C084FC 100%)" },
+  { emoji: "🌡️", title: "Feel", desc: "Check in with your emotions, explore coping tools, try breathing exercises, and find calm with sensory activities.", bg: "linear-gradient(135deg, #EC4899 0%, #F9A8D4 100%)" },
+  { emoji: "🏆", title: "Grow", desc: "Earn stars and badges as you play. Parents can view progress, set time limits, create custom lessons, and manage profiles.", bg: "linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%)" },
+];
+
+function OnboardingTour({ onComplete }) {
+  const [slide, setSlide] = useState(0);
+  const s = tourSlides[slide];
+  const isLast = slide === tourSlides.length - 1;
+
+  return (
+    <div style={{
+      padding: "40px 20px", minHeight: "100vh", display: "flex", flexDirection: "column",
+      justifyContent: "center", alignItems: "center",
+    }}>
+      <div style={{
+        width: "100%", maxWidth: 380, borderRadius: 28, padding: "48px 28px 36px",
+        background: s.bg, color: "#fff", textAlign: "center", position: "relative",
+        boxShadow: "0 12px 40px rgba(0,0,0,0.2)", overflow: "hidden",
+      }}>
+        <div style={{ position: "absolute", top: -20, right: -10, fontSize: 120, opacity: 0.12 }}>{s.emoji}</div>
+        <div style={{ fontSize: 72, marginBottom: 16, position: "relative", zIndex: 1 }}>{s.emoji}</div>
+        <h2 style={{ fontFamily: T.font, fontSize: 30, fontWeight: 800, margin: "0 0 12px", position: "relative", zIndex: 1 }}>{s.title}</h2>
+        <p style={{ fontFamily: T.fontAlt, fontSize: 15, lineHeight: 1.6, opacity: 0.9, margin: 0, position: "relative", zIndex: 1 }}>{s.desc}</p>
+      </div>
+
+      {/* Dots */}
+      <div style={{ display: "flex", gap: 8, marginTop: 28 }}>
+        {tourSlides.map((_, i) => (
+          <div key={i} style={{
+            width: i === slide ? 24 : 8, height: 8, borderRadius: 4,
+            background: i === slide ? T.primary : T.border,
+            transition: "all 0.2s ease",
+          }} />
+        ))}
+      </div>
+
+      {/* Nav buttons */}
+      <div style={{ display: "flex", gap: 12, marginTop: 24, width: "100%", maxWidth: 380 }}>
+        <button onClick={onComplete} style={{
+          flex: isLast ? 0 : 1, padding: "14px 20px", borderRadius: 50,
+          border: `2px solid ${T.border}`, background: T.surface,
+          fontFamily: T.font, fontSize: 15, fontWeight: 700, color: T.soft, cursor: "pointer",
+          display: isLast ? "none" : "block",
+        }}>Skip</button>
+        <Btn color={T.primary} size="md" onClick={() => {
+          if (isLast) onComplete();
+          else setSlide(s => s + 1);
+        }} style={{ flex: 1 }}>
+          {isLast ? "Let's Go!" : "Next"}
+        </Btn>
+      </div>
+    </div>
+  );
+}
+
 // ─── HOME ────────────────────────────────────────────────────────────────────
 function HomeScreen({ setScreen }) {
   const { settings, updateSettings } = useApp();
@@ -1739,7 +1799,7 @@ function HomeScreen({ setScreen }) {
               Tools built for the way <em>your</em> brain works
             </p>
           </div>
-          <button onClick={() => setScreen("settings")} style={{
+          <button aria-label="Open settings" onClick={() => setScreen("settings")} style={{
             width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.25)",
             border: "1px solid rgba(255,255,255,0.3)", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
@@ -1790,6 +1850,37 @@ function HomeScreen({ setScreen }) {
           </div>
         </Card>
       )}
+
+      {/* Jump back in: most-played games */}
+      {(() => {
+        const sessions = progress.sessions || [];
+        if (sessions.length === 0) return null;
+        const counts = {};
+        for (const s of sessions) {
+          counts[s.key] = (counts[s.key] || 0) + 1;
+        }
+        const topKeys = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4).map(e => e[0]);
+        const items = topKeys.map(k => {
+          const meta = GAME_META[`game_${k}`];
+          return meta ? { key: k, screen: `game_${k}`, label: meta.label } : null;
+        }).filter(Boolean);
+        if (items.length === 0) return null;
+        return (
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.soft, marginBottom: 8 }}>🔄 Jump Back In</div>
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+              {items.map(g => (
+                <button key={g.key} onClick={() => setScreen(g.screen)} style={{
+                  flexShrink: 0, padding: "12px 18px", borderRadius: 16,
+                  border: `2px solid ${T.primary}25`, background: T.primaryGlow,
+                  fontFamily: T.font, fontSize: 13, fontWeight: 700, color: T.primary,
+                  cursor: "pointer", whiteSpace: "nowrap",
+                }}>{g.label}</button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Feature Cards - Grid layout for top 4, then stack */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
@@ -1960,7 +2051,7 @@ function SettingsScreen({ setScreen }) {
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>Kids Mode</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Simplified UI, locked settings</div>
           </div>
-          <button onClick={() => updateSettings({ kidsMode: !settings.kidsMode })} style={{
+          <button role="switch" aria-checked={settings.kidsMode} aria-label="Kids Mode" onClick={() => updateSettings({ kidsMode: !settings.kidsMode })} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.kidsMode ? T.green : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2016,12 +2107,26 @@ function SettingsScreen({ setScreen }) {
           ))}
         </div>
 
+        <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft, marginBottom: 8 }}>Font Style</div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          {[{ id: "default", label: "Standard" }, { id: "dyslexic", label: "Dyslexia-Friendly" }].map(f => (
+            <button key={f.id} onClick={() => updateSettings({ fontFamily: f.id })} style={{
+              flex: 1, padding: "10px 8px", borderRadius: 12,
+              border: `2px solid ${(settings.fontFamily || "default") === f.id ? T.blue : T.border}`,
+              background: (settings.fontFamily || "default") === f.id ? T.blueGlow : T.surface,
+              fontFamily: f.id === "dyslexic" ? "'Open Dyslexic', sans-serif" : T.font,
+              fontSize: 13, fontWeight: 700, cursor: "pointer",
+              color: (settings.fontFamily || "default") === f.id ? T.blue : T.text,
+            }}>{f.label}</button>
+          ))}
+        </div>
+
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <div>
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>High Contrast</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Bolder colors & borders</div>
           </div>
-          <button onClick={() => updateSettings({ highContrast: !settings.highContrast })} style={{
+          <button role="switch" aria-checked={settings.highContrast} aria-label="High Contrast" onClick={() => updateSettings({ highContrast: !settings.highContrast })} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.highContrast ? T.blue : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2037,7 +2142,7 @@ function SettingsScreen({ setScreen }) {
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🌙 Dark Mode</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Easier on sensitive eyes</div>
           </div>
-          <button onClick={() => updateSettings({ darkMode: !settings.darkMode })} style={{
+          <button role="switch" aria-checked={settings.darkMode} aria-label="Dark Mode" onClick={() => updateSettings({ darkMode: !settings.darkMode })} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.darkMode ? T.purple : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2053,7 +2158,7 @@ function SettingsScreen({ setScreen }) {
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🌀 Reduce Motion</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Skip confetti & animations</div>
           </div>
-          <button onClick={() => updateSettings({ reduceMotion: !settings.reduceMotion })} style={{
+          <button role="switch" aria-checked={settings.reduceMotion} aria-label="Reduce Motion" onClick={() => updateSettings({ reduceMotion: !settings.reduceMotion })} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.reduceMotion ? T.blue : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2069,7 +2174,7 @@ function SettingsScreen({ setScreen }) {
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🔊 Sound Effects</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Chimes for taps & correct/wrong</div>
           </div>
-          <button onClick={() => updateSettings({ soundEffects: !(settings.soundEffects !== false) })} style={{
+          <button role="switch" aria-checked={settings.soundEffects !== false} aria-label="Sound Effects" onClick={() => updateSettings({ soundEffects: !(settings.soundEffects !== false) })} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.soundEffects !== false ? T.green : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2085,7 +2190,7 @@ function SettingsScreen({ setScreen }) {
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>🗣️ Voice Guidance</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Spoken words & instructions</div>
           </div>
-          <button onClick={() => updateSettings({ voiceGuidance: !(settings.voiceGuidance !== false) })} style={{
+          <button role="switch" aria-checked={settings.voiceGuidance !== false} aria-label="Voice Guidance" onClick={() => updateSettings({ voiceGuidance: !(settings.voiceGuidance !== false) })} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.voiceGuidance !== false ? T.primary : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2101,7 +2206,7 @@ function SettingsScreen({ setScreen }) {
             <div style={{ fontFamily: T.font, fontSize: 15, fontWeight: 600, color: T.text }}>📳 Haptic Feedback</div>
             <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>Vibrate on taps (phones/tablets)</div>
           </div>
-          <button onClick={() => { updateSettings({ hapticFeedback: !settings.hapticFeedback }); try { navigator.vibrate && navigator.vibrate(20); } catch {} }} style={{
+          <button role="switch" aria-checked={settings.hapticFeedback} aria-label="Haptic Feedback" onClick={() => { updateSettings({ hapticFeedback: !settings.hapticFeedback }); try { navigator.vibrate && navigator.vibrate(20); } catch {} }} style={{
             width: 52, height: 30, borderRadius: 15, border: "none", cursor: "pointer",
             background: settings.hapticFeedback ? T.pink : T.border, position: "relative", transition: "all 0.2s ease",
           }}>
@@ -2384,7 +2489,7 @@ function SoundboardScreen({ setScreen }) {
         {sentence.length === 0 ? (
           <span style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>Tap words to build a sentence...</span>
         ) : sentence.map((s, i) => (
-          <button key={i} onClick={() => removeWord(i)} style={{
+          <button key={i} aria-label={`Remove ${s.label} from sentence`} onClick={() => removeWord(i)} style={{
             background: T.blueGlow, padding: "4px 8px", borderRadius: 8, border: `1px solid ${T.blue}30`,
             fontFamily: T.font, fontSize: 12, fontWeight: 600, color: T.blue, cursor: "pointer",
             display: "flex", alignItems: "center", gap: 3,
@@ -5470,8 +5575,11 @@ function ReadingScreen({ setScreen }) {
 // ─── EMOTION METER ──────────────────────────────────────────────────────────
 function EmotionScreen({ setScreen }) {
   const { settings, addProgress } = useApp();
-  const [level, setLevel] = useState(3); // 1-5 scale
+  const [level, setLevel] = useState(3);
   const [selectedCoping, setSelectedCoping] = useState(null);
+  const [feelingsLog, setFeelingsLog] = useState(() => loadState("feelingsLog", []));
+  const [showHistory, setShowHistory] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const emotionScale = [
     { level: 1, emoji: "😢", label: "Very Upset", color: "#FF4444" },
@@ -5483,17 +5591,109 @@ function EmotionScreen({ setScreen }) {
 
   const current = emotionScale.find(e => e.level === level);
 
+  function saveCheckin() {
+    const entry = { level, ts: Date.now() };
+    const updated = [entry, ...feelingsLog].slice(0, 200);
+    setFeelingsLog(updated);
+    saveState("feelingsLog", updated);
+    setSaved(true);
+    playSfx("complete");
+    addProgress({ emotionCheckins: 1 });
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  function getLast7Days() {
+    const days = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toLocaleDateString("en-US", { weekday: "short" });
+      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      const end = start + 86400000;
+      const dayEntries = feelingsLog.filter(e => e.ts >= start && e.ts < end);
+      const avg = dayEntries.length > 0 ? dayEntries.reduce((s, e) => s + e.level, 0) / dayEntries.length : null;
+      days.push({ dayStr, avg, count: dayEntries.length });
+    }
+    return days;
+  }
+
+  const trendDays = getLast7Days();
+  const avgMood = feelingsLog.length > 0
+    ? (feelingsLog.slice(0, 30).reduce((s, e) => s + e.level, 0) / Math.min(feelingsLog.length, 30)).toFixed(1)
+    : null;
+
+  if (showHistory) {
+    return (
+      <div style={{ padding: "24px 20px 120px" }}>
+        <Header title="📊 Feelings History" onBack={() => setShowHistory(false)} />
+
+        <Card style={{ padding: 20, marginBottom: 16 }}>
+          <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 16 }}>Last 7 Days</div>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120, padding: "0 4px" }}>
+            {trendDays.map((d, i) => {
+              const barH = d.avg ? (d.avg / 5) * 100 : 0;
+              const barColor = d.avg ? emotionScale[Math.round(d.avg) - 1].color : T.border;
+              return (
+                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ fontSize: 11, fontFamily: T.fontAlt, color: T.soft }}>{d.avg ? emotionScale[Math.round(d.avg) - 1].emoji : ""}</div>
+                  <div style={{
+                    width: "100%", borderRadius: 8, background: d.avg ? `${barColor}30` : T.border + "20",
+                    height: `${Math.max(barH, 8)}%`, transition: "height 0.3s ease",
+                    border: d.avg ? `2px solid ${barColor}40` : `1px solid ${T.border}`,
+                  }} />
+                  <div style={{ fontSize: 10, fontFamily: T.fontAlt, color: T.soft, fontWeight: 600 }}>{d.dayStr}</div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {avgMood && (
+          <Card style={{ padding: 18, marginBottom: 16, display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ fontSize: 36 }}>{emotionScale[Math.round(Number(avgMood)) - 1].emoji}</div>
+            <div>
+              <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: T.text }}>Average Mood</div>
+              <div style={{ fontFamily: T.fontAlt, fontSize: 13, color: T.soft }}>{avgMood} / 5 (last 30 check-ins)</div>
+            </div>
+          </Card>
+        )}
+
+        <div style={{ fontFamily: T.font, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>Recent Check-ins</div>
+        {feelingsLog.length === 0 ? (
+          <Card style={{ padding: 24, textAlign: "center" }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>📝</div>
+            <div style={{ fontFamily: T.fontAlt, fontSize: 14, color: T.soft }}>No check-ins yet. Go back and save one!</div>
+          </Card>
+        ) : feelingsLog.slice(0, 20).map((entry, i) => {
+          const e = emotionScale[entry.level - 1];
+          const d = new Date(entry.ts);
+          const timeStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " at " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+          return (
+            <Card key={i} style={{ padding: 14, marginBottom: 8, display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ fontSize: 28 }}>{e.emoji}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: T.font, fontSize: 14, fontWeight: 700, color: e.color }}>{e.label}</div>
+                <div style={{ fontFamily: T.fontAlt, fontSize: 12, color: T.soft }}>{timeStr}</div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: "24px 20px 120px" }}>
       <Header title="🌡️ How I Feel" onBack={() => setScreen("home")} />
 
-      {/* Emotion Meter */}
       <Card style={{ textAlign: "center", padding: 28, marginBottom: 20, background: `${current.color}10`, border: `2px solid ${current.color}25` }}>
         <div style={{ fontSize: 72, marginBottom: 8, transition: "all 0.3s ease" }}>{current.emoji}</div>
         <div style={{ fontFamily: T.font, fontSize: 24, fontWeight: 800, color: current.color }}>{current.label}</div>
         <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 20 }}>
           {emotionScale.map(e => (
-            <button key={e.level} onClick={() => { setLevel(e.level); playSfx("tap"); }}
+            <button key={e.level} onClick={() => { setLevel(e.level); setSaved(false); playSfx("tap"); }}
+              aria-label={`Feeling ${e.label}`}
               style={{
                 width: 52, height: 52, borderRadius: 16, border: `3px solid ${level === e.level ? e.color : T.border}`,
                 background: level === e.level ? `${e.color}20` : T.surface,
@@ -5502,9 +5702,30 @@ function EmotionScreen({ setScreen }) {
               }}>{e.emoji}</button>
           ))}
         </div>
+        <button onClick={saveCheckin}
+          aria-label="Save how I feel"
+          style={{
+            marginTop: 18, padding: "12px 32px", borderRadius: 20, border: "none",
+            background: saved ? T.green : current.color, color: "#fff", fontFamily: T.font,
+            fontSize: 16, fontWeight: 700, cursor: "pointer", transition: "all 0.2s ease",
+          }}>
+          {saved ? "✓ Saved!" : "Save Check-in"}
+        </button>
       </Card>
 
-      {/* Coping Strategies */}
+      {feelingsLog.length > 0 && (
+        <button onClick={() => { setShowHistory(true); playSfx("tap"); }}
+          aria-label="View feelings history"
+          style={{
+            width: "100%", padding: 14, borderRadius: 16, border: `1.5px solid ${T.purple}25`,
+            background: `${T.purple}08`, cursor: "pointer", marginBottom: 20,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          }}>
+          <span style={{ fontSize: 18 }}>📊</span>
+          <span style={{ fontFamily: T.font, fontSize: 15, fontWeight: 700, color: T.purple }}>View My History ({feelingsLog.length} check-ins)</span>
+        </button>
+      )}
+
       <div style={{ fontFamily: T.font, fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 14 }}>
         {level <= 2 ? "💡 Things That Can Help" : "🌟 Keep It Going!"}
       </div>
@@ -5905,14 +6126,14 @@ function BottomNav({ screen, setScreen }) {
       padding: "6px 0 max(8px, env(safe-area-inset-bottom))", zIndex: 100,
     }}>
       {items.map(item => (
-        <button key={item.id} onClick={() => setScreen(item.id)} style={{
+        <button key={item.id} aria-label={item.label} aria-current={activeId === item.id ? "page" : undefined} onClick={() => setScreen(item.id)} style={{
           background: "none", border: "none", display: "flex", flexDirection: "column",
           alignItems: "center", gap: 2, padding: "8px 14px", cursor: "pointer",
           opacity: activeId === item.id ? 1 : 0.4,
           transform: activeId === item.id ? "scale(1.12)" : "scale(1)",
           transition: "all 0.15s ease",
         }}>
-          <span style={{ fontSize: 22 }}>{item.emoji}</span>
+          <span aria-hidden="true" style={{ fontSize: 22 }}>{item.emoji}</span>
           <span style={{ fontFamily: T.font, fontSize: 11, fontWeight: activeId === item.id ? 700 : 500, color: activeId === item.id ? T.primary : T.soft }}>{item.label}</span>
         </button>
       ))}
@@ -5926,8 +6147,12 @@ export default function App() {
   const [progress, setProgress] = useState(() => loadState("progress", defaultProgress));
   const [screen, setScreen] = useState("home");
 
-  // Apply dark mode theme
-  T = settings.darkMode ? darkTheme : lightTheme;
+  // Apply dark mode theme + font family override
+  T = settings.darkMode ? { ...darkTheme } : { ...lightTheme };
+  if (settings.fontFamily === "dyslexic") {
+    T.font = "'Open Dyslexic', sans-serif";
+    T.fontAlt = "'Open Dyslexic', sans-serif";
+  }
 
   // Keep module-level a11y flags in sync so speak/playSfx/haptics respect prefs
   syncA11y(settings);
@@ -6036,6 +6261,13 @@ export default function App() {
     return () => clearInterval(gameTimerRef.current);
   }, [isGameScreen, gameTimeLeft > 0, gameTimerDone]);
 
+  // Tour state: show once per profile after age selection
+  const [tourDone, setTourDone] = useState(() => loadState("tourDone", false));
+  function completeTour() {
+    setTourDone(true);
+    saveState("tourDone", true);
+  }
+
   // Show onboarding if no age range selected
   if (!settings.ageRange) {
     return (
@@ -6046,6 +6278,21 @@ export default function App() {
         }}>
           <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
           <div style={{ animation: "fadeIn 0.4s ease-out" }}><OnboardingScreen /></div>
+        </div>
+      </AppContext.Provider>
+    );
+  }
+
+  // Show tour once after age selection
+  if (!tourDone) {
+    return (
+      <AppContext.Provider value={{ settings, updateSettings, progress, addProgress, currentScreen: screen }}>
+        <div style={{
+          background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto",
+          fontFamily: T.fontAlt, color: T.text, position: "relative", WebkitFontSmoothing: "antialiased",
+        }}>
+          <style>{`* { box-sizing: border-box; } button { -webkit-tap-highlight-color: transparent; } ::-webkit-scrollbar { display: none; } input { outline: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+          <div style={{ animation: "fadeIn 0.4s ease-out" }}><OnboardingTour onComplete={completeTour} /></div>
         </div>
       </AppContext.Provider>
     );
