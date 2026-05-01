@@ -2227,12 +2227,45 @@ function SoundboardScreen({ setScreen }) {
   const [newWordEmoji, setNewWordEmoji] = useState("🗣️");
   const [newWordSpeech, setNewWordSpeech] = useState("");
   const [newWordCat, setNewWordCat] = useState("custom");
+  const [tapCounts, setTapCounts] = useState(() => loadState("boardTapCounts", {}));
+  const [recentTaps, setRecentTaps] = useState(() => loadState("boardRecent", []));
+  const [copiedMsg, setCopiedMsg] = useState(false);
+
+  // Index every tappable item (built-in board, built-in categories, custom)
+  // so favorites/recent can resolve a speech key back to a full item.
+  const itemIndex = {};
+  for (const col of boardColumns) for (const it of col.items) if (!itemIndex[it.speech]) itemIndex[it.speech] = { ...it, _color: col.color };
+  for (const c of aacCategories) for (const it of c.items) if (!itemIndex[it.speech]) itemIndex[it.speech] = { ...it, _color: c.color };
+  for (const it of customWords) if (!itemIndex[it.speech]) itemIndex[it.speech] = { ...it, _color: T.primary };
+
+  // Derived quick-access rows
+  const favorites = Object.entries(tapCounts)
+    .filter(([speech]) => itemIndex[speech])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([speech]) => itemIndex[speech]);
+  const recent = recentTaps
+    .filter(speech => itemIndex[speech])
+    .slice(0, 10)
+    .map(speech => itemIndex[speech]);
 
   function tapItem(item) {
     speak(item.speech, settings);
     setLastSpoken(item.label);
     setSentence(prev => [...prev, item]);
     addProgress({ wordsSpoken: 1 });
+    // Bump usage count so favorites row stays current
+    setTapCounts(prev => {
+      const next = { ...prev, [item.speech]: (prev[item.speech] || 0) + 1 };
+      saveState("boardTapCounts", next);
+      return next;
+    });
+    // Move this item to the front of recent (dedupe)
+    setRecentTaps(prev => {
+      const next = [item.speech, ...prev.filter(s => s !== item.speech)].slice(0, 24);
+      saveState("boardRecent", next);
+      return next;
+    });
     setTimeout(() => setLastSpoken(null), 600);
   }
 
@@ -2241,6 +2274,16 @@ function SoundboardScreen({ setScreen }) {
       const text = sentence.map(s => s.speech).join(" ");
       speak(text, settings);
     }
+  }
+
+  function copySentence() {
+    if (sentence.length === 0) return;
+    const text = sentence.map(s => s.speech).join(" ");
+    try {
+      navigator.clipboard?.writeText(text);
+      setCopiedMsg(true);
+      setTimeout(() => setCopiedMsg(false), 1400);
+    } catch {}
   }
 
   function removeWord(index) {
@@ -2361,8 +2404,54 @@ function SoundboardScreen({ setScreen }) {
 
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
         <Btn color={T.blue} onClick={speakSentence} style={{ flex: 1 }} disabled={sentence.length === 0} size="sm">🔊 Speak</Btn>
+        <Btn color={T.green} onClick={copySentence} disabled={sentence.length === 0} size="sm">{copiedMsg ? "✓ Copied" : "📋 Copy"}</Btn>
         <Btn color={T.soft} onClick={() => setSentence([])} disabled={sentence.length === 0} size="sm">Clear</Btn>
       </div>
+
+      {/* Favorites & Recent quick-access rows */}
+      {(favorites.length > 0 || recent.length > 0) && (
+        <div style={{ marginBottom: 12 }}>
+          {favorites.length > 0 && (
+            <div style={{ marginBottom: recent.length > 0 ? 8 : 0 }}>
+              <div style={{ fontFamily: T.font, fontSize: 11, fontWeight: 700, color: T.soft, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4, paddingLeft: 2 }}>⭐ Favorites</div>
+              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+                {favorites.map((item, i) => {
+                  const isActive = lastSpoken === item.label;
+                  return (
+                    <button key={`f-${i}`} onClick={() => tapItem(item)} style={{
+                      flexShrink: 0, padding: "10px 14px", borderRadius: 12, border: `1.5px solid ${item._color}40`,
+                      background: isActive ? item._color : T.surface, cursor: "pointer",
+                      fontFamily: T.font, fontSize: 13, fontWeight: 700,
+                      color: isActive ? "#fff" : T.text,
+                      boxShadow: isActive ? `0 3px 10px ${item._color}50` : "0 1px 3px rgba(0,0,0,0.06)",
+                      whiteSpace: "nowrap",
+                    }}>{item.label}</button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {recent.length > 0 && (
+            <div>
+              <div style={{ fontFamily: T.font, fontSize: 11, fontWeight: 700, color: T.soft, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4, paddingLeft: 2 }}>🕐 Recent</div>
+              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+                {recent.map((item, i) => {
+                  const isActive = lastSpoken === item.label;
+                  return (
+                    <button key={`r-${i}`} onClick={() => tapItem(item)} style={{
+                      flexShrink: 0, padding: "10px 14px", borderRadius: 12, border: `1.5px dashed ${item._color}40`,
+                      background: isActive ? item._color : T.surface, cursor: "pointer",
+                      fontFamily: T.font, fontSize: 13, fontWeight: 600,
+                      color: isActive ? "#fff" : T.text,
+                      whiteSpace: "nowrap",
+                    }}>{item.label}</button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ─── BOARD VIEW ─── */}
       {viewMode === "board" && (
