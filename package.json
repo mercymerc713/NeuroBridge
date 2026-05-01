@@ -7,11 +7,18 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:init": "npx cap init NeuroBridge com.neurobridge.app --web-dir dist",
+    "cap:android": "npx cap add android",
+    "cap:sync": "vite build && npx cap sync",
+    "cap:open": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
